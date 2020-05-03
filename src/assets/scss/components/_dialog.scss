@@ -1,0 +1,40 @@
+.prompt-dialog-ui{
+  position: fixed;
+  z-index: 999;
+  width: 100%;
+  top: 0;
+  left: 0;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  &--overlay{
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    z-index: 0;
+    background-color: rgba(0, 0, 0, 0.45);
+    animation: opacity .6s;
+  }
+  &--content{
+    min-width: 400px;
+    z-index: 1;
+    transition: all .3s ease;
+  }
+}
+
+// @keyframes scale{
+//   from{ transform: scale(0.7); }
+//   to{ transform: scale(1); }
+// }
+
+// @keyframes opacity{
+//   from { opacity: 0; }
+//   to { opacity: 1;  }
+// }
+
+@screen lg{
+  .prompt-dialog-ui--content{
+    @apply max-w-screen-xl;
+  }
+}

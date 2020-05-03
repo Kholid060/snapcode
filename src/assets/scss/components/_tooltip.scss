@@ -1,0 +1,12 @@
+@import '~/assets/scss/base/variables.scss';
+
+.tooltip-ui {
+  @apply rounded-md py-2 px-3 shadow-xl text-sm;
+  z-index: 88;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+}
+
+.vue-popover-theme{
+  z-index: 99;
+}

@@ -1,0 +1,56 @@
+html,
+body {
+  scroll-behavior: smooth;
+}
+body {
+  font-family: 'Inter', sans-serif;
+  @apply bg-lighter text-default;
+  &.light-theme {
+    border-color: rgba(0, 0, 0, 0.06);
+  }
+}
+
+.vue-popover-theme {
+  z-index: 99;
+}
+.mdi-icon{
+  transition: transform .2s ease;
+}
+.line-clamp {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.text-overflow {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.group:hover .group-hover\:visible {
+  visibility: visible;
+}
+.vue-popover-theme:focus{
+  outline: none;
+  div, .popover-inner{
+    outline: none;
+  }
+}
+.CodeMirror-overlayscroll-vertical div{
+  background-color: #12151b !important;
+}
+
+.scroll::-webkit-scrollbar {
+  width: 7px;
+  height: 9px;
+}
+
+.scroll::-webkit-scrollbar-thumb {
+  background: hsla(0, 0%, 100%, 0.15);
+  border-radius: 8px;
+}
+
+.scroll::-webkit-scrollbar-track {
+  background: transparent;
+}

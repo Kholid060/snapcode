@@ -1,0 +1,31 @@
+$baseColors: (
+  'primary': #0052cc,
+  'secondary': #0747a6,
+  'danger': #f56565,
+  'green': #36b37e,
+  'warning': #ffab00,
+);
+
+$lightTheme: (
+  'bg-dark': #e2e8f0,
+  'bg-default': #edf2f7,
+  'bg-lighter': #f7fafc,
+  'bg-input': rgba(0, 0, 0, 0.04),
+  'bg-input-dark': rgba(0, 0, 0, 0.07),
+  'bg-card': white,
+  'text-default': #344563,
+  'text-light': #4A5568,
+  'text-lighter': #718096,
+);
+
+$darkTheme: (
+  'bg-dark': #1a192b,
+  'bg-default': #202136,
+  'bg-lighter': #292a42,
+  'bg-input': hsla(0, 0%, 0%, 0.1),
+  'bg-input-dark': hsla(0, 0%, 0%, 0.5),
+  'bg-card': blue,
+  'text-default': white,
+  'text-light': #cacaca,
+  'text-lighter': hsla(0, 0%, 100%, 0.77),
+);

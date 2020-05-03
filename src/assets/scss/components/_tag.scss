@@ -1,0 +1,26 @@
+.tag-ui {
+  @apply px-2 border rounded text-sm;
+  line-height: 1.8rem;
+  display: inline-block;
+  cursor: pointer;
+  transition: background-color .2s ease;
+  &__content {
+    max-width: 80px;
+    display: inline-block;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    vertical-align: middle;
+  }
+  &:hover {
+    @apply bg-lighter;
+  }
+  svg {
+    height: 16px;
+    width: 16px;
+    @apply ml-2 text-light;
+    &:hover {
+      @apply text-default;
+    }
+  }
+}

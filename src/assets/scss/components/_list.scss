@@ -1,0 +1,44 @@
+@import '../base/variables';
+
+.list-ui {
+  transition: background-color 0.2s ease;
+  @apply p-3 flex items-center text-light rounded-lg;
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+  &.active-group{
+    @apply pl-4 text-default;
+    &:before{
+      @apply rounded bg-primary;
+      content: "";
+      position: absolute;
+      width: 10px;
+      height: 25px;
+      left: -5px;
+      transform: translateX(0);
+    }
+  }
+  &.router-link-exact-active, &.active{
+    @apply text-primary;
+    background-color: lighten(map-get($baseColors, primary), 55%);
+  }
+  .prefix{
+    @apply mr-3;
+    svg {
+      vertical-align: top;
+    }
+  }
+  .dense{
+    @apply p-2;
+  }
+  &:not(.router-link-exact-active):not(.active):hover{
+    @apply bg-input;
+  }
+}
+
+.list-ui-group {
+  .list-ui:not(.activator) {
+    padding-left: 3.3rem;
+    @apply mb-2;
+  }
+}

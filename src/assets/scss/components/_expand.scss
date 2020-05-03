@@ -1,0 +1,14 @@
+.expand-ui{
+  transition: box-shadow .2s ease;
+  &--header{
+    @apply flex items-center bg-lighter rounded-tl-lg rounded-tr-lg;
+    width: 100%;
+    height: 50px;
+    &:focus{
+      outline: none;
+    }
+  }
+  &--content{
+    @apply bg-lighter rounded-bl-lg rounded-br-lg;
+  }
+}
