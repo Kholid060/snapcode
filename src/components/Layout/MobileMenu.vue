@@ -35,9 +35,11 @@
           <v-mdi name="mdi-folder-outline"></v-mdi>
           <div class="z-20">
             <v-mdi
+             size="20"
              @click="renameFolder(folder)"
              name="mdi-pencil"></v-mdi>
             <v-mdi
+             size="20"
              @click="deleteFolder(folder)"
              name="mdi-delete-outline"
              class="ml-3 text-danger"></v-mdi>
