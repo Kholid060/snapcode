@@ -1,91 +1,129 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
-// import shortid from 'shortid';
-import faker from 'faker';
+import shortid from 'shortid';
 import modules from './modules';
+import db from '~/utils/db';
 
 Vue.use(Vuex);
 
 export default new Vuex.Store({
   modules,
+  state: () => ({
+    activeFile: '',
+    activeTag: '',
+    dark: true,
+    mobileMenu: false,
+  }),
   mutations: {
     changeEntityData(state, { key, data }) {
       Vue.set(state[key], 'entities', data);
     },
+    changeState(state, { key, data }) {
+      if (key === 'dark') {
+        localStorage.setItem(key, data);
+      }
+
+      Vue.set(state, key, data);
+    },
   },
   actions: {
-    retrieve({ commit }) {
-      return new Promise((resolve) => {
+    /* eslint-disable consistent-return */
+    async retrieve({ commit }) {
+      try {
+        const dark = JSON.parse(localStorage.getItem('dark'));
+        const toObject = (array, id = 'id', key = 'name') => array.reduce((obj, curr) => ({
+          [curr[id]]: {
+            name: curr[key],
+          },
+          ...obj,
+        }), {});
+        const count = await db.folders.count();
+
+        commit('changeState', {
+          key: 'dark',
+          data: dark,
+        });
+
+        if (count === 0) {
+          const folderId = shortid.generate();
+          const tagId = shortid.generate();
+          const defaultData = {
+            folders: {
+              id: folderId,
+              name: 'My Folder',
+            },
+            files: {
+              [shortid.generate()]: {
+                title: 'Hello world!!',
+                tags: [tagId],
+                content: 'console.log(\'Hello world\')',
+                star: false,
+                createDate: Date.now(),
+                folderId,
+                mode: 'text/javascript',
+              },
+            },
+            tags: {
+              id: tagId,
+              name: 'javascript',
+            },
+          };
+
+          await db.folders.put(defaultData.folders);
+          await db.files.put({
+            folderId,
+            data: defaultData.files,
+          });
+          await db.tags.put(defaultData.tags);
+
+          Object.keys(defaultData).forEach((key) => {
+            const data = defaultData[key];
+
+            commit('changeEntityData', {
+              key,
+              data: key === 'files' ? {
+                [folderId]: data,
+              } : {
+                [data.id]: data,
+              },
+            });
+          });
+
+          return { ...defaultData, dark };
+        }
+
+        const folders = await db.folders.toArray();
         commit('changeEntityData', {
           key: 'folders',
-          data: {
-            aaaa1: {
-              name: 'my project',
-              activeFile: 'aaaa1_1',
-            },
-            aaaa2: {
-              name: 'another project',
-              activeFile: '',
-            },
-          },
+          data: toObject(folders),
         });
 
-        commit('changeEntityData', {
-          key: 'tags',
-          data: {
-            aaaa1: {
-              anu1: {
-                name: 'project',
-              },
-              anu2: {
-                name: 'javascript',
-              },
-              anu3: {
-                name: 'css',
-              },
-              anu4: {
-                name: 'Vue',
-              },
-            },
-            aaaa2: {},
-          },
-        });
-
+        const files = await db.files.toArray();
         commit('changeEntityData', {
           key: 'files',
-          data: {
-            aaaa1: {
-              aaaa1_1: {
-                title: faker.random.words(),
-                tags: ['anu1', 'anu3'],
-                content: 'console.log(func())',
-                star: false,
-                createDate: Date.now(),
-                folderId: 'aaaa1',
-              },
-              aaaa1_2: {
-                title: faker.random.words(),
-                tags: ['anu2'],
-                content: 'console.log(func())',
-                star: false,
-                createDate: Date.now(),
-                folderId: 'aaaa1',
-              },
-              aaaa1_3: {
-                title: faker.random.words(),
-                tags: ['anu2', 'anu3', 'anu4'],
-                content: 'console.log(func())',
-                star: false,
-                createDate: Date.now(),
-                folderId: 'aaaa1',
-              },
+          data: files.reduce((obj, file) => ({
+            [file.folderId]: {
+              ...file.data,
             },
-            aaaa2: {},
-          },
+            ...obj,
+          }), {}),
         });
 
-        resolve();
-      });
+        const tags = await db.tags.toArray();
+        commit('changeEntityData', {
+          key: 'tags',
+          data: toObject(tags),
+        });
+
+        return {
+          folders,
+          files,
+          tags,
+          dark,
+        };
+      } catch (err) {
+        console.error(err);
+      }
     },
   },
 });

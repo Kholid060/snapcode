@@ -20,6 +20,16 @@ import '~/plugins/vue-mdijs';
 import '~/plugins/v-tooltip';
 import '~/plugins/vue-js-modal';
 
+Vue.prototype.$dark = function (dark = false) {
+  const bodyClass = document.body.classList;
+
+  if (dark) {
+    bodyClass.replace('light-theme', 'dark-theme');
+  } else {
+    bodyClass.replace('dark-theme', 'light-theme');
+  }
+};
+
 Vue.config.productionTip = false;
 
 new Vue({

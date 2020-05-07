@@ -4,6 +4,14 @@
   display: inline-block;
   cursor: pointer;
   transition: background-color .2s ease;
+  &.default {
+    @apply bg-lighter;
+  }
+  &.primary {
+    background-color: rgba(0, 82, 204, 0.2);
+    border-color: rgba(0, 82, 204, 0.7);
+    @apply text-primary;
+  }
   &__content {
     max-width: 80px;
     display: inline-block;
@@ -12,15 +20,9 @@
     overflow: hidden;
     vertical-align: middle;
   }
-  &:hover {
-    @apply bg-lighter;
-  }
   svg {
     height: 16px;
     width: 16px;
-    @apply ml-2 text-light;
-    &:hover {
-      @apply text-default;
-    }
+    @apply ml-2;
   }
 }

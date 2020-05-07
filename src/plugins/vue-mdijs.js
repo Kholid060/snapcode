@@ -6,9 +6,16 @@ import {
   mdiMagnify,
   mdiChevronDown,
   mdiStarOutline,
+  mdiStar,
   mdiDeleteOutline,
   mdiArchiveOutline,
   mdiClose,
+  mdiLabelOutline,
+  mdiFile,
+  mdiMoonWaningCrescent,
+  mdiDotsHorizontal,
+  mdiPencil,
+  mdiMenu,
 } from '@mdi/js';
 
 VMdijs.add({
@@ -17,9 +24,16 @@ VMdijs.add({
   mdiMagnify,
   mdiChevronDown,
   mdiStarOutline,
+  mdiStar,
   mdiDeleteOutline,
   mdiArchiveOutline,
   mdiClose,
+  mdiLabelOutline,
+  mdiFile,
+  mdiMoonWaningCrescent,
+  mdiDotsHorizontal,
+  mdiPencil,
+  mdiMenu,
 });
 
 Vue.use(VMdijs);

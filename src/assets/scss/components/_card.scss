@@ -14,7 +14,7 @@
   @apply rounded-lg bg-card;
   transition-duration: 200ms;
   transition-timing-function: ease;
-  transition-property: background-color, color, box-shadow, transform;
+  transition-property: background-color, color, box-shadow, transform, border;
   min-width: 200px;
   overflow: hidden;
   &.disabled {

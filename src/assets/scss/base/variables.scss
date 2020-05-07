@@ -11,11 +11,12 @@ $lightTheme: (
   'bg-default': #edf2f7,
   'bg-lighter': #f7fafc,
   'bg-input': rgba(0, 0, 0, 0.04),
-  'bg-input-dark': rgba(0, 0, 0, 0.07),
+  'bg-input-dark': rgba(0, 0, 0, 0.08),
   'bg-card': white,
   'text-default': #344563,
   'text-light': #4A5568,
   'text-lighter': #718096,
+  'border': rgba(0, 0, 0, 0.06),
 );
 
 $darkTheme: (
@@ -23,9 +24,10 @@ $darkTheme: (
   'bg-default': #202136,
   'bg-lighter': #292a42,
   'bg-input': hsla(0, 0%, 0%, 0.1),
-  'bg-input-dark': hsla(0, 0%, 0%, 0.5),
-  'bg-card': blue,
+  'bg-input-dark': hsla(0, 0%, 0%, 0.2),
+  'bg-card': #202136,
   'text-default': white,
   'text-light': #cacaca,
   'text-lighter': hsla(0, 0%, 100%, 0.77),
+  'border': rgba(255, 255, 255, 0.15),
 );

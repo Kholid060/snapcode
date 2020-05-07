@@ -5,7 +5,7 @@
      :width="360"
      height="auto"
      @before-open="modalHandler">
-      <card-ui>
+      <card-ui class="border">
         <template slot="header">
           <p class="font-semibold">
             {{ params.title }}
@@ -37,9 +37,9 @@
     <modal
       name="confirm"
       :width="360"
-      height="200px"
+      :max-height="230"
       @before-open="modalHandler">
-      <card-ui>
+      <card-ui class="border">
         <template slot="header">
           <p class="font-semibold">
             {{ params.title }}
@@ -202,6 +202,7 @@ export default {
 </script>
 <style lang="scss">
 .v--modal-box.v--modal, .vm--modal{
+  box-shadow: none !important;
   background-color: transparent !important;
 }
 </style>

@@ -1,0 +1,26 @@
+.empty-state-ui {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  &--header {
+    @apply px-5 pt-5;
+    .icon {
+      @apply bg-lighter p-5 rounded-full;
+    }
+  }
+  &--content {
+    @apply p-5;
+    p {
+      text-align: center;
+    }
+    .title {
+      @apply text-xl font-semibold;
+    }
+    .description {
+      @apply mt-1;
+    }
+  }
+  &--action {
+    @apply px-5 pb-5;
+  }
+}

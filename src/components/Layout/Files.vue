@@ -6,18 +6,26 @@
        v-model="search"
        icon="mdi-magnify"></input-ui>
      </div>
+     <p
+      v-if="files.length === 0"
+      class="py-8 text-center text-lighter font-semibold">
+        Nothing here
+      </p>
      <simplebar
       class="mt-3 pt-3 pb-6 files px-6 overflow-y-auto"
-      style="height: calc(100vh - 5rem)">
+      style="height: calc(100vh - 5rem)"
+      v-else>
        <file-card
         class="mb-3"
         v-for="file in filteredFiles"
         :key="file.id"
+        :active="activeFileId === file.id"
         :file="file"></file-card>
      </simplebar>
      <button-ui
+      v-if="showAddFileBtn"
       @click="addFile"
-      v-tooltip="'Add file'"
+      v-tooltip="'Add snippet'"
       class="shadow-xl absolute"
       round
       style="bottom: 20px; right: 20px"
@@ -32,42 +40,12 @@
 import simplebar from 'simplebar-vue';
 import 'simplebar/dist/simplebar.min.css';
 import FileCard from './Files/FileCard.vue';
-
-function sortFiles(files, key = 'createAt') {
-  return files.sort((a, b) => a[key] - b[key]);
-}
+import file from '~/mixins/file';
 
 export default {
   components: {
     FileCard, simplebar,
   },
-  data: () => ({
-    search: '',
-  }),
-  methods: {
-    addFile() {
-      this.$store.dispatch('files/insert', this.$route.params.folderId);
-    },
-  },
-  computed: {
-    files() {
-      const { folderId } = this.$route.params;
-
-      if (folderId === 'all') {
-        return sortFiles(this.$store.getters['files/getAll']);
-      }
-
-      const files = sortFiles(this.$store.getters['files/getByFolderId'](folderId));
-
-      if (folderId === 'star') {
-        return files.filter((file) => file.star);
-      }
-
-      return files;
-    },
-    filteredFiles() {
-      return this.files.filter((file) => file.title.toLowerCase().match(this.search.toLowerCase()));
-    },
-  },
+  mixins: [file],
 };
 </script>

@@ -1,5 +1,3 @@
-@import '../base/variables';
-
 .list-ui {
   transition: background-color 0.2s ease;
   @apply p-3 flex items-center text-light rounded-lg;
@@ -20,7 +18,7 @@
   }
   &.router-link-exact-active, &.active{
     @apply text-primary;
-    background-color: lighten(map-get($baseColors, primary), 55%);
+    background-color: rgba(0, 82, 204, 0.2);
   }
   .prefix{
     @apply mr-3;
@@ -40,5 +38,12 @@
   .list-ui:not(.activator) {
     padding-left: 3.3rem;
     @apply mb-2;
+  }
+}
+.dark-theme {
+  .list-ui {
+    &.router-link-exact-active, &.active {
+      @apply text-white;
+    }
   }
 }

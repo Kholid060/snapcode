@@ -5,9 +5,10 @@ body {
 body {
   font-family: 'Inter', sans-serif;
   @apply bg-lighter text-default;
-  &.light-theme {
-    border-color: rgba(0, 0, 0, 0.06);
-  }
+}
+
+* {
+  border-color: var(--border);
 }
 
 .vue-popover-theme {
