@@ -1,4 +1,8 @@
-# snapcode2
+![image](./public/image.png)
+# Snapcode - Code Snippet Manager
+
+# Demo
+[Demo](https://snapcode.now.sh/)
 
 ## Project setup
 ```
