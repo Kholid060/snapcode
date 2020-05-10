@@ -26,6 +26,7 @@
       <card-ui
        v-for="folder in folders"
        height="100px"
+       class="mr-3"
        :class="{'border border-primary': folder.id === $route.params.folderId}"
        :key="folder.id">
         <router-link
@@ -53,7 +54,7 @@
        placeholder="Search"
        v-model="search"
        icon="mdi-magnify"></input-ui>
-       <div>
+       <div class="w-6/12 ml-6" align="right">
         <v-popover placement="left" class="inline-block">
           <button-ui icon>
             <v-mdi name="mdi-label-outline"></v-mdi>
@@ -78,7 +79,7 @@
          icon type="primary"
          @click="addFile"
          v-if="showAddFileBtn"
-         class="ml-4 shadow-xl">
+         class="ml-3 shadow-xl">
           <v-mdi name="mdi-plus"></v-mdi>
         </button-ui>
       </div>

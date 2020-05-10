@@ -17,7 +17,7 @@
        :file="file"
        class="flex-auto overflow-y-auto px-4"></vue-codemirror>
       <div class="flex items-center py-1 pb-2 px-6 text-sm">
-        <v-popover>
+        <v-popover placement="top-end">
           <p class="cursor-pointer">{{ getMimeName(file.mode) }}</p>
           <card-ui class="shadow-xl border" slot="popover">
             <list-ui
@@ -39,7 +39,7 @@
       <empty-state-ui
        class="mt-10"
        icon="mdi-file"
-       title="Select file to view contet">
+       title="Select snippet to view contet">
       </empty-state-ui>
     </template>
   </div>

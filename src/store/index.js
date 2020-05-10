@@ -30,7 +30,8 @@ export default new Vuex.Store({
     /* eslint-disable consistent-return */
     async retrieve({ commit }) {
       try {
-        const dark = JSON.parse(localStorage.getItem('dark'));
+        const darkStorage = JSON.parse(localStorage.getItem('dark'));
+        const dark = darkStorage === null ? true : darkStorage;
         const toObject = (array, id = 'id', key = 'name') => array.reduce((obj, curr) => ({
           [curr[id]]: {
             name: curr[key],
@@ -41,7 +42,7 @@ export default new Vuex.Store({
 
         commit('changeState', {
           key: 'dark',
-          data: dark,
+          data: dark === null ? true : dark,
         });
 
         if (count === 0) {
@@ -122,7 +123,7 @@ export default new Vuex.Store({
           dark,
         };
       } catch (err) {
-        console.error(err);
+        return err;
       }
     },
   },

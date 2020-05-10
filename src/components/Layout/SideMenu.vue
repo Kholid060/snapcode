@@ -8,6 +8,7 @@
          v-for="list in libraryList"
          :key="list.path"
          tag="router-link"
+         :active="$route.params.folderId === list.path"
          class="mb-2 capitalize"
          :to="`/${list.path}`">
           <v-mdi
@@ -16,7 +17,7 @@
           {{ list.name }}
         </list-ui>
       </div>
-      <div class="mt-6">
+      <div class="mt-8">
         <div class="flex items-center justify-between">
           <span class="align-middle">Folders</span>
           <button-ui icon small
@@ -58,7 +59,7 @@
           </list-ui>
         </div>
       </div>
-      <div class="tags mt-6">
+      <div class="tags mt-8">
         <div class="flex items-center mb-4 justify-between">
           <span class="align-middle">Tags</span>
           <button-ui icon small

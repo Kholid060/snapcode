@@ -22,27 +22,31 @@
        v-if="fileTags.length < 5"
        @focus="openPopover = true"
        @blur="openPopover = false">
-      <card-ui slot="popover" class="shadow-xl border">
-        <p
-         v-if="availableTags.length === 0 && !search"
-         class="text-lighter text-center">No tags</p>
-        <list-ui
-         @click="addNewTag"
-         v-else-if="filteredTags.length === 0">
-          <p>
-            Add <b>{{ search }}</b> as a tag
-          </p>
-        </list-ui>
-        <template v-else>
-          <list-ui
-           dense
-           v-for="tag in filteredTags"
-           :key="tag.id"
-           @click="addFileTag(tag.id)">
-            {{ tag.name }}
-          </list-ui>
+        <template slot="popover">
+          <card-ui
+           style="max-height: 400px"
+           class="shadow-xl border overflow-y-auto">
+            <p
+             v-if="availableTags.length === 0 && !search"
+             class="text-lighter text-center">No tags</p>
+            <list-ui
+             @click="addNewTag"
+             v-else-if="filteredTags.length === 0">
+              <p>
+                Add <b>{{ search }}</b> as a tag
+              </p>
+            </list-ui>
+            <template v-else>
+              <list-ui
+               dense
+               v-for="tag in filteredTags"
+               :key="tag.id"
+               @click="addFileTag(tag.id)">
+                {{ tag.name }}
+              </list-ui>
+            </template>
+          </card-ui>
         </template>
-      </card-ui>
     </v-popover>
   </div>
 </template>
