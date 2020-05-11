@@ -89,5 +89,8 @@ export default {
       word-break: break-word;
     }
   }
+  .CodeMirror-gutters{
+    background-color: transparent !important;
+  }
 }
 </style>
