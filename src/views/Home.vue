@@ -39,7 +39,7 @@
       <empty-state-ui
        class="mt-10"
        icon="mdi-file"
-       title="Select snippet to view contet">
+       title="Select snippet to view content">
       </empty-state-ui>
     </template>
   </div>
