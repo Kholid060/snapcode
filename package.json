@@ -12,6 +12,8 @@
     "core-js": "^3.6.4",
     "dayjs": "^1.8.26",
     "dexie": "^3.0.0",
+    "dexie-export-import": "^1.0.0-rc.2",
+    "downloadjs": "^1.4.7",
     "faker": "^4.1.0",
     "lodash.camelcase": "^4.3.0",
     "lodash.debounce": "^4.0.8",
