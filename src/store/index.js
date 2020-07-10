@@ -1,8 +1,9 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
-import shortid from 'shortid';
 import modules from './modules';
 import db from '~/utils/db';
+
+import customData from '~/data.json';
 
 Vue.use(Vuex);
 
@@ -46,29 +47,8 @@ export default new Vuex.Store({
         });
 
         if (count === 0) {
-          const folderId = shortid.generate();
-          const tagId = shortid.generate();
-          const defaultData = {
-            folders: {
-              id: folderId,
-              name: 'My Folder',
-            },
-            files: {
-              [shortid.generate()]: {
-                title: 'Hello world!!',
-                tags: [tagId],
-                content: 'console.log(\'Hello world\')',
-                star: false,
-                createDate: Date.now(),
-                folderId,
-                mode: 'text/javascript',
-              },
-            },
-            tags: {
-              id: tagId,
-              name: 'javascript',
-            },
-          };
+          const folderId = 1;
+          const defaultData = customData;
 
           await db.folders.put(defaultData.folders);
           await db.files.put({

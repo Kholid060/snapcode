@@ -1,0 +1,34 @@
+{
+  "folders": {
+    "id": 1,
+    "name": "My Folder"
+  },
+  "files": {
+    "6SMgy6slg": {
+      "title": "FUCK!!",
+      "tags": [
+        1
+      ],
+      "content": "console.log('Hello Hell')",
+      "star": false,
+      "createDate": 1594385401712,
+      "folderId": 1,
+      "mode": "text/javascript"
+    },
+    "lIJY_9U1BD": {
+      "title": "Daymn!!",
+      "tags": [
+        1
+      ],
+      "content": "console.log('Hello world')",
+      "star": false,
+      "createDate": 1594385401712,
+      "folderId": 1,
+      "mode": "text/javascript"
+    }
+  },
+  "tags": {
+    "id": 1,
+    "name": "javascript"
+  }
+}
