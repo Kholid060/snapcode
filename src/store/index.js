@@ -2,8 +2,7 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import modules from './modules';
 import db from '~/utils/db';
-
-import defaultData from '~/data.json';
+import importdb from '~/utils/dbImport';
 
 Vue.use(Vuex);
 
@@ -47,28 +46,7 @@ export default new Vuex.Store({
         });
 
         if (count === 0) {
-          const folderId = 1;
-
-          await db.folders.put(defaultData.folders);
-          await db.files.put({
-            folderId,
-            data: defaultData.files,
-          });
-          await db.tags.put(defaultData.tags);
-
-          Object.keys(defaultData).forEach((key) => {
-            const data = defaultData[key];
-
-            commit('changeEntityData', {
-              key,
-              data: key === 'files' ? {
-                [folderId]: data,
-              } : {
-                [data.id]: data,
-              },
-            });
-          });
-          return { ...defaultData, dark };
+          importdb();
         }
 
         const folders = await db.folders.toArray();

@@ -16,6 +16,7 @@ import {
   mdiDotsHorizontal,
   mdiPencil,
   mdiMenu,
+  mdiArrowCollapseDown,
 } from '@mdi/js';
 
 VMdijs.add({
@@ -34,6 +35,7 @@ VMdijs.add({
   mdiDotsHorizontal,
   mdiPencil,
   mdiMenu,
+  mdiArrowCollapseDown,
 });
 
 Vue.use(VMdijs);

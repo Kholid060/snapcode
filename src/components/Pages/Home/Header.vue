@@ -55,9 +55,20 @@
        size="20"
        name="mdi-moon-waning-crescent"></v-mdi>
     </button-ui>
+    <button-ui
+      @click="download"
+      icon class="mx-3"
+      v-tooltip="{ content: 'Download DB', placement: 'left' }">
+      <v-mdi
+        class="icon-white"
+        name="mdi-arrow-collapse-down"
+        size="20"></v-mdi>
+    </button-ui>
   </div>
 </template>
 <script>
+import dldb from '~/utils/dbSave';
+
 export default {
   props: {
     file: Object,
@@ -104,6 +115,9 @@ export default {
         data: currentTheme,
       });
       this.$dark(currentTheme);
+    },
+    download() {
+      dldb();
     },
     deleteFile() {
       this.$store.dispatch('files/delete', {

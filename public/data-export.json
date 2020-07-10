@@ -18,7 +18,7 @@
       {
         "name": "tags",
         "schema": "id,name",
-        "rowCount": 1
+        "rowCount": 3
       }
     ],
     "data": [{
@@ -40,7 +40,7 @@
             "6SMgy6slg": {
               "title": "FUCK!!",
               "tags": [
-                1
+                "1"
               ],
               "content": "console.log('Hello Hell')",
               "star": false,
@@ -51,7 +51,7 @@
             "lIJY_9U1BD": {
               "title": "Daymn!!",
               "tags": [
-                1
+                "1"
               ],
               "content": "console.log('Hello world')",
               "star": false,
