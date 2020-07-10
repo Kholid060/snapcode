@@ -3,7 +3,7 @@ import Vuex from 'vuex';
 import modules from './modules';
 import db from '~/utils/db';
 
-import customData from '~/data.json';
+import defaultData from '~/data.json';
 
 Vue.use(Vuex);
 
@@ -48,7 +48,6 @@ export default new Vuex.Store({
 
         if (count === 0) {
           const folderId = 1;
-          const defaultData = customData;
 
           await db.folders.put(defaultData.folders);
           await db.files.put({
@@ -69,7 +68,6 @@ export default new Vuex.Store({
               },
             });
           });
-
           return { ...defaultData, dark };
         }
 

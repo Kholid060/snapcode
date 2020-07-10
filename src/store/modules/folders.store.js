@@ -1,6 +1,5 @@
 import Vue from 'vue';
 import shortid from 'shortid';
-import dldb from '~/utils/dbSave';
 import db from '~/utils/db';
 import toArray from '../../utils/toArray';
 
@@ -18,7 +17,6 @@ export default {
         name,
       });
       db.folders.add({ id, name });
-      dldb(db);
     },
     updateFolder(state, { folderId, data }) {
       Vue.set(state.entities, folderId, data);

@@ -34,6 +34,8 @@
          Line {{ cursor.line + 1 }}, Column {{ cursor.column + 1 }}
         </span>
       </div>
+      <load/>
+      <download/>
     </template>
     <template v-else>
       <empty-state-ui
@@ -41,6 +43,8 @@
        icon="mdi-file"
        title="Select snippet to view content">
       </empty-state-ui>
+      <load/>
+      <download/>
     </template>
   </div>
 </template>
@@ -49,9 +53,17 @@
 import HomeHeader from '~/components/Pages/Home/Header.vue';
 import FileTags from '~/components/Pages/Home/FileTags.vue';
 import VueCodemirror from '~/components/Pages/Home/VueCodemirror.vue';
+import Download from '~/components/download.vue';
+import Load from '~/components/load.vue';
 
 export default {
-  components: { HomeHeader, FileTags, VueCodemirror },
+  components: {
+    HomeHeader,
+    FileTags,
+    VueCodemirror,
+    Download,
+    Load,
+  },
   name: 'Home',
   data: () => ({
     modes: [

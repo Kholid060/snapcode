@@ -1,0 +1,84 @@
+{
+  "formatName": "dexie",
+  "formatVersion": 1,
+  "data": {
+    "databaseName": "snapcode",
+    "databaseVersion": 1,
+    "tables": [
+      {
+        "name": "folders",
+        "schema": "id,name",
+        "rowCount": 1
+      },
+      {
+        "name": "files",
+        "schema": "folderId,data",
+        "rowCount": 1
+      },
+      {
+        "name": "tags",
+        "schema": "id,name",
+        "rowCount": 1
+      }
+    ],
+    "data": [{
+      "tableName": "folders",
+      "inbound": true,
+      "rows": [
+        {
+          "id": 1,
+          "name": "My Folder"
+        }
+      ]
+    },{
+      "tableName": "files",
+      "inbound": true,
+      "rows": [
+        {
+          "folderId": 1,
+          "data": {
+            "6SMgy6slg": {
+              "title": "FUCK!!",
+              "tags": [
+                1
+              ],
+              "content": "console.log('Hello Hell')",
+              "star": false,
+              "createDate": 1594385401712,
+              "folderId": 1,
+              "mode": "text/javascript"
+            },
+            "lIJY_9U1BD": {
+              "title": "Daymn!!",
+              "tags": [
+                1
+              ],
+              "content": "console.log('Hello world')",
+              "star": false,
+              "createDate": 1594385401712,
+              "folderId": 1,
+              "mode": "text/javascript"
+            }
+          }
+        }
+      ]
+    },{
+      "tableName": "tags",
+      "inbound": true,
+      "rows": [
+        {
+          "id": 1,
+          "name": "javascript"
+        },
+        {
+          "id": 2,
+          "name": "test"
+        },
+        {
+          "id": 3,
+          "name": "dwxs"
+        }
+      ]
+    }]
+  }
+}
