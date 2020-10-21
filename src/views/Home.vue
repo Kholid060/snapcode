@@ -1,94 +1,46 @@
 <template>
-  <div
-   class="home flex h-full flex-col">
-    <div class="pt-3 lg:pt-6 pb-3 px-6">
-      <home-header
-       :file="file"
-       :hide="!isFileActive"></home-header>
-      <file-tags
-       v-if="isFileActive"
-       :folder-id="file.folderId"
-       :file-id="file.id"
-       :tags="file.tags"></file-tags>
-    </div>
-    <template v-if="isFileActive">
-      <vue-codemirror
-       @cursorPosition="cursor = $event"
-       :file="file"
-       class="flex-auto overflow-y-auto px-4"></vue-codemirror>
-      <div class="flex items-center py-1 pb-2 px-6 text-sm">
-        <v-popover placement="top-end">
-          <p class="cursor-pointer">{{ getMimeName(file.mode) }}</p>
-          <card-ui class="shadow-xl border" slot="popover">
-            <list-ui
-             v-for="mode in modes"
-             :key="mode.mime"
-             :active="mode.mime === file.mode"
-             class="mb-2"
-             v-close-popover
-             @click="changeMode(mode.mime)">{{ mode.name }}</list-ui>
-          </card-ui>
-        </v-popover>
-        <div class="flex-grow"></div>
-        <span>
-         Line {{ cursor.line + 1 }}, Column {{ cursor.column + 1 }}
-        </span>
+  <div class="home flex">
+  	<home-sidebar class="w-64"></home-sidebar>
+    <div class="flex-1 grid grid-cols-10 h-screen" style="grid-template-rows: auto 1fr;">
+      <nav class="h-16 px-5 border-b flex items-center justify-between col-span-full">
+        <div class="search-container">
+          <icon-ui name="search" class="text-lighter mr-2"></icon-ui>
+          <input type="text" placeholder="Search..." class="h-full bg-transparent">
+        </div>
+        <button-ui icon>
+          <icon-ui name="moon"></icon-ui>
+        </button-ui>
+      </nav>
+    	<div class="p-5 col-span-3 border-r overflow-auto scroll">
+       <folders></folders>
       </div>
-    </template>
-    <template v-else>
-      <empty-state-ui
-       class="mt-10"
-       icon="mdi-file"
-       title="Select snippet to view content">
-      </empty-state-ui>
-    </template>
+      <div class="code p-5 col-span-7 overflow-auto space-y-2 scroll">
+      	<file-card v-model:file="file"></file-card>
+        <file-card v-model:file="file"></file-card>
+      </div>
+    </div>
   </div>
 </template>
-
 <script>
-import HomeHeader from '~/components/Pages/Home/Header.vue';
-import FileTags from '~/components/Pages/Home/FileTags.vue';
-import VueCodemirror from '~/components/Pages/Home/VueCodemirror.vue';
+import { ref } from 'vue';
+import HomeSidebar from '../components/pages/home/HomeSidebar.vue';
+import FileCard from '../components/pages/home/FileCard.vue';
+import Folders from '../components/pages/home/Folders.vue';
 
 export default {
-  components: { HomeHeader, FileTags, VueCodemirror },
-  name: 'Home',
-  data: () => ({
-    modes: [
-      { name: 'HTML', mime: 'text/html' },
-      { name: 'CSS', mime: 'text/css' },
-      { name: 'JavaScript', mime: 'text/javascript' },
-      { name: 'Vue.js', mime: 'text/x-vue' },
-    ],
-    cursor: {
-      line: 1,
-      column: 1,
-    },
-  }),
-  methods: {
-    changeMode(mode) {
-      this.$store.dispatch('files/update', {
-        fileId: this.file.id,
-        folderId: this.file.folderId,
-        data: {
-          mode,
-        },
-      });
-    },
-    getMimeName(mime) {
-      return this.modes.find((mode) => mode.mime === mime).name;
-    },
-  },
-  computed: {
-    isFileActive() {
-      return this.$store.state.activeFile !== '';
-    },
-    file() {
-      return this.$store.getters['files/activeFile'];
-    },
-  },
-  mounted() {
-    // const { CodeMirror } = document.querySelector('.CodeMirror');
+  components: { HomeSidebar, FileCard, Folders },
+  setup() {
+    const file = ref({
+      id: 'ahdoahd',
+      name: 'some-code',
+      language: 'javascript',
+      code: 'const ulala',
+      shared: false,
+    });
+
+    return {
+      file,
+    };
   },
 };
 </script>

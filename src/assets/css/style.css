@@ -1,0 +1,36 @@
+html,
+body {
+  scroll-behavior: smooth;
+}
+
+.line-clamp {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.text-overflow {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.scroll::-webkit-scrollbar {
+  width: 7px;
+  height: 9px;
+}
+
+.scroll::-webkit-scrollbar-thumb {
+  @apply bg-input-dark;
+  border-radius: 8px;
+}
+
+.scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.popover-ui {
+  z-index: 9999;
+}
