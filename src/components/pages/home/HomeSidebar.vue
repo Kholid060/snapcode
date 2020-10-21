@@ -13,7 +13,7 @@
 					<template #prepend>
 						<icon-ui name="star"></icon-ui>
 					</template>
-					Favorites
+					Starred
 				</list-item-ui>
 			</list-ui>
 		</div>
@@ -27,11 +27,11 @@
 				></icon-ui>
 			</div>
 			<list-ui>
-				<list-item-ui small v-for="i in 15" :key="i">
+				<list-item-ui small v-for="i in 4" :key="i">
 					<template #prepend>
 						<div class="h-3 w-3 rounded-lg bg-primary"></div>
 					</template>
-					what
+					tag {{ i }}
 				</list-item-ui>
 			</list-ui>
 		</div>

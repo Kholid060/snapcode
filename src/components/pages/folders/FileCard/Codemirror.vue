@@ -21,6 +21,7 @@ import 'codemirror/lib/codemirror.css';
 import '~/assets/css/themes/one-dark.css';
 
 export default {
+  emits: ['change', 'update:modelValue'],
   props: {
     modelValue: {
       type: String,
@@ -31,7 +32,7 @@ export default {
     	default: () => ({}),
     },
   },
-  setup(props) {
+  setup(props, { emit }) {
   	const editor = shallowRef(null);
   	const container = ref(null);
   	
@@ -49,14 +50,27 @@ export default {
 			  line: true,
 			  ...props.options,
   		});
+
+      editor.value.on('change', (cm) => {
+        const value = cm.getValue();
+
+        emit('update:modelValue', value);
+        emit('change', value);
+      });
   	});
 
     watch(() => props.options, (options) => {
       Object.keys(options).forEach((key) => {
         editor.value.setOption(key, options[key]);
       });
-      console.log(editor.value);
     }, { deep: true });
+    watch(() => props.modelValue, (newValue) => {
+      const currentValue = editor.value.getValue();
+
+      if (newValue !== currentValue) {
+        editor.value.setValue(newValue);
+      }
+    });
 
   	return {
   		container,
