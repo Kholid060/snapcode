@@ -1,17 +1,14 @@
 export default {
   javascript: { 
   	ext: 'js',
-  	icon: 'mdiLanguageJavascript',
     mode: 'text/javascript',
   },
   html: {
   	ext: 'html',
-  	icon: 'mdiLanguageHtml5', 
-    mode: 'text/html',
+    mode: 'htmlmixed',
   },
   css: {
   	ext: 'css',
-  	icon: 'mdiLanguageJavascript',
-    mode: 'text/javascript',
+    mode: 'text/css',
   },
 };

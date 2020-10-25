@@ -1,6 +1,6 @@
 import { createRouter, createWebHashHistory } from 'vue-router';
 import Home from '../views/Home.vue';
-import Folder from '../views/Folder.vue';
+import View from '../views/View.vue';
 
 const routes = [
   {
@@ -8,11 +8,11 @@ const routes = [
     name: 'home',
     component: Home,
     children: [
-    	{
-    		path: 'folder/:folderId',
-    		name: 'folder',
-    		component: Folder,
-    	},
+      {
+        path: 'view/:fileId',
+        name: 'view',
+        component: View,
+      },
     ],
   },
 ];

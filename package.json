@@ -9,16 +9,16 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "@mdi/js": "^5.1.45",
     "@vuex-orm/core": "^0.36.3",
+    "@vuex-orm/plugin-search": "^0.24.1",
     "codemirror": "^5.58.1",
     "comps-ui": "../components/packages/components-ui",
     "dayjs": "^1.8.26",
-    "dexie": "^3.0.0",
     "lodash.debounce": "^4.0.8",
+    "nanoid": "^3.1.15",
     "register-service-worker": "^1.6.2",
     "switch-theme": "^0.2.0",
-    "uuid": "^8.3.1",
+    "tiny-emitter": "^2.1.0",
     "vue": "^3.0.1",
     "vue-codemirror": "^4.0.6",
     "vue-router": "^4.0.0-beta.13",
@@ -38,8 +38,6 @@
     "eslint-plugin-import": "^2.20.1",
     "eslint-plugin-vue": "^6.1.2",
     "lint-staged": "^9.5.0",
-    "node-sass": "^4.12.0",
-    "sass-loader": "^8.0.2",
     "vue-cli-plugin-tailwind": "~1.5.0",
     "vue-template-compiler": "^2.6.11"
   },

@@ -1,6 +1,6 @@
 <template>
   <div class="codemirror">
-    <div ref="container"></div>
+    <div ref="container" class="h-full"></div>
   </div>
 </template>
 <script>
@@ -21,7 +21,7 @@ import 'codemirror/lib/codemirror.css';
 import '~/assets/css/themes/one-dark.css';
 
 export default {
-  emits: ['change', 'update:modelValue'],
+  emits: ['change', 'update:modelValue', 'cursorActivity'],
   props: {
     modelValue: {
       type: String,
@@ -57,6 +57,12 @@ export default {
         emit('update:modelValue', value);
         emit('change', value);
       });
+
+      editor.value.on('cursorActivity', (event) => {
+        const { line, ch: column } = event.doc.getCursor();
+
+        emit('cursorActivity', { line, column });
+      });
   	});
 
     watch(() => props.options, (options) => {
@@ -80,6 +86,7 @@ export default {
 </script>
 <style>
 .CodeMirror {
+  height: 100%;
 	font-family: 'Fira Code', Menlo, Consolas, 'DejaVu Sans Mono', monospace;
 }
 </style>

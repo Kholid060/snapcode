@@ -17,5 +17,6 @@ module.exports = {
     'no-mixed-spaces-and-tabs': 0,
     'no-trailing-spaces': 0,
     'vue/valid-v-model': 0,
+    'max-len': 0,
   },
 };

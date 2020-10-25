@@ -1,5 +1,5 @@
 import { Model } from '@vuex-orm/core';
-import { v4 as uuid } from 'uuid';
+import { nanoid } from 'nanoid';
 
 class File extends Model {
 	static entity = 'files'
@@ -8,12 +8,13 @@ class File extends Model {
 
 	static fields() {
 	  return {
-	    id: this.uid(() => uuid()),
+	    id: this.uid(() => nanoid()),
 	    folderId: this.attr(null),
 	    name: this.string('my code'),
 	    language: this.string('javascript'),
 	    code: this.string(''),
 	    starred: this.boolean(false),
+	    createdAt: this.number(Date.now()),
 	    isShared: this.boolean(false),
 	  };
 	}

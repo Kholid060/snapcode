@@ -9,6 +9,15 @@ Object.keys(models).forEach((name) => {
 
 const store = createStore({
   plugins: [VuexORM.install(database)],
+  state: () => ({
+  	searchQuery: '',
+    filterBy: 'all',
+  }),
+  mutations: {
+  	updateState(state, { key, value }) {
+  		state[key] = value;
+  	},
+  },
 });
 
 export default store;
