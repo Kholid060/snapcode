@@ -53,7 +53,7 @@
 			  				v-if="snippet.isShared"
 			  			></icon-ui>
 			  			<a 
-			  				class="leading-tight text-overflow flex-1 pr-2"
+			  				class="leading-tight text-overflow flex-1 pr-2 focus:text-primary"
 			  				v-bind="{ href }"
 			  				@click="navigate"
 			  			>{{ snippet.name }}</a>
@@ -79,13 +79,16 @@
 import { computed, shallowReactive } from 'vue';
 import { useStore } from 'vuex';
 import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
 import { File } from '~/models';
+
+dayjs.extend(relativeTime);
 
 export default {
   setup() {
   	const sort = shallowReactive({
   		by: 'createdAt',
-  		type: 'asc',
+  		type: 'desc',
   	});
   	const sortOptions = ['createdAt', 'name', 'language'];
   	const store = useStore();
@@ -111,10 +114,15 @@ export default {
   		});
   	}
   	function addFile() {
-  		console.log('ulala');
+  		File.insert({
+  			data: {
+  				name: 'untitled snippet',
+  				folderId: store.state.filterBy,
+  			},
+  		});
   	}
   	function formatTime(time) {
-  		return dayjs(time).format('DD MMMM');
+  		return dayjs(time).fromNow();
   	}
 
   	return {

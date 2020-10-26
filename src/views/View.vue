@@ -1,19 +1,31 @@
 <template>
-	<div class="h-full snippet relative flex flex-col">
-		<div class="pt-3 pb-4 px-5 flex items-center justify-between">
-			<div>
-				<input type="text" :value="file.name" class="bg-transparent font-semibold text-lg">
-				<p class="text-lighter text-sm">Created at: 8 minutes ago</p>
+	<div class="h-full snippet relative flex flex-col" v-if="file">
+		<expand-transition>
+			<div class="pt-3 px-5 flex items-center justify-between" v-if="!state.isEditorFocused">
+				<div>
+					<input 
+						type="text" 
+						:value="file.name" 
+						class="bg-transparent text-lg"
+						@change="updateFile({ name: $event.target.value })"
+					/>
+					<p class="text-lighter text-sm">
+						Created at: {{ createdDate }}
+					</p>
+				</div>
+				<file-buttons-group
+					v-bind="{ file }"
+					@change="updateFile"
+				></file-buttons-group>
 			</div>
-			<file-buttons-group
-				v-bind="{ file }"
-				@change="updateFile"
-			></file-buttons-group>
-		</div>
+		</expand-transition>
 		<codemirror
-			class="flex-1 overflow-auto scroll" 
+			class="flex-1 overflow-auto scroll mt-2" 
 			:model-value="file.code"
+			@change="updateFile({ code: $event })"
 			@cursor-activity="state.cursorPosition = $event"
+			@focus="state.isEditorFocused = true"
+			@blur="state.isEditorFocused = false"
 			:options="state.cmOptions"
 		></codemirror>
 		<div class="px-5 text-sm text-lighter py-2">
@@ -44,6 +56,7 @@
 <script>
 import { computed, reactive, watch } from 'vue';
 import { useRoute } from 'vue-router';
+import dayjs from 'dayjs';
 import { File } from '~/models';
 import languages from '~/utils/languages';
 import Codemirror from '~/components/pages/view/Codemirror.vue';
@@ -54,8 +67,10 @@ export default {
   setup() {
   	const route = useRoute();
   	const fileId = computed(() => route.params.fileId);
-  	const file = computed(() => File.find(fileId.value) || {});  		
+  	const file = computed(() => File.find(fileId.value) || false);  		
+  	const createdDate = computed(() => dayjs(file.createdDate).format('DD MMMM YYYY'));
   	const state = reactive({
+  		isEditorFocused: false,
   		cmOptions: {
   			mode: 'text/javascript',
   		},
@@ -85,6 +100,7 @@ export default {
   		state,
   		languages,
   		updateFile,
+  		createdDate,
   		updateFileLanguage,
   	};
   },

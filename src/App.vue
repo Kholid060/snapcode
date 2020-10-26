@@ -17,12 +17,13 @@ export default {
   					id: 'bla123',
 	  				name: 'some code',
 	  				code: 'const code = false',
-	  				createdAt: Date.now() - 18000,
+	  				createdAt: 1603678803621,
 	  				isShared: true,
 	  			},
 	  			{
 	  				name: 'vuex',
 	  				code: 'function test',
+	  				createdAt: 1603678481495,
 	  				starred: true,
 	  			},
 	  			{

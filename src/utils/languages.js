@@ -11,4 +11,8 @@ export default {
   	ext: 'css',
     mode: 'text/css',
   },
+  vue: {
+    ext: 'vue',
+    mode: 'text/x-vue',
+  },
 };

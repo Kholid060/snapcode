@@ -54,6 +54,7 @@
 import { onMounted } from 'vue';
 import { useGroupTooltip } from 'comps-ui';
 import { File } from '~/models';
+import copyToClipboard from '~/utils/copyToClipboard';
 
 export default {
   props: {
@@ -68,11 +69,10 @@ export default {
       document.execCommand('copy');
     }
     function copyCode() {
-      const codemirrorEl = document.querySelector('.CodeMirror');
-      /* eslint-disable-next-line */
-      codemirrorEl && codemirrorEl.CodeMirror.getInputField().select();
+      const cmContainer = document.querySelector('.CodeMirror');
+      const code = cmContainer.CodeMirror.getValue();
 
-      document.execCommand('copy');
+      copyToClipboard(code);
     }
 
     onMounted(() => {

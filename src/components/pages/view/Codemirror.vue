@@ -15,13 +15,14 @@ import Codemirror from 'codemirror';
 import 'codemirror/mode/javascript/javascript';
 import 'codemirror/mode/css/css';
 import 'codemirror/mode/htmlmixed/htmlmixed';
+import 'codemirror/mode/vue/vue';
 import 'codemirror/keymap/sublime';
 import 'codemirror/addon/edit/closebrackets';
 import 'codemirror/lib/codemirror.css';
 import '~/assets/css/themes/one-dark.css';
 
 export default {
-  emits: ['change', 'update:modelValue', 'cursorActivity'],
+  emits: ['change', 'update:modelValue', 'cursorActivity', 'focus', 'blur'],
   props: {
     modelValue: {
       type: String,
@@ -62,6 +63,16 @@ export default {
         const { line, ch: column } = event.doc.getCursor();
 
         emit('cursorActivity', { line, column });
+      });
+
+      ['focus', 'blur'].forEach((evtName) => {
+        editor.value.on(evtName, (event) => {
+          emit(evtName, event);
+        });
+      });
+
+      ['.CodeMirror-vscrollbar', '.CodeMirror-hscrollbar'].forEach((selector) => {
+        document.querySelector(selector).classList.add('scroll');
       });
   	});
 

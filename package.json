@@ -20,7 +20,6 @@
     "switch-theme": "^0.2.0",
     "tiny-emitter": "^2.1.0",
     "vue": "^3.0.1",
-    "vue-codemirror": "^4.0.6",
     "vue-router": "^4.0.0-beta.13",
     "vuex": "^4.0.0-beta.4"
   },

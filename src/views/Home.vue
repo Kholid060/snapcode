@@ -6,7 +6,7 @@
     	<div class="col-span-3 border-r overflow-auto scroll">
        <snippets></snippets>
       </div>
-      <div class="code col-span-7 space-y-2">
+      <div class="code col-span-7 space-y-2 h-full overflow-hidden">
       	<router-view></router-view>
       </div>
     </div>

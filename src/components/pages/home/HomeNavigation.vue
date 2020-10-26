@@ -4,10 +4,7 @@
 	    <icon-ui name="search" class="text-lighter mr-2"></icon-ui>
 	    <input type="text" placeholder="Search snippet, code, tag" class="h-full bg-transparent">
 	  </div>
-	  <div>
-  		<button-ui variant="primary" icon>
-  			<icon-ui name="mdiPlus"></icon-ui>
-  		</button-ui>
+	  <div class="space-x-2">
 		  <button-ui icon @click="toggleDarkTheme">
 		    <icon-ui name="moon"></icon-ui>
 		  </button-ui>

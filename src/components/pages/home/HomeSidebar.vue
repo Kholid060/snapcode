@@ -34,6 +34,7 @@
 					class="cursor-pointer" 
 					name="mdiPlus"
 					v-tooltip="'Add folder'"
+					@click="addFolder"
 				></icon-ui>
 			</div>
 			<list-ui class="space-y-1">
@@ -41,7 +42,7 @@
 					small 
 					v-for="folder in folders" 
 					:key="folder.id" 
-					class="cursor-pointer"
+					class="cursor-pointer group"
 					@click="filterBy(folder.id)"
 					:active="folder.id === activeFilter"
 				>
@@ -49,6 +50,18 @@
 						<icon-ui name="folder"></icon-ui>
 					</template>
 					{{ folder.name }}
+					<template #append>
+						<popover-ui class="text-default">
+							<icon-ui
+								name="dotsHorizontal"
+								:class="[folder.id === activeFilter ? 'visibile' : 'md:invisible']"
+								class="group-hover:visible"
+							></icon-ui>
+							<template #popover>
+								<p>hola</p>
+							</template>
+						</popover-ui>
+					</template>
 				</list-item-ui>
 			</list-ui>
 		</div>
@@ -57,6 +70,7 @@
 <script>
 import { computed } from 'vue';
 import { useStore } from 'vuex';
+import { useDialog } from 'comps-ui';
 import { Folder } from '~/models';
 
 export default {
@@ -68,10 +82,28 @@ export default {
   	function filterBy(name) {
   		store.commit('updateState', { key: 'filterBy', value: name });
   	}
+  	function addFolder() {
+  		const dialog = useDialog();
+
+  		dialog.prompt({
+  			title: 'Add folder',
+  			input: {
+  				label: 'Folder name',
+  			},
+  			onConfirm: (name) => {
+  				Folder.insert({
+  					data: {
+  						name,
+  					},
+  				});
+  			},
+  		});
+  	}
 
   	return {
   		folders,
   		filterBy,
+  		addFolder,
   		activeFilter,
   	};
   },
