@@ -58,7 +58,20 @@
 								class="group-hover:visible"
 							></icon-ui>
 							<template #popover>
-								<p>hola</p>
+								<list-ui class="w-40 space-y-1">
+									<list-item-ui small>
+										<template #prepend>
+											<icon-ui name="pencil"></icon-ui>
+										</template>
+										Rename
+									</list-item-ui>
+									<list-item-ui small>
+										<template #prepend>
+											<icon-ui name="trash" class="text-danger"></icon-ui>
+										</template>
+										Delete
+									</list-item-ui>
+								</list-ui>
 							</template>
 						</popover-ui>
 					</template>

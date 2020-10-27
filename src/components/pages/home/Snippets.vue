@@ -94,6 +94,7 @@ export default {
   	const store = useStore();
   	const activeFilter = computed(() => store.state.filterBy);
   	const snippets = computed(() => {
+  		const search = store.state.searchQuery;
   		const filtered = File.query()
   			.where((file) => {
   				if (activeFilter.value === 'all') return true;
@@ -101,6 +102,7 @@ export default {
 
   				return file.folderId === activeFilter.value;
   			})
+  			.where(({ name, code }) => name.includes(search) || code.includes(search))
   			.orderBy(sort.by, sort.type)
   			.get();
 
