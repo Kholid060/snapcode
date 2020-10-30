@@ -16,6 +16,8 @@
 	  			width="160px" 
 	  			class="select-sort"
 	  			:options="sortOptions"
+	  			item-label="name"
+	  			item-value="value"
 	  			v-model="sort.by"
 	  		></select-ui>
 	  	</div>
@@ -56,6 +58,7 @@
 			  				class="leading-tight text-overflow flex-1 pr-2 focus:text-primary"
 			  				v-bind="{ href }"
 			  				@click="navigate"
+			  				:title="snippet.name"
 			  			>{{ snippet.name }}</a>
 				  		<icon-ui 
 				  			:name="snippet.starred ? 'starSolid' : 'star'" 
@@ -73,6 +76,9 @@
 			  </router-link>
 			</div>
 		</transition-group>
+		<p class="text-lighter text-center my-6" v-if="snippets.length === 0">
+			No data
+		</p>
   </div>
 </template>
 <script>
@@ -90,8 +96,13 @@ export default {
   		by: 'createdAt',
   		type: 'desc',
   	});
-  	const sortOptions = ['createdAt', 'name', 'language'];
-  	const store = useStore();
+  	const sortOptions = [
+  		{ name: 'Created date', value: 'createdAt' },
+  		{ name: 'Name', value: 'name' },
+  		{ name: 'Language', value: 'language' },
+  	];
+  	
+  	const store = useStore();  	
   	const activeFilter = computed(() => store.state.filterBy);
   	const snippets = computed(() => {
   		const search = store.state.searchQuery;

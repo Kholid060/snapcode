@@ -21,7 +21,8 @@
     "tiny-emitter": "^2.1.0",
     "vue": "^3.0.1",
     "vue-router": "^4.0.0-beta.13",
-    "vuex": "^4.0.0-beta.4"
+    "vuex": "^4.0.0-beta.4",
+    "vuex-orm-localforage": "^0.3.2"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.7",

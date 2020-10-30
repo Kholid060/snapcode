@@ -11,7 +11,6 @@ class Folder extends Model {
 	  return {
 	    id: this.uid(() => nanoid()),
 	    name: this.string(''),
-	    description: this.string(''),
 	    createdAt: this.number(Date.now()),
 	    files: this.hasMany(File, 'folderId'),
 	  };

@@ -12,6 +12,7 @@ const store = createStore({
   state: () => ({
   	searchQuery: '',
     filterBy: 'all',
+    showSidebar: false,
   }),
   mutations: {
   	updateState(state, { key, value }) {

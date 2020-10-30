@@ -1,18 +1,24 @@
 <template>
   <div class="home flex">
-  	<home-sidebar class="w-64 hidden lg:block"></home-sidebar>
-    <div class="flex-1 lg:grid grid-cols-10 lg:h-screen" style="grid-template-rows: auto 1fr;">
+  	<home-sidebar></home-sidebar>
+    <div class="flex-1">
       <home-navigation></home-navigation>
-    	<div class="col-span-3 border-r overflow-auto scroll">
-       <snippets></snippets>
-      </div>
-      <div class="code col-span-7 space-y-2 h-full overflow-hidden">
-      	<router-view></router-view>
-      </div>
+	   	<div class="flex" style="height: calc(100vh - 64px)">
+	    	<div 
+	    		class="lg:border-r overflow-auto scroll w-full md:max-w-xs"
+	    		:class="{ 'hidden md:block': route.name === 'view' }"
+	    	>
+	       <snippets></snippets>
+	      </div>
+	      <div class="code flex-grow space-y-2 h-full overflow-hidden">
+	      	<router-view></router-view>
+	      </div>
+	    </div>
     </div>
   </div>
 </template>
 <script>
+import { useRoute } from 'vue-router';
 import HomeSidebar from '../components/pages/home/HomeSidebar.vue';
 import Snippets from '../components/pages/home/Snippets.vue';
 import HomeNavigation from '../components/pages/home/HomeNavigation.vue';
@@ -20,6 +26,13 @@ import HomeNavigation from '../components/pages/home/HomeNavigation.vue';
 export default {
   components: {
     HomeSidebar, Snippets, HomeNavigation, 
+  },
+  setup() {
+  	const route = useRoute();
+
+  	return {
+  		route,
+  	};
   },
 };
 </script>

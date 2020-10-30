@@ -7,13 +7,6 @@
         :class="{ 'text-warning': file.starred }"
       ></icon-ui>
     </button-ui>
-    <button-ui 
-      icon
-      v-tooltip:top.group="'Copy code'"
-      @click="copyCode"
-    >
-      <icon-ui size="20" name="clipboardCopy"></icon-ui>
-    </button-ui>
     <popover-ui>
       <button-ui icon :class="{ 'text-primary': file.isShared }" v-tooltip:top.group="'Share'">
         <icon-ui size="20" name="link"></icon-ui>
@@ -41,6 +34,13 @@
       </template>
     </popover-ui>
     <button-ui 
+      icon
+      v-tooltip:top.group="'Copy code'"
+      @click="copyCode"
+    >
+      <icon-ui size="20" name="clipboardCopy"></icon-ui>
+    </button-ui>
+    <button-ui 
       icon 
       class="text-danger" 
       v-tooltip:top.group="'Delete'"
@@ -52,6 +52,7 @@
 </template>
 <script>
 import { onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import { useGroupTooltip } from 'comps-ui';
 import { File } from '~/models';
 import copyToClipboard from '~/utils/copyToClipboard';
@@ -63,7 +64,9 @@ export default {
       default: () => ({}),
     },
   },
-  setup(props, { emit }) {
+  setup(props, { emit }) {    
+    const router = useRouter();
+
     function copyUrl(event) {
       event.target.select();
       document.execCommand('copy');
@@ -74,6 +77,11 @@ export default {
 
       copyToClipboard(code);
     }
+    function deleteFile() {
+      File.delete(props.file.id).then(() => {
+        router.replace('/');
+      });
+    }
 
     onMounted(() => {
       useGroupTooltip();
@@ -83,9 +91,7 @@ export default {
       copyUrl,
       copyCode,
       location: window.location.origin,
-      deleteFile: () => {
-        File.delete(props.file.id);
-      },
+      deleteFile,
       updateFile: (key, value) => {
         emit('change', { [key]: value });
       },

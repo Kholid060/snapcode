@@ -14,8 +14,9 @@ class File extends Model {
 	    language: this.string('javascript'),
 	    code: this.string(''),
 	    starred: this.boolean(false),
-	    createdAt: this.number(Date.now()),
+	    createdAt: this.attr(Date.now()),
 	    isShared: this.boolean(false),
+	    isEdited: this.boolean(false),
 	  };
 	}
 }

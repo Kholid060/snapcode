@@ -20,6 +20,7 @@ import 'codemirror/keymap/sublime';
 import 'codemirror/addon/edit/closebrackets';
 import 'codemirror/lib/codemirror.css';
 import '~/assets/css/themes/one-dark.css';
+import '~/assets/css/themes/one-light.css';
 
 export default {
   emits: ['change', 'update:modelValue', 'cursorActivity', 'focus', 'blur'],

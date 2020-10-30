@@ -1,3 +1,7 @@
+.CodeMirror {
+  background-color: transparent !important;
+}
+
 .CodeMirror.cm-s-one-light {
     color: #383a42;
 }
@@ -14,7 +18,7 @@
 .cm-s-one-light .CodeMirror-linenumber,
 .cm-s-one-light .CodeMirror-linenumbers {
     color: #929292 !important;
-    background-color: transparent
+    @apply bg-lighter;
 }
 
 .cm-s-one-light .CodeMirror-lines {

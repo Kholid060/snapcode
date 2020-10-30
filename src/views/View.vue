@@ -11,9 +11,10 @@
 						:value="file.name" 
 						class="bg-transparent text-lg"
 						@change="updateFile({ name: $event.target.value })"
+            maxlength="60" 
 					/>
 					<p class="text-lighter text-sm">
-						Created at: {{ createdDate }}
+						Created at: {{ formatDate(file.createdAt) }}
 					</p>
 				</div>
 				<file-buttons-group
@@ -42,7 +43,7 @@
 							:key="language"
 							small
 							class="cursor-pointer"
-							@click="updateFileLanguage(language)"
+							@click="updateFile({ language })"
 						>
 							{{ language }}
 						</list-item-ui>
@@ -57,25 +58,42 @@
 	</div>
 </template>
 <script>
-import { computed, reactive, watch } from 'vue';
-import { useRoute } from 'vue-router';
+/* eslint-disable */
+import { computed, reactive, watch, toRef, defineAsyncComponent } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 import dayjs from 'dayjs';
+import { useTheme } from 'comps-ui';
 import { File } from '~/models';
 import languages from '~/utils/languages';
-import Codemirror from '~/components/pages/view/Codemirror.vue';
 import FileButtonsGroup from '~/components/pages/view/FileButtonsGroup.vue';
 
 export default {
-  components: { Codemirror, FileButtonsGroup },
+  components: { 
+    Codemirror: defineAsyncComponent(() => import('~/components/pages/view/Codemirror.vue')),
+    FileButtonsGroup,
+  },
   setup() {
+  	const theme = useTheme();
   	const route = useRoute();
+  	const router = useRouter();
+  	
   	const fileId = computed(() => route.params.fileId);
-  	const file = computed(() => File.find(fileId.value) || false);  		
-  	const createdDate = computed(() => dayjs(file.createdDate).format('DD MMMM YYYY'));
+  	const file = computed(() => {
+  		const findFile = File.find(fileId.value);
+  		
+  		if (findFile === null) {
+  			router.replace('/');
+  			return {};
+  		}
+
+  		return findFile;
+  	});  		
+  	
   	const state = reactive({
   		isEditorFocused: false,
   		cmOptions: {
   			mode: 'text/javascript',
+  			theme: 'one-dark',
   		},
   		cursorPosition: {
   			line: 1,
@@ -83,28 +101,29 @@ export default {
   		},
   	});
   
+  	function formatDate(date) {
+  		return dayjs(date).format('DD MMMM YYYY');	
+  	}
   	function updateFile(data) {
       File.update({
         where: file.value.id,
         data,
       });
     }
-  	function updateFileLanguage(language) {
-  		state.cmOptions.mode = languages[language].mode;
-  		updateFile({ language });
-  	}
 
-  	watch(file, () => {
-  		state.cmOptions.mode = languages[file.value.language].mode;
-  	});
+  	watch([theme.currentTheme, () => file.value.language], () => {
+  		state.cmOptions = {
+  			mode: languages[file.value.language]?.mode,
+  			theme: theme.currentTheme.value === 'light' ? 'one-light' : 'one-dark',
+  		};
+  	}, { immediate: true });
 
   	return {
   		file,
   		state,
   		languages,
   		updateFile,
-  		createdDate,
-  		updateFileLanguage,
+  		formatDate,
   	};
   },
 };

@@ -8,6 +8,9 @@ module.exports = {
         90: '0.9',
         10: '0.1',
       },
+      // borderRadius: {
+      //   lg: '0.75rem',
+      // },
     },
   },
   variants: {
