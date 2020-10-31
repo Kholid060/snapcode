@@ -56,7 +56,7 @@
 						<template #prepend>
 							<icon-ui name="folder"></icon-ui>
 						</template>
-						{{ folder.name }}
+						<p class="text-overflow w-32">{{ folder.name }}</p>
 						<template #append>
 							<popover-ui class="text-default">
 								<icon-ui
@@ -66,13 +66,24 @@
 								></icon-ui>
 								<template #popover>
 									<list-ui class="w-40 space-y-1">
-										<list-item-ui v-close-popover small @click="renameFolder(folder)">
+										<list-item-ui 
+											v-close-popover 
+											small 
+											@click="renameFolder(folder)"
+											class="cursor-pointer"
+										>
 											<template #prepend>
 												<icon-ui name="pencil"></icon-ui>
 											</template>
 											Rename
 										</list-item-ui>
-										<list-item-ui @click="deleteFolder(folder.id)" small v-if="folders.length !== 1">
+										<list-item-ui 
+											@click="deleteFolder(folder)" 
+											small
+											v-close-popover 
+											v-if="folders.length !== 1"
+											class="cursor-pointer"
+										>
 											<template #prepend>
 												<icon-ui name="trash" class="text-danger"></icon-ui>
 											</template>
@@ -111,7 +122,7 @@ export default {
   				label: 'Folder name',
   			},
   			onConfirm: (name) => {
-  				Folder.insert({
+  				Folder.$update({
   					data: {
   						name,
   					},
@@ -127,20 +138,26 @@ export default {
   				modelValue: name,
   			},
   			onConfirm: (newName) => {
-  				Folder.update({
+  				Folder.$update({
   					where: id,
   					data: {
-  						name: newName,
+  						name: newName.slice(0, 20),
   					},
   				});
   			},
   		});
   	}
-  	function deleteFolder(folderId) {
-  		Folder.delete(folderId).then(() => {
-  			store.commit('updateState', { key: 'filterBy', value: 'all' });
-  			File.delete((file) => file.folderId === folderId);
-  		});
+  	function deleteFolder({ id, name }) {
+	  	dialog.confirm({
+	  		title: 'Delete folder',
+	  		content: `Are you sure wanto delete ${name} folder?`,
+	  		onConfirm: () => {
+		  		Folder.$delete(id).then(() => {
+		  			store.commit('updateState', { key: 'filterBy', value: 'all' });
+		  			File.$delete((file) => file.folderId === id);
+		  		});
+	  		},
+	  	});	
   	}
   	function closeSidebar() {
   		store.commit('updateState', {

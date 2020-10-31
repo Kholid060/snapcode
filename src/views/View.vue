@@ -58,13 +58,15 @@
 	</div>
 </template>
 <script>
-/* eslint-disable */
-import { computed, reactive, watch, toRef, defineAsyncComponent } from 'vue';
+import {
+  computed, reactive, watch, defineAsyncComponent,
+} from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import dayjs from 'dayjs';
 import { useTheme } from 'comps-ui';
 import { File } from '~/models';
 import languages from '~/utils/languages';
+import debounce from '~/utils/debounce';
 import FileButtonsGroup from '~/components/pages/view/FileButtonsGroup.vue';
 
 export default {
@@ -101,15 +103,16 @@ export default {
   		},
   	});
   
-  	function formatDate(date) {
-  		return dayjs(date).format('DD MMMM YYYY');	
-  	}
-  	function updateFile(data) {
-      File.update({
+    const updateFile = debounce((data) => {
+      File.$update({
         where: file.value.id,
         data,
       });
-    }
+    }, 500);
+
+  	function formatDate(date) {
+  		return dayjs(date).format('DD MMMM YYYY');	
+  	}
 
   	watch([theme.currentTheme, () => file.value.language], () => {
   		state.cmOptions = {

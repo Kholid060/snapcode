@@ -78,7 +78,7 @@ export default {
       copyToClipboard(code);
     }
     function deleteFile() {
-      File.delete(props.file.id).then(() => {
+      File.$delete(props.file.id).then(() => {
         router.replace('/');
       });
     }

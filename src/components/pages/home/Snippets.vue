@@ -121,13 +121,13 @@ export default {
   	});
 
   	function updateFile(id, data) {
-  		File.update({
+  		File.$update({
   			where: id,
   			data,
   		});
   	}
   	function addFile() {
-  		File.insert({
+  		File.$update({
   			data: {
   				name: 'untitled snippet',
   				folderId: store.state.filterBy,

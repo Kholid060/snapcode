@@ -5,42 +5,30 @@
 </template>
 <script>
 import { useTheme } from 'comps-ui';
-import { Folder } from './models';
+import { Folder, File } from './models';
 
 export default {
   setup() {
   	const theme = useTheme();
   	theme.setTheme(localStorage.getItem('theme') || 'dark');
 
-  	Folder.insert({
-  		data: {
-  			name: 'Abb',
-  		},
-  	});
-  	Folder.insert({
-  		data: {
-	  		name: 'My folder',
-	  		files: [
-	  			{
-  					id: 'bla123',
-	  				name: 'some code',
-	  				code: 'const code = false',
-	  				isShared: true,
-	  			},
-	  			{
-	  				name: 'vuex',
-	  				code: 'function test',
-	  				starred: true,
-	  			},
-	  			{
-	  				name: 'my html',
-	  				language: 'html',
-	  				code: '<p>wowow</p>',
-	  				starred: true,
-	  			},
-	  		],
-	  	},
-  	});
+  	const isFirstTime = JSON.parse(localStorage.getItem('firstTime'));
+
+  	if (isFirstTime === null) {
+  		Folder.$create({
+  			data: {
+  				name: 'My Folder',
+  				files: [
+  					{ name: 'First snippet' },
+  				],
+  			},
+  		});
+
+  		localStorage.setItem('firstTime', false);
+  	} else {
+  		Folder.$fetch();
+  		File.$fetch();
+  	}
   },
 };
 </script>
