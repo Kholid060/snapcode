@@ -4,13 +4,13 @@
   </div>
 </template>
 <script>
-/* eslint-disable */
 import { 
   onMounted, 
   ref, 
   watch, 
   shallowRef,
 } from 'vue';
+import { useTheme } from 'comps-ui';
 import Codemirror from 'codemirror';
 import 'codemirror/mode/javascript/javascript';
 import 'codemirror/mode/css/css';
@@ -35,7 +35,8 @@ export default {
     },
   },
   setup(props, { emit }) {
-  	const editor = shallowRef(null);
+  	const theme = useTheme();
+    const editor = shallowRef(null);
   	const container = ref(null);
   	
   	onMounted(() => {
@@ -77,6 +78,9 @@ export default {
       });
   	});
 
+    watch(theme.currentTheme, (value) => {
+      editor.value.setOption('theme', value === 'light' ? 'one-light' : 'one-dark');
+    });
     watch(() => props.options, (options) => {
       Object.keys(options).forEach((key) => {
         editor.value.setOption(key, options[key]);

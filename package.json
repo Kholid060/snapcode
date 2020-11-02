@@ -13,6 +13,7 @@
     "codemirror": "^5.58.1",
     "comps-ui": "../components/packages/components-ui",
     "dayjs": "^1.8.26",
+    "firebase-auth-lite": "^0.8.7",
     "nanoid": "^3.1.15",
     "register-service-worker": "^1.6.2",
     "switch-theme": "^0.2.0",

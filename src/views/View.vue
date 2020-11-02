@@ -63,7 +63,6 @@ import {
 } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import dayjs from 'dayjs';
-import { useTheme } from 'comps-ui';
 import { File } from '~/models';
 import languages from '~/utils/languages';
 import debounce from '~/utils/debounce';
@@ -71,11 +70,10 @@ import FileButtonsGroup from '~/components/pages/view/FileButtonsGroup.vue';
 
 export default {
   components: { 
-    Codemirror: defineAsyncComponent(() => import('~/components/pages/view/Codemirror.vue')),
+    Codemirror: defineAsyncComponent(() => import('~/components/ui/Codemirror.vue')),
     FileButtonsGroup,
   },
   setup() {
-  	const theme = useTheme();
   	const route = useRoute();
   	const router = useRouter();
   	
@@ -95,7 +93,6 @@ export default {
   		isEditorFocused: false,
   		cmOptions: {
   			mode: 'text/javascript',
-  			theme: 'one-dark',
   		},
   		cursorPosition: {
   			line: 1,
@@ -114,10 +111,9 @@ export default {
   		return dayjs(date).format('DD MMMM YYYY');	
   	}
 
-  	watch([theme.currentTheme, () => file.value.language], () => {
+  	watch(() => file.value.language, () => {
   		state.cmOptions = {
   			mode: languages[file.value.language]?.mode,
-  			theme: theme.currentTheme.value === 'light' ? 'one-light' : 'one-dark',
   		};
   	}, { immediate: true });
 

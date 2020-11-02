@@ -8,9 +8,14 @@ module.exports = {
         90: '0.9',
         10: '0.1',
       },
-      // borderRadius: {
-      //   lg: '0.75rem',
-      // },
+      container: {
+        center: true,
+        screens: {
+          sm: '640px',
+          md: '768px',
+          lg: '1024px',
+        },
+      },
     },
   },
   variants: {

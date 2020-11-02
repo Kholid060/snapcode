@@ -33,7 +33,8 @@
         </slide-transition>
       </template>
     </popover-ui>
-    <button-ui 
+    <button-ui
+      class="hidden md:inline-block" 
       icon
       v-tooltip:top.group="'Copy code'"
       @click="copyCode"
@@ -42,12 +43,43 @@
     </button-ui>
     <button-ui 
       icon 
-      class="text-danger" 
+      class="text-danger hidden md:inline-block rounded-r-lg" 
       v-tooltip:top.group="'Delete'"
       @click="deleteFile"
     >
       <icon-ui size="20" name="trash"></icon-ui>
     </button-ui>
+    <popover-ui class="md:hidden">
+      <button-ui icon>
+        <icon-ui size="20" name="dotsHorizontal"></icon-ui>
+      </button-ui>
+      <template #popover>
+        <list-ui class="space-y-1 w-48">
+          <list-item-ui
+            class="cursor-pointer"
+            small
+            @click="copyCode"
+            v-close-popover
+          >
+            <template #prepend>
+              <icon-ui name="clipboardCopy"></icon-ui>
+            </template>
+            Copy code
+          </list-item-ui>
+          <list-item-ui
+            class="cursor-pointer text-danger"
+            small
+            v-close-popover
+            @click="deleteFile"
+          >
+            <template #prepend>
+              <icon-ui name="trash"></icon-ui>
+            </template>
+            Delete snippet
+          </list-item-ui>
+        </list-ui>
+      </template>
+    </popover-ui>
   </button-group-ui>
 </template>
 <script>

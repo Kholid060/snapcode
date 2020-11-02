@@ -1,6 +1,7 @@
-import { createRouter, createWebHashHistory } from 'vue-router';
+import { createRouter, createWebHistory } from 'vue-router';
 import Home from '../views/Home.vue';
 import View from '../views/View.vue';
+import Snippet from '../views/Snippet.vue';
 
 const routes = [
   {
@@ -15,10 +16,15 @@ const routes = [
       },
     ],
   },
+  {
+    path: '/snippet/:fileId',
+    name: 'snippet',
+    component: Snippet,
+  },
 ];
 
 const router = createRouter({
-  history: createWebHashHistory(),
+  history: createWebHistory(),
   routes,
 });
 
