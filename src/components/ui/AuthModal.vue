@@ -4,7 +4,8 @@
 			Login
 		</template>
 		<div class="space-y-2 mt-2">
-			<button 
+			<button
+				@click="loginWith('github.com')" 
 				class="flex items-center px-4 w-full rounded-lg" 
 				style="height: 52px; background-color: #24292e"
 			>
@@ -12,6 +13,7 @@
 				<span class="ml-3">Continue with Github</span>
 			</button>
 			<button 
+				@click="loginWith('google.com')" 
 				class="flex items-center px-4 w-full rounded-lg" 
 				style="height: 52px; background-color: #4285F4"
 			>
@@ -24,15 +26,26 @@
 	</modal-ui>
 </template>
 <script>
+import auth from '~/utils/firebaseAuth';
+
 export default {
   props: {
   	modelValue: Boolean,
   },
   setup(props, { emit }) {
+  	function loginWith(provider) {
+  		auth.signInWithProvider({
+  			provider,
+  			oauthScope: 'https://www.googleapis.com/auth/userinfo.profile',
+  		});
+  	}
+  	function updateModal() {
+  		emit('update:modelValue', false);
+  	}
+
   	return {
-  		updateModal: () => {
-  			emit('update:modelValue', false);
-  		},
+  		loginWith,
+  		updateModal,
   	};
   },
 };

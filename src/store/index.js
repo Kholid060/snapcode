@@ -2,6 +2,7 @@ import { createStore } from 'vuex';
 import VuexORM from '@vuex-orm/core';
 import VuexORMLocalForage from 'vuex-orm-localforage';
 import { File, Folder } from '~/models';
+import Auth from '~/utils/firebaseAuth';
 
 const database = new VuexORM.Database();
 database.register(File);
@@ -28,7 +29,7 @@ const store = createStore({
   	},
   },
   actions: {
-    async retrieveData() {
+    async retrieveData({ commit }) {
       const isFirstTime = JSON.parse(localStorage.getItem('firstTime'));
 
       if (isFirstTime === null) {
@@ -46,6 +47,12 @@ const store = createStore({
         await Folder.$fetch();
         await File.$fetch();
       }
+
+      commit('updateState', { key: 'user', value: Auth.user });
+      
+      Auth.listen((user) => {
+        commit('updateState', { key: 'user', value: user });
+      });
     },
   },
 });

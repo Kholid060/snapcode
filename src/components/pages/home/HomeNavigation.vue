@@ -44,8 +44,12 @@
 			  	<list-ui class="w-56">
             <li class="list-none">
               <template v-if="store.state.user">
-                <p class="leading-tight">Ahmad Kholid</p>
-                <p class="leading-tight text-lighter">Kholid060@gmail.com</p>
+                <p class="leading-tight">
+                  {{ store.state.user.displayName }}
+                </p>
+                <p class="leading-tight text-lighter">
+                  {{ store.state.user.email }}
+                </p>
               </template>
               <p v-else>Guest</p>
             </li>
@@ -66,7 +70,12 @@
               <span>Settings</span>
             </list-item-ui>
             <div class="h1 border-b my-2"></div>
-            <list-item-ui small class="text-danger cursor-pointer" v-if="store.state.user">
+            <list-item-ui 
+              small 
+              class="text-danger cursor-pointer" 
+              v-if="store.state.user"
+              @click="logout"
+            >
               <template #prepend>
                 <icon-ui name="logout"></icon-ui>
               </template>
@@ -97,6 +106,7 @@ import { useRoute } from 'vue-router';
 import { useStore } from 'vuex';
 import { useTheme } from 'comps-ui';
 import AuthModal from '~/components/ui/AuthModal.vue';
+import Auth from '~/utils/firebaseAuth';
 
 export default {
   components: { AuthModal },
@@ -122,6 +132,11 @@ export default {
         value: !store.state.showSidebar,
       });
     }
+    function logout() {
+      Auth.signOut().then(() => {
+        window.location.reload();
+      });
+    }
 
     watch(isDark, (dark) => {
       theme.setTheme(dark ? 'dark' : 'light');
@@ -131,6 +146,7 @@ export default {
       route,
       store,
       isDark,
+      logout,
       authModal,
       toggleSidebar,
   		updateSearchQuery,
