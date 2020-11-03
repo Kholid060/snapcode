@@ -1,10 +1,10 @@
 <template>
 	<div class="h-full snippet relative flex flex-col" v-if="file">
-		<button class="bg-light absolute top-0 z-50 rounded-br-lg" v-if="state.isEditorFocused">
-			<icon-ui name="chevronDown" size="18"></icon-ui>
-		</button>
 		<expand-transition>
-			<div class="pt-3 px-5 flex items-center justify-between" v-if="!state.isEditorFocused">
+  		<button class="bg-light absolute top-0 z-50 rounded-br-lg" v-if="state.isEditorFocused">
+  			<icon-ui name="chevronDown" size="18"></icon-ui>
+  		</button>
+			<div class="pt-3 px-5 flex items-center justify-between" v-else>
 				<div>
 					<input 
 						type="text" 

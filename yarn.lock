@@ -3074,8 +3074,10 @@ compression@^1.7.4:
     safe-buffer "5.1.2"
     vary "~1.1.2"
 
-comps-ui@../components/packages/components-ui:
-  version "0.6.12"
+comps-ui@^0.6.15:
+  version "0.6.15"
+  resolved "https://registry.yarnpkg.com/comps-ui/-/comps-ui-0.6.15.tgz#76971c245567f338bb8bd74fe263565f4b948abc"
+  integrity sha512-LEjwaj4FIGIDq0exuvQGKKgaGYzrsGEowF9JqLi0EKFu5ICeXHOmgHTOQXPBOSnsxrK+53HnjPRogADLwTOk3w==
   dependencies:
     deepmerge "^4.2.2"
     tippy.js "^6.2.7"

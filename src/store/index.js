@@ -1,12 +1,11 @@
 import { createStore } from 'vuex';
 import VuexORM from '@vuex-orm/core';
 import VuexORMLocalForage from 'vuex-orm-localforage';
-import * as models from '~/models';
+import { File, Folder } from '~/models';
 
 const database = new VuexORM.Database();
-Object.keys(models).forEach((name) => {
-  database.register(models[name]);
-});
+database.register(File);
+database.register(Folder);
 
 VuexORM.use(VuexORMLocalForage, {
   localforage: {
@@ -21,11 +20,33 @@ const store = createStore({
   	searchQuery: '',
     filterBy: 'all',
     showSidebar: false,
+    user: null,
   }),
   mutations: {
   	updateState(state, { key, value }) {
   		state[key] = value;
   	},
+  },
+  actions: {
+    async retrieveData() {
+      const isFirstTime = JSON.parse(localStorage.getItem('firstTime'));
+
+      if (isFirstTime === null) {
+        await Folder.$create({
+          data: {
+            name: 'My Folder',
+            files: [
+              { name: 'First snippet' },
+            ],
+          },
+        });
+
+        localStorage.setItem('firstTime', false);
+      } else {
+        await Folder.$fetch();
+        await File.$fetch();
+      }
+    },
   },
 });
 

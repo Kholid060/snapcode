@@ -1,16 +1,27 @@
 <template>
 	<div class="snippet-view container my-10 px-4">
-		<div class="author flex mb-12 items-center">
-			<avatar-ui class="mr-4">
-				<icon-ui name="user"></icon-ui>
-			</avatar-ui>
-			<div class="author__name">
-				<p>John Doe</p>
-				<p class="leading-tight text-lighter">
-					Created at: {{ formatDate(file.createdDate) }}
-				</p>
+		<nav class="nav flex mb-12 items-center">
+			<div class="author flex items-center">
+				<avatar-ui class="mr-4">
+					<icon-ui name="user"></icon-ui>
+				</avatar-ui>
+				<div class="author__name">
+					<p>John Doe</p>
+					<p class="leading-tight text-lighter">
+						Created at: {{ formatDate(file.createdDate) }}
+					</p>
+				</div>
 			</div>
-		</div>
+			<div class="flex-grow"></div>
+			<button-ui 
+				@click="theme.toggle" 
+				icon
+				v-tooltip="'Dark mode'"
+				:class="{ 'text-primary': theme.currentTheme.value === 'dark' }"
+			>
+				<icon-ui name="moon"></icon-ui>
+			</button-ui>
+		</nav>
 		<div class="editor bg-light rounded-lg pb-4">
 			<div class="rounded-t-lg p-4 mb-4 flex items-center border-b">
 				<div class="file-info">
@@ -29,17 +40,23 @@
 			</div>
 			<codemirror 
 				:model-value="file.code" 
-				:options="{ readOnly: true }"
+				:options="cmOptions"
 			></codemirror>
 		</div>
 	</div>
 </template>
 <script>
-import { defineAsyncComponent, onMounted, ref } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import { useGroupTooltip } from 'comps-ui';
+import {
+  defineAsyncComponent, 
+  onMounted, 
+  ref, 
+  shallowReactive,
+} from 'vue';
+import { useRouter } from 'vue-router';
+import { useGroupTooltip, useTheme } from 'comps-ui';
 import dayjs from 'dayjs';
 import { File } from '~/models';
+import languages from '~/utils/languages';
 import copyToClipboard from '~/utils/copyToClipboard';
 
 export default {
@@ -47,17 +64,22 @@ export default {
     Codemirror: defineAsyncComponent(() => import('~/components/ui/Codemirror.vue')),
   },
   setup() {
-  	const file = ref({});
-
-  	const route = useRoute();
+  	const theme = useTheme();
   	const router = useRouter();
+  	const route = router.currentRoute.value;
+  	
+  	const file = ref({});
+  	const cmOptions = shallowReactive({
+  		readOnly: true,
+  		mode: '',
+  	});
 
   	const formatDate = (date) => dayjs(date).format('DD MMMM YYYY');
 
   	function copyCode() {
   		copyToClipboard(file.code);
   	}
-
+  	
   	onMounted(() => {
   		useGroupTooltip();
 
@@ -66,11 +88,15 @@ export default {
   		if (findFile === null || !findFile.isShared) router.replace('/404');
 
   		file.value = findFile;
+  		cmOptions.mode = languages[findFile.language].mode;
   	});
 
   	return {
   		file,
+  		theme,
   		copyCode,
+  		cmOptions,
+  		languages,
   		formatDate,
   	};
   },
