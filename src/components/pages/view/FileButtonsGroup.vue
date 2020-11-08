@@ -1,6 +1,10 @@
 <template>
 	<button-group-ui class="divide-x" @click.stop>
-    <button-ui icon v-tooltip:top.group="'Star'" @click="updateFile('starred', !file.starred)">
+    <button-ui 
+      icon
+      v-tooltip:top.group="file.starred ? 'Starred' : 'Not starred'" 
+      @click="updateFile('starred', !file.starred)"
+    >
       <icon-ui 
         size="20" 
         :name="file.starred ? 'starSolid' : 'star'"

@@ -4,10 +4,13 @@ export default function (callback, time = 200) {
   return (...args) => {
   	clearTimeout(interval);
 
-  	interval = setTimeout(() => {
-  		interval = null;
+  	return new Promise((resolve) => {
+	  	interval = setTimeout(() => {
+	  		interval = null;
 
-  		callback(...args);
-  	}, time);
+	  		callback(...args);
+	  		resolve();
+	  	}, time);
+  	});
   };  
 }

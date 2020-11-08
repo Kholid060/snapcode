@@ -5,13 +5,13 @@
 </template>
 <script>
 import { useRouter } from 'vue-router';
-import Auth from '~/utils/firebaseAuth';
+import { auth } from '~/utils/firebase';
 
 export default {
   setup() {
   	const router = useRouter();
 
-  	Auth.handleSignInRedirect().then(() => {
+  	auth.handleSignInRedirect().then(() => {
   		router.replace('/');
   	});
   },

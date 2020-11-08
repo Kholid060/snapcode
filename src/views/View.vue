@@ -65,7 +65,6 @@ import { useRouter, useRoute } from 'vue-router';
 import dayjs from 'dayjs';
 import { File } from '~/models';
 import languages from '~/utils/languages';
-import debounce from '~/utils/debounce';
 import FileButtonsGroup from '~/components/pages/view/FileButtonsGroup.vue';
 
 export default {
@@ -100,15 +99,18 @@ export default {
   		},
   	});
   
-    const updateFile = debounce((data) => {
+    const updateFile = (data) => {
       File.$update({
         where: file.value.id,
-        data,
+        data: {
+          ...data,
+          isEdited: true,
+        },
       });
-    }, 500);
+    };
 
   	function formatDate(date) {
-  		return dayjs(date).format('DD MMMM YYYY');	
+  		return dayjs(date).format('DD MMMM YYYY, h:mm A');	
   	}
 
   	watch(() => file.value.language, () => {

@@ -26,7 +26,7 @@
 	</modal-ui>
 </template>
 <script>
-import auth from '~/utils/firebaseAuth';
+import { auth } from '~/utils/firebase';
 
 export default {
   props: {

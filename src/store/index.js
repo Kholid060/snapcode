@@ -2,9 +2,10 @@ import { createStore } from 'vuex';
 import VuexORM from '@vuex-orm/core';
 import VuexORMLocalForage from 'vuex-orm-localforage';
 import { File, Folder } from '~/models';
-import Auth from '~/utils/firebaseAuth';
+import { auth } from '~/utils/firebase';
 
 const database = new VuexORM.Database();
+
 database.register(File);
 database.register(Folder);
 
@@ -25,7 +26,7 @@ const store = createStore({
   }),
   mutations: {
   	updateState(state, { key, value }) {
-  		state[key] = value;
+    	state[key] = value;
   	},
   },
   actions: {
@@ -37,7 +38,10 @@ const store = createStore({
           data: {
             name: 'My Folder',
             files: [
-              { name: 'First snippet' },
+              { 
+                name: 'First snippet',
+                code: 'console.log(\'hello world\')',
+              },
             ],
           },
         });
@@ -48,9 +52,9 @@ const store = createStore({
         await File.$fetch();
       }
 
-      commit('updateState', { key: 'user', value: Auth.user });
+      commit('updateState', { key: 'user', value: auth.user });
       
-      Auth.listen((user) => {
+      auth.listen((user) => {
         commit('updateState', { key: 'user', value: user });
       });
     },

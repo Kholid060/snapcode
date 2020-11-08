@@ -10,29 +10,32 @@ class File extends Model {
 	  return {
 	    id: this.uid(() => nanoid()),
 	    folderId: this.attr(null),
-	    name: this.string('my code'),
+	    name: this.string(''),
 	    language: this.string('javascript'),
 	    code: this.string(''),
 	    starred: this.boolean(false),
 	    createdAt: this.number(Date.now()),
-	    lastUpdated: this.number(Date.now()),
 	    isShared: this.boolean(false),
-	    isEdited: this.boolean(false),
+	    isEdited: this.boolean(true),
 	  };
 	}
 
-	static beforeUpdate(model) {
+	static afterWhere(files) {
 	  /* eslint-disable no-param-reassign */
-	  model.isEdited = true;
-	  model.lastUpdated = Date.now();
+	  return files.map((file) => {
+	    delete file.$id;
+	    delete file.$isEdited;
+
+	    return file;
+	  });
 	}
 
 	static afterDelete(model) {
-	  const deletedFileIds = JSON.parse(localStorage.getItem('deletedFiles')) || [];
+	  const deletedFiles = JSON.parse(localStorage.getItem('deletedFiles')) || [];
 
-	  deletedFileIds.push(model.id);
+	  deletedFiles.push(model.id);
 	
-	  localStorage.setItem('deletedFiles', JSON.stringify(deletedFileIds));
+	  localStorage.setItem('deletedFiles', JSON.stringify(deletedFiles));
 	}
 }
 

@@ -3,10 +3,15 @@
 		<nav class="nav flex mb-12 items-center">
 			<div class="author flex items-center">
 				<avatar-ui class="mr-4">
-					<icon-ui name="user"></icon-ui>
+					<img 
+						:src="file.user.photoUrl" 
+						alt="user photo" 
+						v-if="file.user.photoUrl"
+					/>
+					<icon-ui name="user" v-else></icon-ui>
 				</avatar-ui>
 				<div class="author__name">
-					<p>John Doe</p>
+					<p>{{ file.user.name }}</p>
 					<p class="leading-tight text-lighter">
 						Created at: {{ formatDate(file.createdDate) }}
 					</p>
@@ -52,6 +57,7 @@ import {
   ref, 
   shallowReactive,
 } from 'vue';
+import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
 import { useGroupTooltip, useTheme } from 'comps-ui';
 import dayjs from 'dayjs';
@@ -65,10 +71,14 @@ export default {
   },
   setup() {
   	const theme = useTheme();
+  	const store = useStore();
   	const router = useRouter();
+
   	const route = router.currentRoute.value;
   	
-  	const file = ref({});
+  	const file = ref({
+  		user: {},
+  	});
   	const cmOptions = shallowReactive({
   		readOnly: true,
   		mode: '',
@@ -77,18 +87,25 @@ export default {
   	const formatDate = (date) => dayjs(date).format('DD MMMM YYYY');
 
   	function copyCode() {
-  		copyToClipboard(file.code);
+  		copyToClipboard(file.value.code);
   	}
   	
   	onMounted(() => {
   		useGroupTooltip();
 
-  		const findFile = File.find(route.params.fileId);
+  		const localFile = File.find(route.params.fileId);
 
-  		if (findFile === null || !findFile.isShared) router.replace('/404');
+  		if (localFile !== null) {
+  			file.value = {
+  				...localFile,
+  				user: {
+  					name: store.state.user.displayName || 'Guest',
+  					photoUrl: store.state.user.photoUrl,
+  				},
+  			};
+  		}
 
-  		file.value = findFile;
-  		cmOptions.mode = languages[findFile.language].mode;
+  		cmOptions.mode = languages[localFile.language].mode;
   	});
 
   	return {

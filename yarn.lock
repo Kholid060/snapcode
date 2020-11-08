@@ -4601,6 +4601,11 @@ firebase-auth-lite@^0.8.7:
   resolved "https://registry.yarnpkg.com/firebase-auth-lite/-/firebase-auth-lite-0.8.7.tgz#61f20ba4afae2debfe7e26d3a363ab0e98882baa"
   integrity sha512-IwwaWHjcMZFg5ODs7OnjX8HUGbZ6L7gfGgMunph5PTbadtOXHMhBefNfmJis7fUeXH+ku6peaaCbUwnb5i9+3A==
 
+firebase-firestore-lite@^1.0.0-RC2.1:
+  version "1.0.0-RC2.1"
+  resolved "https://registry.yarnpkg.com/firebase-firestore-lite/-/firebase-firestore-lite-1.0.0-RC2.1.tgz#3a2e4524570f4d8e49dab2865946213bcb620eab"
+  integrity sha512-vsGTe4RVUVYtnxnZsBAmJ1M2kvDP1VpanRCOLBg99S7aY1jRxtJ0rC8pmbqFdCXcsQY7hNdwhZIHQZ6xQ/Zvpw==
+
 flat-cache@^2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/flat-cache/-/flat-cache-2.0.1.tgz#5d296d6f04bda44a4630a301413bdbc2ec085ec0"

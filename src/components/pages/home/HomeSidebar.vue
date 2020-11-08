@@ -44,6 +44,9 @@
 						@click="addFolder"
 					></icon-ui>
 				</div>
+				<p class="text-lighter text-center mt-8" v-if="folders.length === 0">
+					You have no folder
+				</p>
 				<list-ui class="space-y-1">
 					<list-item-ui
 						small 
@@ -81,7 +84,6 @@
 											@click="deleteFolder(folder)" 
 											small
 											v-close-popover 
-											v-if="folders.length !== 1"
 											class="cursor-pointer"
 										>
 											<template #prepend>
@@ -123,9 +125,7 @@ export default {
   			},
   			onConfirm: (name) => {
   				Folder.$update({
-  					data: {
-  						name,
-  					},
+  					data: { name },
   				});
   			},
   		});
@@ -141,7 +141,8 @@ export default {
   				Folder.$update({
   					where: id,
   					data: {
-  						name: newName.slice(0, 20),
+  						name: newName.slice(0, 16),
+  						isEdited: true,
   					},
   				});
   			},
@@ -150,11 +151,18 @@ export default {
   	function deleteFolder({ id, name }) {
 	  	dialog.confirm({
 	  		title: 'Delete folder',
-	  		content: `Are you sure wanto delete ${name} folder?`,
+	  		content: `Are you sure want to delete "${name}" folder?`,
+	  		buttons: {
+	  			confirm: {
+	  				text: 'Delete',
+	  				variant: 'danger',
+	  			},
+	  		},
 	  		onConfirm: () => {
-		  		Folder.$delete(id).then(() => {
+		  		Folder.$delete(id).then(async () => {
+		  			await File.$delete((file) => file.folderId === id);
+		  			
 		  			store.commit('updateState', { key: 'filterBy', value: 'all' });
-		  			File.$delete((file) => file.folderId === id);
 		  		});
 	  		},
 	  	});	

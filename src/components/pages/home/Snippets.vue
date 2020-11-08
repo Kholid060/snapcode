@@ -63,7 +63,7 @@
 				  		<icon-ui 
 				  			:name="snippet.starred ? 'starSolid' : 'star'" 
 				  			size="22"
-				  			:class="[snippet.starred ? 'text-warning visible' : 'invisible text-light']" 
+				  			:class="[snippet.starred ? 'text-warning visible' : 'lg:invisible text-light']" 
 				  			class="group-hover:visible cursor-pointer"
 				  			@click="updateFile(snippet.id, { starred: !snippet.starred })"
 				  		></icon-ui>
@@ -123,7 +123,10 @@ export default {
   	function updateFile(id, data) {
   		File.$update({
   			where: id,
-  			data,
+  			data: {
+  				...data,
+  				isEdited: true,
+  			},
   		});
   	}
   	function addFile() {

@@ -13,13 +13,18 @@ class Folder extends Model {
 	    name: this.string(''),
 	    createdAt: this.number(Date.now()),
 	    files: this.hasMany(File, 'folderId'),
-	    isEdited: this.boolean(false),
+	    isEdited: this.boolean(true),
 	  };
 	}
 
-	static beforeUpdate(model) {
+	static afterWhere(folders) {
 	  /* eslint-disable no-param-reassign */
-	  model.isEdited = true;
+	  return folders.map((folder) => {
+	    delete folder.$id;
+	    delete folder.$isEdited;
+
+	    return folder;
+	  });
 	}
 
 	static afterDelete(model) {
