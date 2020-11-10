@@ -25,36 +25,32 @@
         icon 
         v-tooltip="'Backup data'"
         @click="backupData" 
-        :loading="state.isBackingUp"
+        :loading="isBackingUp"
+        :disabled="!state.isDataChanged"
         class="align-top"
         variant="primary" 
-        v-if="user"
+        v-if="state.user"
       >
 		    <icon-ui name="cloudUpload"></icon-ui>
 		  </button-ui>
 		  <user-popover></user-popover>
 		</div>
-	  <auth-modal v-model="state.authModal"></auth-modal>
   </nav>
 </template>
 <script>
-import { shallowReactive } from 'vue';
+import { ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { useStore } from 'vuex';
-import AuthModal from '~/components/ui/AuthModal.vue';
 import backup from '~/utils/backup';
 import UserPopover from './UserPopover.vue';
 
 export default {
-  components: { AuthModal, UserPopover },
+  components: { UserPopover },
   setup() {
     const route = useRoute();
   	const store = useStore();
 
-    const state = shallowReactive({
-      authModal: false,
-      isBackingUp: false,
-    });
+    const isBackingUp = ref(false);
 
   	function updateSearchQuery(event) {
   		const { value } = event.target;
@@ -71,18 +67,18 @@ export default {
       });
     }
     function backupData() {
-      state.isBackingUp = true;
+      isBackingUp.value = true;
 
       backup.init().then(() => {
-        state.isBackingUp = false;
+        isBackingUp.value = false;
       });  
     }
 
   	return {
-      user: store.state.user,
+      state: store.state,
       route,
-      state,
       backupData,
+      isBackingUp,
       toggleSidebar,
   		updateSearchQuery,
   	};

@@ -14,5 +14,5 @@ export const apiFetch = (path, options) => (
 	    },
     	...options,
     },
-  ).then((response) => response.json())
+  )
 );

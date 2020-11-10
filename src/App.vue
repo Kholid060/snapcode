@@ -7,6 +7,7 @@
 import { onMounted, ref } from 'vue';
 import { useStore } from 'vuex';
 import { useTheme } from 'comps-ui';
+import retrieveBackupData from './utils/retrieveBackupData';
 
 export default {
   suspensible: true,
@@ -19,6 +20,8 @@ export default {
 
     onMounted(async () => {
       await store.dispatch('retrieveData');
+      await retrieveBackupData();
+
       isRetrieved.value = true;
     });
 

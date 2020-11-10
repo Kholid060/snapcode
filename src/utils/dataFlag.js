@@ -21,6 +21,7 @@ export default {
 		      where: typeof item === 'string' ? item : item.id,
 		      data: {
 		        isEdited: false,
+		        isNew: false,
 		      },
 		    });
 		  });

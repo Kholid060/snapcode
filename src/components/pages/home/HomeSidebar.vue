@@ -125,7 +125,10 @@ export default {
   			},
   			onConfirm: (name) => {
   				Folder.$update({
-  					data: { name },
+  					data: { 
+  						name,
+  						isNew: true,
+  					},
   				});
   			},
   		});

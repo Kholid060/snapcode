@@ -23,6 +23,7 @@ const store = createStore({
     filterBy: 'all',
     showSidebar: false,
     user: null,
+    isDataChanged: false,
   }),
   mutations: {
   	updateState(state, { key, value }) {

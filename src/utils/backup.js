@@ -1,3 +1,4 @@
+import store from '~/store';
 import { auth, apiFetch } from './firebase';
 import debounce from './debounce';
 import dataFlag from './dataFlag';
@@ -49,6 +50,11 @@ class Backup {
 
       await dataFlag.cleanAllFlag('files', this.data.files.updated);
       await dataFlag.cleanAllFlag('folders', this.data.folders.updated);
+
+      store.commit('updateState', {
+        key: 'isDataChanged',
+        value: false,
+      });
 
       localStorage.setItem('lastBackup', lastBackup);
     } catch (error) {

@@ -5,15 +5,15 @@
   			<icon-ui name="chevronDown" size="18"></icon-ui>
   		</button>
 			<div class="pt-3 px-5 flex items-center justify-between" v-else>
-				<div>
+				<div class="md:w-7/12 w-6/12">
 					<input 
 						type="text" 
 						:value="file.name" 
 						class="bg-transparent text-lg"
-						@change="updateFile({ name: $event.target.value })"
+						@change="updateFileName"
             maxlength="60" 
 					/>
-					<p class="text-lighter text-sm">
+					<p class="text-lighter text-sm text-overflow">
 						Created at: {{ formatDate(file.createdAt) }}
 					</p>
 				</div>
@@ -99,7 +99,7 @@ export default {
   		},
   	});
   
-    const updateFile = (data) => {
+    function updateFile(data) {
       File.$update({
         where: file.value.id,
         data: {
@@ -107,8 +107,15 @@ export default {
           isEdited: true,
         },
       });
-    };
+    }
+    function updateFileName({ target }) {
+      const fileName = target.value;
+      const isValidName = fileName.replace(/\s/g, '') !== '';
 
+      if (isValidName) {
+        updateFile({ name: fileName });
+      }
+    }
   	function formatDate(date) {
   		return dayjs(date).format('DD MMMM YYYY, h:mm A');	
   	}
@@ -125,6 +132,7 @@ export default {
   		languages,
   		updateFile,
   		formatDate,
+      updateFileName,
   	};
   },
 };

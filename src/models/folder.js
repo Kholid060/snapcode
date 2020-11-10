@@ -13,15 +13,23 @@ class Folder extends Model {
 	    name: this.string(''),
 	    createdAt: this.number(Date.now()),
 	    files: this.hasMany(File, 'folderId'),
-	    isEdited: this.boolean(true),
+	    isEdited: this.boolean(false),
+	    isNew: this.boolean(false),
 	  };
+	}
+
+	static afterUpdate(model) {
+	  model.$store().commit('updateState', {
+	    key: 'isDataChanged',
+	    value: true,
+	  });
 	}
 
 	static afterWhere(folders) {
 	  /* eslint-disable no-param-reassign */
 	  return folders.map((folder) => {
 	    delete folder.$id;
-	    delete folder.$isEdited;
+	    delete folder.isEdited;
 
 	    return folder;
 	  });

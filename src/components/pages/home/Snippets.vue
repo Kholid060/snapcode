@@ -68,10 +68,14 @@
 				  			@click="updateFile(snippet.id, { starred: !snippet.starred })"
 				  		></icon-ui>
 				  	</div>
-			  		<div class="snippet__footer text-sm text-lighter flex items-center justify-between">
+			  		<a 
+			  			class="snippet__footer text-sm text-lighter flex items-center justify-between"
+			  			@click="navigate"
+			  			v-bind="{ href }"
+			  		>
 			  			<span>{{ snippet.language }}</span>
 			  			<span>{{ formatTime(snippet.createdAt) }}</span>
-			  		</div>
+			  		</a>
 			  	</div>
 			  </router-link>
 			</div>
@@ -134,6 +138,8 @@ export default {
   			data: {
   				name: 'untitled snippet',
   				folderId: store.state.filterBy,
+  				isNew: true,
+  				isEdited: true,
   			},
   		});
   	}

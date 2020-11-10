@@ -16,7 +16,8 @@ class File extends Model {
 	    starred: this.boolean(false),
 	    createdAt: this.number(Date.now()),
 	    isShared: this.boolean(false),
-	    isEdited: this.boolean(true),
+	    isEdited: this.boolean(false),
+	    isNew: this.boolean(false),
 	  };
 	}
 
@@ -24,9 +25,16 @@ class File extends Model {
 	  /* eslint-disable no-param-reassign */
 	  return files.map((file) => {
 	    delete file.$id;
-	    delete file.$isEdited;
+	    delete file.isEdited;
 
 	    return file;
+	  });
+	}
+
+	static afterUpdate(model) {
+	  model.$store().commit('updateState', {
+	    key: 'isDataChanged',
+	    value: true,
 	  });
 	}
 
