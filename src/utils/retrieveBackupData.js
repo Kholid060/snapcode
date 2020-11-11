@@ -1,9 +1,6 @@
 import { auth, apiFetch } from './firebase';
 import store from '~/store';
-
-function getTimestamp(date) {
-  return (new Date(date)).getTime();
-}
+import { getTimestamp } from './helper';
 
 function mergeData(modelName, newData) {
   const model = store.$db().model(modelName);

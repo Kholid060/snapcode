@@ -1,5 +1,6 @@
 import { Model } from '@vuex-orm/core';
 import { nanoid } from 'nanoid';
+import { updateDataChange } from '~/utils/helper';
 
 class File extends Model {
 	static entity = 'files'
@@ -32,14 +33,13 @@ class File extends Model {
 	}
 
 	static afterUpdate(model) {
-	  model.$store().commit('updateState', {
-	    key: 'isDataChanged',
-	    value: true,
-	  });
+	  updateDataChange(model);
 	}
 
 	static afterDelete(model) {
 	  if (model.isNew) return;
+
+	  updateDataChange(model);
 
 	  const deletedFiles = JSON.parse(localStorage.getItem('deletedFiles')) || [];
 

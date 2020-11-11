@@ -1,5 +1,6 @@
 import { Model } from '@vuex-orm/core';
 import { nanoid } from 'nanoid';
+import { updateDataChange } from '~/utils/helper';
 import File from './file';
 
 class Folder extends Model {
@@ -19,10 +20,7 @@ class Folder extends Model {
 	}
 
 	static afterUpdate(model) {
-	  model.$store().commit('updateState', {
-	    key: 'isDataChanged',
-	    value: true,
-	  });
+	  updateDataChange(model);
 	}
 
 	static afterWhere(folders) {
@@ -38,6 +36,8 @@ class Folder extends Model {
 	static afterDelete(model) {
 	  if (model.isNew) return;
 		
+	  updateDataChange(model);
+
 	  const deletedFolderIds = JSON.parse(localStorage.getItem('deletedFolders')) || [];
 
 	  deletedFolderIds.push(model.id);

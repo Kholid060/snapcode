@@ -58,6 +58,11 @@ const store = createStore({
       auth.listen((user) => {
         commit('updateState', { key: 'user', value: user });
       });
+
+      commit('updateState', {
+        key: 'isDataChanged',
+        value: JSON.parse(localStorage.getItem('isDataChanged')) || false,
+      });
     },
   },
 });

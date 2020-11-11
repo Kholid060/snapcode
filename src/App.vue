@@ -10,7 +10,6 @@ import { useTheme } from 'comps-ui';
 import retrieveBackupData from './utils/retrieveBackupData';
 
 export default {
-  suspensible: true,
   setup() {
     const store = useStore();
     const isRetrieved = ref(false);
