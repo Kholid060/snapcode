@@ -39,6 +39,8 @@ class File extends Model {
 	}
 
 	static afterDelete(model) {
+	  if (model.isNew) return;
+
 	  const deletedFiles = JSON.parse(localStorage.getItem('deletedFiles')) || [];
 
 	  deletedFiles.push(model.id);

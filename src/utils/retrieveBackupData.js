@@ -39,8 +39,7 @@ export default async function () {
   if (!auth.user) return;
 
   const lastBackup = +localStorage.getItem('lastBackup');
-  const response = await apiFetch(`/sync?timestamp=${lastBackup}`);
-  const data = await response.json();
+  const data = await apiFetch(`/sync?timestamp=${lastBackup}`);
 
   if (data.empty) return;
 

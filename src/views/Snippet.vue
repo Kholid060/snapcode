@@ -4,14 +4,14 @@
 			<div class="author flex items-center">
 				<avatar-ui class="mr-4">
 					<img 
-						:src="file.user.photoUrl" 
+						:src="file.user.photoURL" 
 						alt="user photo" 
-						v-if="file.user.photoUrl"
+						v-if="file.user.photoURL"
 					/>
 					<icon-ui name="user" v-else></icon-ui>
 				</avatar-ui>
 				<div class="author__name">
-					<p>{{ file.user.name }}</p>
+					<p>{{ file.user.displayName }}</p>
 					<p class="leading-tight text-lighter">
 						Created at: {{ formatDate(file.createdDate) }}
 					</p>
@@ -35,6 +35,9 @@
 				</div>
 				<div class="flex-grow"></div>
 				<button-group-ui class="divide-x">
+					<button-ui icon v-tooltip.group="'Fork snippet'" v-if="!isLocalFile">
+						<icon-ui name="mdiSourceFork"></icon-ui>
+					</button-ui>
 					<button-ui icon @click="copyCode" v-tooltip.group="'Copy code'">
 						<icon-ui name="clipboardCopy"></icon-ui>
 					</button-ui>
@@ -64,6 +67,7 @@ import dayjs from 'dayjs';
 import { File } from '~/models';
 import languages from '~/utils/languages';
 import copyToClipboard from '~/utils/copyToClipboard';
+import { apiFetch } from '~/utils/firebase';
 
 export default {
   components: { 
@@ -79,6 +83,7 @@ export default {
   	const file = ref({
   		user: {},
   	});
+  	const isLocalFile = ref(false);
   	const cmOptions = shallowReactive({
   		readOnly: true,
   		mode: '',
@@ -90,22 +95,31 @@ export default {
   		copyToClipboard(file.value.code);
   	}
   	
-  	onMounted(() => {
-  		useGroupTooltip();
+  	onMounted(async () => {
+	  	try {
+	  		useGroupTooltip();
 
-  		const localFile = File.find(route.params.fileId);
+	  		const localFile = File.find(route.params.fileId);
 
-  		if (localFile !== null) {
-  			file.value = {
-  				...localFile,
-  				user: {
-  					name: store.state.user.displayName || 'Guest',
-  					photoUrl: store.state.user.photoUrl,
-  				},
-  			};
-  		}
+	  		if (localFile !== null) {
+	  			isLocalFile.value = true;
+	  			file.value = {
+	  				...localFile,
+	  				user: {
+	  					displayName: store.state.user.displayName || 'Guest',
+	  					photoURL: store.state.user?.photoUrl || null,
+	  				},
+	  			};
+	  		} else {
+		  		const data = await apiFetch(`/files/${route.params.fileId}`);
+		  		file.value = data;
+		  	}
 
-  		cmOptions.mode = languages[localFile.language].mode;
+	  		cmOptions.mode = languages[localFile.language].mode;
+	  	} catch (error) {
+	  		console.error(error);
+	  		// router.replace('/404');
+	  	}
   	});
 
   	return {
@@ -115,6 +129,7 @@ export default {
   		cmOptions,
   		languages,
   		formatDate,
+  		isLocalFile,
   	};
   },
 };

@@ -36,6 +36,8 @@ class Folder extends Model {
 	}
 
 	static afterDelete(model) {
+	  if (model.isNew) return;
+		
 	  const deletedFolderIds = JSON.parse(localStorage.getItem('deletedFolders')) || [];
 
 	  deletedFolderIds.push(model.id);
