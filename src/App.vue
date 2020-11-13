@@ -1,6 +1,7 @@
 <template>
   <div class="app">
     <router-view v-if="isRetrieved"></router-view>
+    <spinner-ui></spinner-ui>
   </div>
 </template>
 <script>

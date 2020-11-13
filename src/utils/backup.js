@@ -57,6 +57,7 @@ class Backup {
       });
 
       localStorage.setItem('lastBackup', lastBackup);
+      localStorage.setItem('isDataChanged', false);
     } catch (error) {
       /* eslint-disable-next-line */
       console.error(error);

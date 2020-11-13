@@ -100,9 +100,3 @@ export default {
   },
 };
 </script>
-<style>
-.CodeMirror {
-  height: 100%;
-	font-family: 'Fira Code', Menlo, Consolas, 'DejaVu Sans Mono', monospace;
-}
-</style>

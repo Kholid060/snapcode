@@ -2,6 +2,7 @@ const customTheme = require('comps-ui/dist/theme');
 const switchTheme = require('switch-theme');
 
 module.exports = {
+  purge: false,
   theme: {
   	extend: {
       backgroundOpacity: {

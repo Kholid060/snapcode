@@ -1,3 +1,17 @@
+/* purgecss ignore */
+
+* {
+  @apply border-default;
+}
+*:focus, button:focus, input:focus {
+  outline: none !important;
+}
+
+body {
+  @apply bg-lighter text-default;
+  font-family: 'Inter', sans-serif;
+}
+
 html,
 body {
   scroll-behavior: smooth;
@@ -33,4 +47,10 @@ body {
 
 .popover-ui {
   z-index: 9999;
+}
+
+.CodeMirror {
+  font-size: 17px;
+  height: 100%;
+  font-family: 'Fira Code', Menlo, Consolas, 'DejaVu Sans Mono', monospace;
 }
