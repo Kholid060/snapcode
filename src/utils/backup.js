@@ -63,6 +63,19 @@ class Backup {
       console.error(error);
     }
   }
+
+  timer(duration = 60000) {
+    if (!auth.user) return;
+
+    let interval;
+
+    clearInterval(interval);
+  
+    interval = setInterval(() => {
+      console.log('backup', store.state.isDataChanged);
+      if (store.state.isDataChanged) this.fetch();
+    }, duration);
+  }
 }
 
 export default new Backup();

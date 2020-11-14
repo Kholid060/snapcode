@@ -51,6 +51,6 @@ body {
 
 .CodeMirror {
   font-size: 17px;
-  height: 100%;
-  font-family: 'Fira Code', Menlo, Consolas, 'DejaVu Sans Mono', monospace;
+  height: 100% !important;
+  font-family: 'Fira Code', Menlo, Consolas, 'DejaVu Sans Mono', monospace !important;
 }

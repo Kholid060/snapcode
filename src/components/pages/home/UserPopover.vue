@@ -37,12 +37,12 @@
   	  				<switch-ui v-model="isDark" class="align-middle"></switch-ui>
   	  			</template>
   	  		</list-item-ui>
-          <list-item-ui small class="cursor-pointer">
+          <!-- <list-item-ui small class="cursor-pointer">
             <template #prepend>
               <icon-ui name="cog"></icon-ui>
             </template>
             <span>Settings</span>
-          </list-item-ui>
+          </list-item-ui> -->
           <div class="h1 border-b my-2"></div>
           <list-item-ui 
             small 

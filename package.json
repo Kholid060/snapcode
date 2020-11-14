@@ -11,7 +11,7 @@
   "dependencies": {
     "@vuex-orm/core": "^0.36.3",
     "codemirror": "^5.58.1",
-    "comps-ui": "^0.6.15",
+    "comps-ui": "^0.6.16",
     "dayjs": "^1.8.26",
     "firebase-auth-lite": "^0.8.7",
     "nanoid": "^3.1.15",

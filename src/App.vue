@@ -1,7 +1,9 @@
 <template>
   <div class="app">
     <router-view v-if="isRetrieved"></router-view>
-    <spinner-ui></spinner-ui>
+    <div class="my-10" v-else>
+      <spinner-ui class="mx-auto"></spinner-ui>
+    </div>
   </div>
 </template>
 <script>
@@ -9,6 +11,7 @@ import { onMounted, ref } from 'vue';
 import { useStore } from 'vuex';
 import { useTheme } from 'comps-ui';
 import retrieveBackupData from './utils/retrieveBackupData';
+import backup from '~/utils/backup';
 
 export default {
   setup() {
@@ -21,6 +24,8 @@ export default {
     onMounted(async () => {
       await store.dispatch('retrieveData');
       await retrieveBackupData();
+
+      backup.timer();
 
       isRetrieved.value = true;
     });
