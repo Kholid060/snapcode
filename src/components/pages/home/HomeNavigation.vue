@@ -52,12 +52,10 @@ export default {
 
     const isBackingUp = ref(false);
 
-  	function updateSearchQuery(event) {
-  		const { value } = event.target;
-  		
+  	function updateSearchQuery({ target }) {
   		store.commit('updateState', {
   			key: 'searchQuery',
-  			value,
+  			value: target.value.toLowerCase(),
   		});
   	}
     function toggleSidebar() {

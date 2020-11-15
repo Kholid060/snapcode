@@ -34,7 +34,7 @@
 </template>
 <script>
 import { onMounted, ref } from 'vue';
-import { useGroupTooltip } from 'comps-ui';
+import { useGroupTooltip, useNotification } from 'comps-ui';
 import { Folder, File } from '~/models';
 import copyToClipboard from '~/utils/copyToClipboard';
 
@@ -52,7 +52,11 @@ export default {
 
   	function copyCode() {
   		copyToClipboard(props.file.value.code);
-  	}
+  	  useNotification({
+        content: 'Code copied',
+        duration: 2000,
+      });
+    }
   	function forkSnippet() {
   		const copyFile = { ...props.file };
   		

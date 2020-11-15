@@ -21,6 +21,7 @@
           <switch-ui 
             :model-value="file.isShared"
             @update:model-value="updateFile('isShared', !file.isShared)"
+            v-if="store.state.user"
           ></switch-ui>
         </div>
         <slide-transition direction="top">
@@ -29,12 +30,16 @@
             aria-label="share url"
             placeholder="url"
             @click="copyUrl"
-            v-if="file.isShared"
+            v-if="store.state.user && file.isShared"
             class="p-2 w-48 rounded-lg bg-input hover:bg-input-dark transition-colors duration-200 ease-in mt-4"
             readonly 
             :value="`${location}/snippet/${file.id}`"
           >
         </slide-transition>
+        <p 
+          class="text-center my-2 text-light" 
+          v-if="!store.state.user"
+        >You need to login first</p>
       </template>
     </popover-ui>
     <button-ui
@@ -89,7 +94,8 @@
 <script>
 import { onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { useGroupTooltip } from 'comps-ui';
+import { useStore } from 'vuex';
+import { useGroupTooltip, useNotification } from 'comps-ui';
 import { File } from '~/models';
 import copyToClipboard from '~/utils/copyToClipboard';
 
@@ -101,17 +107,26 @@ export default {
     },
   },
   setup(props, { emit }) {    
+    const store = useStore();
     const router = useRouter();
 
     function copyUrl(event) {
       event.target.select();
       document.execCommand('copy');
+      useNotification({
+        content: 'Link copied',
+        duration: 2000,
+      });
     }
     function copyCode() {
       const cmContainer = document.querySelector('.CodeMirror');
       const code = cmContainer.CodeMirror.getValue();
 
       copyToClipboard(code);
+      useNotification({
+        content: 'Code copied',
+        duration: 2000,
+      });
     }
     function deleteFile() {
       File.$delete(props.file.id).then(() => {
@@ -124,6 +139,7 @@ export default {
     });
 
     return {
+      store,
       copyUrl,
       copyCode,
       location: window.location.origin,

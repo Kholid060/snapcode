@@ -117,7 +117,9 @@ export default {
 
   				return file.folderId === activeFilter.value;
   			})
-  			.where(({ name, code }) => name.includes(search) || code.includes(search))
+  			.where(({ name, code }) => (
+  				name.toLowerCase().includes(search) || code.toLowerCase().includes(search)
+  			))
   			.orderBy(sort.by, sort.type)
   			.get();
 

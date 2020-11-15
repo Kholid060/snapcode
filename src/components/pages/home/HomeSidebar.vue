@@ -139,12 +139,13 @@ export default {
   			input: {
   				label: 'Folder name',
   				modelValue: name,
+  				maxlength: 60,
   			},
   			onConfirm: (newName) => {
   				Folder.$update({
   					where: id,
   					data: {
-  						name: newName.slice(0, 16),
+  						name: newName.slice(0, 60),
   						isEdited: true,
   					},
   				});

@@ -72,7 +72,7 @@ class Backup {
     clearInterval(interval);
   
     interval = setInterval(() => {
-      console.log('backup', store.state.isDataChanged);
+      console.log('backup data');
       if (store.state.isDataChanged) this.fetch();
     }, duration);
   }

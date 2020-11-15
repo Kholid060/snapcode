@@ -11,7 +11,8 @@
 						:value="file.name" 
 						class="bg-transparent text-lg"
 						@change="updateFileName"
-            maxlength="60" 
+            maxlength="60"
+            required 
 					/>
 					<p class="text-lighter text-sm text-overflow">
 						Created at: {{ formatDate(file.createdAt) }}
@@ -114,6 +115,9 @@ export default {
 
       if (isValidName) {
         updateFile({ name: fileName });
+      } else {
+        /* eslint-disable-next-line */
+        target.value = file.value.name;
       }
     }
   	function formatDate(date) {
