@@ -2,7 +2,7 @@ import Auth from 'firebase-auth-lite';
 
 export const auth = new Auth({
   apiKey: process.env.VUE_APP_FIREBASE_API_KEY,
-  redirectUri: 'http://localhost:8080/auth',
+  redirectUri: process.env.VUE_APP_REDIRECT_URI,
 });
 
 export const apiFetch = (path, options) => (

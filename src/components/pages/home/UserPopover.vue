@@ -106,11 +106,13 @@ export default {
             await Folder.$deleteAll();
             await File.$deleteAll();
             
-            ['deletedFiles', 'deletedFolders', 'lastBackup'].forEach((key) => {
+            ['deletedFiles', 'deletedFolders', 'lastBackup', 'isDataChanged'].forEach((key) => {
               localStorage.removeItem(key);
             });
 
-            window.location.reload();
+            setTimeout(() => {
+              window.location.reload();
+            }, 1000);
           });
         },
       }); 
