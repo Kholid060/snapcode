@@ -1,15 +1,16 @@
 <template>
 	<nav class="h-16 px-5 border-b flex items-center">
     <div class="lg:hidden">
-      <router-link to="/" v-if="route.name === 'view'">
-        <icon-ui name="arrowLeft" class="mr-4 lg:hidden"></icon-ui>
+      <router-link to="/" v-if="route.name === 'view'" class="md:hidden">
+        <icon-ui name="arrowLeft" class="mr-4"></icon-ui>
       </router-link>
-  	  <icon-ui
-        v-else
-        name="menu" 
-        class="mr-4 lg:hidden cursor-pointer" 
-        @click="toggleSidebar"
-      ></icon-ui>
+    	<button :class="{ 'hidden md:block': route.name === 'view' }">
+        <icon-ui
+          name="menu" 
+          class="mr-4 lg:hidden cursor-pointer" 
+          @click="toggleSidebar"
+        ></icon-ui>
+      </button>
     </div>
     <div class="search-container flex-1">
 	    <icon-ui name="search" class="text-lighter mr-2"></icon-ui>
