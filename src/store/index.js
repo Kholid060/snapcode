@@ -11,7 +11,7 @@ database.register(Folder);
 
 VuexORM.use(VuexORMLocalForage, {
   localforage: {
-    name: 'snapcode',
+    name: 'snapcode2',
   },
   database,
 });
