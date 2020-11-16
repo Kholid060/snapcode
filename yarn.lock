@@ -3087,10 +3087,10 @@ compression@^1.7.4:
     safe-buffer "5.1.2"
     vary "~1.1.2"
 
-comps-ui@^0.6.16:
-  version "0.6.16"
-  resolved "https://registry.yarnpkg.com/comps-ui/-/comps-ui-0.6.16.tgz#b5b0f12d0bc4a3067bc8beae1b7bce5bf2b680a3"
-  integrity sha512-R1zUoD9M4ug1QW56oagQyopg8N4dYgdvjdCp9G1HZ49V3Mc83C9qG5ZqMbwn0IHyzoxi1p6s74mBqStrwxsmlg==
+comps-ui@^0.6.18:
+  version "0.6.18"
+  resolved "https://registry.yarnpkg.com/comps-ui/-/comps-ui-0.6.18.tgz#5094b04fd14b3e04c3c4e4d062c79d0b2037d448"
+  integrity sha512-6VwNNXpQ6M2hBgN1euGfr6RhWeyCzI1rInoLqgf/suK9HvKAAEN7wMdtnqZJHHk5CbsfkN7iOUeYgBXQIvbT7Q==
   dependencies:
     deepmerge "^4.2.2"
     tippy.js "^6.2.7"
