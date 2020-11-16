@@ -18,5 +18,6 @@ module.exports = {
     'no-trailing-spaces': 0,
     'vue/valid-v-model': 0,
     'max-len': 0,
+    'line-break-style': 0,
   },
 };
