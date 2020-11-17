@@ -1,130 +1,70 @@
-import Vue from 'vue';
-import Vuex from 'vuex';
-import shortid from 'shortid';
-import modules from './modules';
-import db from '~/utils/db';
+import { createStore } from 'vuex';
+import VuexORM from '@vuex-orm/core';
+import VuexORMLocalForage from 'vuex-orm-localforage';
+import { File, Folder } from '~/models';
+import { auth } from '~/utils/firebase';
 
-Vue.use(Vuex);
+const database = new VuexORM.Database();
 
-export default new Vuex.Store({
-  modules,
+database.register(File);
+database.register(Folder);
+
+VuexORM.use(VuexORMLocalForage, {
+  localforage: {
+    name: 'snapcode2',
+  },
+  database,
+});
+
+const store = createStore({
+  plugins: [VuexORM.install(database)],
   state: () => ({
-    activeFile: '',
-    activeTag: '',
-    dark: true,
-    mobileMenu: false,
+  	searchQuery: '',
+    filterBy: 'all',
+    showSidebar: false,
+    user: null,
+    isDataChanged: false,
   }),
   mutations: {
-    changeEntityData(state, { key, data }) {
-      Vue.set(state[key], 'entities', data);
-    },
-    changeState(state, { key, data }) {
-      if (key === 'dark') {
-        localStorage.setItem(key, data);
-      }
-
-      Vue.set(state, key, data);
-    },
+  	updateState(state, { key, value }) {
+    	state[key] = value;
+  	},
   },
   actions: {
-    /* eslint-disable consistent-return */
-    async retrieve({ commit }) {
-      try {
-        const darkStorage = JSON.parse(localStorage.getItem('dark'));
-        const dark = darkStorage === null ? true : darkStorage;
-        const toObject = (array, id = 'id', key = 'name') => array.reduce((obj, curr) => ({
-          [curr[id]]: {
-            name: curr[key],
+    async retrieveData({ commit }) {
+      const isFirstTime = JSON.parse(localStorage.getItem('firstTime'));
+
+      if (isFirstTime === null) {
+        await Folder.$create({
+          data: {
+            name: 'My Folder',
+            files: [
+              { 
+                name: 'First snippet',
+                code: 'console.log(\'hello world\')',
+              },
+            ],
           },
-          ...obj,
-        }), {});
-        const count = await db.folders.count();
-
-        commit('changeState', {
-          key: 'dark',
-          data: dark === null ? true : dark,
         });
 
-        if (count === 0) {
-          const folderId = shortid.generate();
-          const tagId = shortid.generate();
-          const defaultData = {
-            folders: {
-              id: folderId,
-              name: 'My Folder',
-            },
-            files: {
-              [shortid.generate()]: {
-                title: 'Hello world!!',
-                tags: [tagId],
-                content: 'console.log(\'Hello world\')',
-                star: false,
-                createDate: Date.now(),
-                folderId,
-                mode: 'text/javascript',
-              },
-            },
-            tags: {
-              id: tagId,
-              name: 'javascript',
-            },
-          };
-
-          await db.folders.put(defaultData.folders);
-          await db.files.put({
-            folderId,
-            data: defaultData.files,
-          });
-          await db.tags.put(defaultData.tags);
-
-          Object.keys(defaultData).forEach((key) => {
-            const data = defaultData[key];
-
-            commit('changeEntityData', {
-              key,
-              data: key === 'files' ? {
-                [folderId]: data,
-              } : {
-                [data.id]: data,
-              },
-            });
-          });
-
-          return { ...defaultData, dark };
-        }
-
-        const folders = await db.folders.toArray();
-        commit('changeEntityData', {
-          key: 'folders',
-          data: toObject(folders),
-        });
-
-        const files = await db.files.toArray();
-        commit('changeEntityData', {
-          key: 'files',
-          data: files.reduce((obj, file) => ({
-            [file.folderId]: {
-              ...file.data,
-            },
-            ...obj,
-          }), {}),
-        });
-
-        const tags = await db.tags.toArray();
-        commit('changeEntityData', {
-          key: 'tags',
-          data: toObject(tags),
-        });
-
-        return {
-          folders,
-          files,
-          tags,
-          dark,
-        };
-      } catch (err) {
-        return err;
+        localStorage.setItem('firstTime', false);
+      } else {
+        await Folder.$fetch();
+        await File.$fetch();
       }
+
+      commit('updateState', { key: 'user', value: auth.user });
+      
+      auth.listen((user) => {
+        commit('updateState', { key: 'user', value: user });
+      });
+
+      commit('updateState', {
+        key: 'isDataChanged',
+        value: JSON.parse(localStorage.getItem('isDataChanged')) || false,
+      });
     },
   },
 });
+
+export default store;

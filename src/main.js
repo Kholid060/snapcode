@@ -1,39 +1,23 @@
-import Vue from 'vue';
-import App from './App.vue';
-import './registerServiceWorker';
+import { createApp } from 'vue';
+import CompsUi from 'comps-ui';
 import router from './router';
 import store from './store';
+import App from './App.vue';
+import icons from './lib/icons';
+import VAutoresize from './directives/VAutoresize';
+import './registerServiceWorker';
+import './assets/css/tailwind.css';
+import './assets/css/style.css';
+import 'comps-ui/dist/style.css';
 
-// (S)CSS
-import '~/assets/css/tailwind.css';
-import '~/assets/scss/base/theme.scss';
-import '~/assets/scss/style.scss';
+const app = createApp(App);
 
-// Base Components
-import '~/components/Base';
+app.directive('autoresize', VAutoresize);
 
-// Directives
-import '~/directives/VAutofocus';
+app.use(CompsUi, {
+  icons,
+});
+app.use(store);
+app.use(router);
 
-// Plugins
-import '~/plugins/vue-mdijs';
-import '~/plugins/v-tooltip';
-import '~/plugins/vue-js-modal';
-
-Vue.prototype.$dark = function (dark = false) {
-  const bodyClass = document.body.classList;
-
-  if (dark) {
-    bodyClass.replace('light-theme', 'dark-theme');
-  } else {
-    bodyClass.replace('dark-theme', 'light-theme');
-  }
-};
-
-Vue.config.productionTip = false;
-
-new Vue({
-  router,
-  store,
-  render: (h) => h(App),
-}).$mount('#app');
+app.mount('#app');

@@ -1,3 +1,4 @@
+/* purgecss ignore */
 /*
     Name:       one-dark 1.1.1
     Author:     Török Ádám (http://github.com/Aerobird98)
@@ -6,9 +7,6 @@
 
 /* basic */
 .cm-s-one-dark {
-  font-family: Menlo, Consolas, 'DejaVu Sans Mono', monospace;
-  font-weight: 350;
-  font-size: 18px;
   color: #abb2bf;
   background-color: transparent;
 }
@@ -21,7 +19,7 @@
 .cm-s-one-dark .CodeMirror-linenumber,
 .cm-s-one-dark .CodeMirror-linenumbers {
   color: #5c6370 !important;
-  background-color: transparent;
+  @apply bg-lighter;
 }
 .cm-s-one-dark .CodeMirror-lines {
   color: #abb2bf !important;

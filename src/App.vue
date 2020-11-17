@@ -1,47 +1,58 @@
 <template>
-  <div id="app" class="h-screen flex" v-if="retrieved">
-    <mobile-menu v-if="mobileMenu && windowSize <= 1024"></mobile-menu>
-    <div v-if="windowSize > 1024" class="hidden lg:flex">
-      <side-menu class="inline-block"></side-menu>
-      <files class="inline-block bg-lighter"></files>
+  <div class="app">
+    <div class="w-56 text-center mx-auto my-10" v-if="isError">
+      <p class="text-lg">Something went wrong</p>
+      <button-ui block class="mt-5" @click="reload">Reload</button-ui>
     </div>
-    <main class="bg-card flex-auto overflow-auto">
-      <router-view/>
-    </main>
-    <modal-ui></modal-ui>
+    <template v-else>
+      <router-view v-if="isRetrieved"></router-view>
+      <div class="my-10" v-else>
+        <spinner-ui class="mx-auto"></spinner-ui>
+      </div>
+    </template>
   </div>
 </template>
 <script>
-import SideMenu from '~/components/Layout/SideMenu.vue';
-import MobileMenu from '~/components/Layout/MobileMenu.vue';
-import Files from '~/components/Layout/Files.vue';
+import { onMounted, ref } from 'vue';
+import { useStore } from 'vuex';
+import { useTheme } from 'comps-ui';
+import retrieveBackupData from './utils/retrieveBackupData';
+import backup from '~/utils/backup';
+import getOldData from '~/utils/getOldData';
 
 export default {
-  components: { SideMenu, Files, MobileMenu },
-  data: () => ({
-    retrieved: false,
-    windowSize: 0,
-  }),
-  created() {
-    this.$store.dispatch('retrieve').then(({ dark }) => {
-      this.$router.push('/all');
-      this.$dark(dark);
-      this.retrieved = true;
+  setup() {
+    const store = useStore();
+    const isRetrieved = ref(false);
+    const isError = ref(false);
+
+  	const theme = useTheme();
+  	theme.setTheme(localStorage.getItem('theme') || 'dark');
+
+    function reload() {
+      window.location.reload();
+    }
+
+    onMounted(async () => {
+      try {
+        await store.dispatch('retrieveData');
+        await retrieveBackupData();
+        await getOldData();
+
+        backup.timer();
+
+        isRetrieved.value = true;
+      } catch (error) {
+        console.error(error);
+        isError.value = true;
+      }
     });
-  },
-  computed: {
-    mobileMenu() {
-      return this.$store.state.mobileMenu;
-    },
-  },
-  methods: {
-    resizeHandler() {
-      this.windowSize = window.innerWidth;
-    },
-  },
-  mounted() {
-    this.resizeHandler();
-    window.addEventListener('resize', this.resizeHandler);
+
+    return {
+      reload,
+      isError,
+      isRetrieved,
+    };
   },
 };
 </script>
