@@ -27,9 +27,6 @@
 		<button-ui icon @click="copyCode" v-tooltip.group="'Copy code'">
 			<icon-ui name="clipboardCopy"></icon-ui>
 		</button-ui>
-		<button-ui icon v-tooltip.group="'Share snippet'">
-			<icon-ui name="share"></icon-ui>
-		</button-ui>
 	</button-group-ui>
 </template>
 <script>
