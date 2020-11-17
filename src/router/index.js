@@ -3,6 +3,7 @@ import Home from '../views/Home.vue';
 import View from '../views/View.vue';
 import Snippet from '../views/Snippet.vue';
 import Auth from '../views/Auth.vue';
+import PageNotFound from '../views/404.vue';
 
 const routes = [
   {
@@ -26,6 +27,16 @@ const routes = [
     path: '/auth',
     name: 'auth',
     component: Auth,
+  },
+  {
+    path: '/404',
+    name: 'not-found',
+    component: PageNotFound,
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'not-found',
+    component: PageNotFound,
   },
 ];
 

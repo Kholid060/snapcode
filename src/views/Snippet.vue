@@ -1,12 +1,14 @@
 <template>
 	<div class="snippet-view container my-10 px-4">
-		<snippet-navigation v-bind="{ file }"></snippet-navigation>
+		<snippet-navigation v-bind="{ file }" v-if="isRetrieved"></snippet-navigation>
+		<div class="w-64 bg-input-dark animate-pulse rounded-lg mb-12 h-12" v-else></div>
 		<div class="editor bg-light rounded-lg pb-4">
 			<div class="rounded-t-lg p-4 mb-4 flex items-center border-b">
-				<div class="file-info">
+				<div class="file-info" v-if="isRetrieved">
 					<p>{{ file.name }}</p>
 					<p class="text-sm leading-tight text-lighter">{{ file.language }}</p>
 				</div>
+				<div class="h-10 rounded-lg w-48 bg-input-dark animate-pulse" v-else></div>
 				<div class="flex-grow"></div>
 				<buttons-group 
 					v-bind="{ file, isLocalFile }"
@@ -47,10 +49,9 @@ export default {
 
   	const route = router.currentRoute.value;
   	
-  	const file = ref({
-  		user: {},
-  	});
   	const isLocalFile = ref(false);
+  	const isRetrieved = ref(false);
+  	const file = ref({ user: {} });
   	const cmOptions = shallowReactive({
   		readOnly: true,
   		mode: '',
@@ -75,6 +76,7 @@ export default {
 		  	}
 
 	  		cmOptions.mode = languages[file.value.language].mode;
+	  		isRetrieved.value = true;
 	  	} catch (error) {
 	  		console.error(error);
 	  		router.replace('/404');
@@ -85,6 +87,7 @@ export default {
   		file,
   		cmOptions,
   		languages,
+  		isRetrieved,
   		isLocalFile,
   	};
   },
