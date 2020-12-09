@@ -127,8 +127,13 @@ export default {
   				Folder.$update({
   					data: { 
   						name,
+  						isEdited: true,
   						isNew: true,
   					},
+  				});
+  				store.commit('updateState', {
+  					key: 'isDataChanged',
+  					value: true,
   				});
   			},
   		});

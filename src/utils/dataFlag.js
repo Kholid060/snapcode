@@ -8,7 +8,7 @@ export default {
   getAllUpdated(model) {
     return store.$db().model(model)
 		  .query()
-		  .where('isEdited', true)
+		  .where(({ isEdited, isNew }) => isEdited || isNew)
 		  .get();
   },
   getAllDeleted(model) {

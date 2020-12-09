@@ -144,6 +144,10 @@ export default {
   				isEdited: true,
   			},
   		});
+  		store.commit('updateState', {
+        key: 'isDataChanged',
+        value: true,
+      });
   	}
   	function formatTime(time) {
   		return dayjs(time).fromNow();
