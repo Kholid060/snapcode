@@ -11,7 +11,6 @@ import { onMounted, ref } from 'vue';
 import { useStore } from 'vuex';
 import { useTheme } from 'comps-ui';
 import retrieveBackupData from './utils/retrieveBackupData';
-import backup from '~/utils/backup';
 import getOldData from '~/utils/getOldData';
 
 export default {
@@ -31,8 +30,6 @@ export default {
       await store.dispatch('retrieveData');
       await retrieveBackupData();
       await getOldData();
-
-      backup.timer();
 
       isRetrieved.value = true;
     });

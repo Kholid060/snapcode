@@ -10,6 +10,14 @@
 				</div>
 				<div class="h-10 rounded-lg w-48 bg-input-dark animate-pulse" v-else></div>
 				<div class="flex-grow"></div>
+				<div
+				  class="px-3 py-2 rounded-full bg-danger self-center bg-opacity-25 text-danger mr-4"
+				  v-tooltip:bottom="'Only you can see this snippet'"
+				  v-if="isLocalFile && !file.isShared"
+				>
+					<icon-ui name="lockClosed" size="20"></icon-ui>
+					<span class="ml-1 text-sm">Private</span>
+				</div>
 				<buttons-group 
 					v-bind="{ file, isLocalFile }"
 					@fork="isLocalFile = true"
@@ -81,6 +89,7 @@ export default {
 	  		console.error(error);
 	  		router.replace('/404');
 	  	}
+	  	console.log(file.value, isLocalFile);
   	});
 
   	return {
