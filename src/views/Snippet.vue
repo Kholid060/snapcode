@@ -18,13 +18,13 @@
 					<icon-ui name="lockClosed" size="20"></icon-ui>
 					<span class="ml-1 text-sm">Private</span>
 				</div>
-				<buttons-group 
+				<buttons-group
 					v-bind="{ file, isLocalFile }"
 					@fork="isLocalFile = true"
 				></buttons-group>
 			</div>
-			<codemirror 
-				:model-value="file.code" 
+			<codemirror
+				:model-value="file.code"
 				:options="cmOptions"
 			></codemirror>
 		</div>
@@ -32,9 +32,9 @@
 </template>
 <script>
 import {
-  defineAsyncComponent, 
-  onMounted, 
-  ref, 
+  defineAsyncComponent,
+  onMounted,
+  ref,
   shallowReactive,
 } from 'vue';
 import { useStore } from 'vuex';
@@ -46,7 +46,7 @@ import SnippetNavigation from '~/components/pages/snippet/SnippetNavigation.vue'
 import ButtonsGroup from '~/components/pages/snippet/ButtonsGroup.vue';
 
 export default {
-  components: { 
+  components: {
     ButtonsGroup,
     Codemirror: defineAsyncComponent(() => import('~/components/ui/Codemirror.vue')),
     SnippetNavigation,
@@ -56,7 +56,7 @@ export default {
   	const router = useRouter();
 
   	const route = router.currentRoute.value;
-  	
+
   	const isLocalFile = ref(false);
   	const isRetrieved = ref(false);
   	const file = ref({ user: {} });
@@ -64,7 +64,7 @@ export default {
   		readOnly: true,
   		mode: '',
   	});
-  	
+
   	onMounted(async () => {
 	  	try {
 	  		const localFile = File.find(route.params.fileId);
@@ -89,7 +89,6 @@ export default {
 	  		console.error(error);
 	  		router.replace('/404');
 	  	}
-	  	console.log(file.value, isLocalFile);
   	});
 
   	return {
