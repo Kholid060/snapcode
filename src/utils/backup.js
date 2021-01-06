@@ -58,6 +58,10 @@ class Backup {
         key: 'isDataChanged',
         value: false,
       });
+      store.commit('updateState', {
+        key: 'lastBackup',
+        value: Date.now(),
+      });
 
       localStorage.setItem('lastBackup', lastBackup);
       localStorage.setItem('isDataChanged', false);

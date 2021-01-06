@@ -23,7 +23,7 @@
   	    />
       </div>
 	  </div>
-	  <div class="space-x-2">
+	  <div class="space-x-2 flex items-center">
       <a
         href="https://github.com/Kholid060/snapcode"
         class="mr-2 hidden sm:inline-block"
@@ -33,27 +33,33 @@
       >
         <icon-ui name="mdiGithub" class="text-light" size="28"></icon-ui>
 		  </a>
-      <button-ui
-        icon
-        v-tooltip="'Backup data'"
-        @click="backupData"
-        :loading="isBackingUp"
-        :disabled="!state.isDataChanged"
-        class="align-top"
-        variant="primary"
-        v-if="state.user"
+      <div
+        v-tooltip="!state.isDataChanged ? `Last backup: ${lastBackup}` : 'Backup data'"
       >
-		    <icon-ui name="cloudUpload"></icon-ui>
-		  </button-ui>
-		  <user-popover></user-popover>
+        <button-ui
+          icon
+          @click="backupData"
+          :loading="isBackingUp"
+          :disabled="!state.isDataChanged"
+          variant="primary"
+          v-if="state.user"
+        >
+  		    <icon-ui name="cloudUpload"></icon-ui>
+  		  </button-ui>
+      </div>
+		  <user-popover class="mt-1"></user-popover>
 		</div>
   </nav>
 </template>
 <script>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { useStore } from 'vuex';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
 import backup from '~/utils/backup';
 import UserPopover from './UserPopover.vue';
+
+dayjs.extend(relativeTime);
 
 export default {
   components: { UserPopover },
@@ -61,6 +67,12 @@ export default {
   	const store = useStore();
 
     const isBackingUp = ref(false);
+    const lastBackup = computed(() => {
+      const lastBackupTimestamp = store.state.lastBackup;
+      const relativeBackupTime = dayjs(lastBackupTimestamp).fromNow();
+
+      return relativeBackupTime;
+    });
 
   	function updateSearchQuery({ target }) {
   		store.commit('updateState', {
@@ -92,6 +104,7 @@ export default {
 
   	return {
       state: store.state,
+      lastBackup,
       backupData,
       isBackingUp,
       toggleSidebar,

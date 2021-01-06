@@ -23,6 +23,7 @@ const store = createStore({
     filterBy: 'all',
     showSidebar: false,
     user: null,
+    lastBackup: Date.now(),
     isDataChanged: false,
   }),
   mutations: {
@@ -39,7 +40,7 @@ const store = createStore({
           data: {
             name: 'My Folder',
             files: [
-              { 
+              {
                 name: 'First snippet',
                 code: 'console.log(\'hello world\')',
               },
@@ -54,7 +55,7 @@ const store = createStore({
       }
 
       commit('updateState', { key: 'user', value: auth.user });
-      
+
       auth.listen((user) => {
         commit('updateState', { key: 'user', value: user });
       });
@@ -62,6 +63,10 @@ const store = createStore({
       commit('updateState', {
         key: 'isDataChanged',
         value: JSON.parse(localStorage.getItem('isDataChanged')) || false,
+      });
+      commit('updateState', {
+        key: 'lastBackup',
+        value: JSON.parse(localStorage.getItem('lastBackup')) || Date.now(),
       });
     },
   },
