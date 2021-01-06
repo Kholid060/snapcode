@@ -10,11 +10,12 @@ function isEmptyArray({ files, folders }) {
 
   return isValidFolders && isValidFiles;
 }
-
+/* eslint-disable no-unused-expressions */
 class Backup {
   constructor() {
     this.init = debounce(this.fetch.bind(this), 1000);
     this.data = {};
+    this.listeners = {};
   }
 
   fetchData() {
@@ -38,6 +39,8 @@ class Backup {
 
       if (isEmptyArray(this.data)) return;
 
+      this.fireEvent('progress', true);
+
       const lastBackup = Date.now();
 
       await apiFetch('/sync', {
@@ -58,10 +61,22 @@ class Backup {
 
       localStorage.setItem('lastBackup', lastBackup);
       localStorage.setItem('isDataChanged', false);
+      this.fireEvent('progress', false);
     } catch (error) {
       /* eslint-disable-next-line */
       console.error(error);
     }
+  }
+
+  fireEvent(name, params) {
+    this.listeners[name] && this.listeners[name](params);
+  }
+
+  on(eventName, callback) {
+    this.listeners = {
+      [eventName]: callback,
+      ...this.listeners,
+    };
   }
 
   timer(duration = 60000) {
@@ -70,7 +85,7 @@ class Backup {
     let interval;
 
     clearInterval(interval);
-  
+
     interval = setInterval(() => {
       if (store.state.isDataChanged) this.fetch();
     }, duration);

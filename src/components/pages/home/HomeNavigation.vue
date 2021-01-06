@@ -6,30 +6,30 @@
       </router-link>
     	<button :class="{ 'hidden md:block': route.name === 'view' }">
         <icon-ui
-          name="menu" 
-          class="mr-4 lg:hidden cursor-pointer" 
+          name="menu"
+          class="mr-4 lg:hidden cursor-pointer"
           @click="toggleSidebar"
         ></icon-ui>
       </button>
     </div>
     <div class="search-container flex-1">
 	    <icon-ui name="search" class="text-lighter mr-2"></icon-ui>
-	    <input 
-	    	type="text" 
-	    	placeholder="Search..." 
+	    <input
+	    	type="text"
+	    	placeholder="Search..."
 	    	class="h-full bg-transparent w-32 md:w-56"
 	    	@input="updateSearchQuery"
 	    />
 	  </div>
 	  <div class="space-x-2">
-		  <button-ui 
-        icon 
+		  <button-ui
+        icon
         v-tooltip="'Backup data'"
-        @click="backupData" 
+        @click="backupData"
         :loading="isBackingUp"
         :disabled="!state.isDataChanged"
         class="align-top"
-        variant="primary" 
+        variant="primary"
         v-if="state.user"
       >
 		    <icon-ui name="cloudUpload"></icon-ui>
@@ -69,9 +69,17 @@ export default {
       isBackingUp.value = true;
 
       backup.init().then(() => {
-        isBackingUp.value = false;
-      });  
+        setTimeout(() => {
+          isBackingUp.value = false;
+        }, 2000);
+      });
     }
+
+    backup.on('progress', (value) => {
+      setTimeout(() => {
+        isBackingUp.value = value;
+      }, 2000);
+    });
 
   	return {
       state: store.state,

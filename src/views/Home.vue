@@ -4,7 +4,7 @@
     <div class="flex-1 overflow-hidden">
       <home-navigation></home-navigation>
 	   	<div class="flex" style="height: calc(100vh - 64px)">
-	    	<div 
+	    	<div
 	    		class="lg:border-r overflow-auto scroll w-full md:max-w-xs"
 	    		:class="{ 'hidden md:block': route.name === 'view' }"
 	    	>
@@ -27,13 +27,13 @@ import backup from '~/utils/backup';
 
 export default {
   components: {
-    HomeSidebar, Snippets, HomeNavigation, 
+    HomeSidebar, Snippets, HomeNavigation,
   },
   setup() {
   	const route = useRoute();
-    
+
     onMounted(() => {
-      backup.timer(5000);
+      backup.timer(10000);
     });
 
   	return {
