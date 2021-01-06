@@ -27,11 +27,16 @@ export default {
     }
 
     onMounted(async () => {
-      await store.dispatch('retrieveData');
-      await retrieveBackupData();
-      await getOldData();
+      try {
+        await store.dispatch('retrieveData');
+        await retrieveBackupData();
+        await getOldData();
 
-      isRetrieved.value = true;
+        isRetrieved.value = true;
+      } catch (error) {
+        isRetrieved.value = true;
+        console.error(error);
+      }
     });
 
     return {
