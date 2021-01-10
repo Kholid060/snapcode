@@ -1,34 +1,54 @@
 export default {
+  'c++': {
+    name: 'C++',
+    mode: 'text/x-c++src',
+  },
+  'c#': {
+    name: 'C#',
+    model: 'text/x-csharp',
+  },
+  c: {
+    name: 'C',
+    mode: 'text/x-csrc',
+  },
   css: {
-  	ext: 'css',
+  	name: 'CSS',
     mode: 'text/css',
   },
   html: {
-  	ext: 'html',
+  	name: 'HTML',
     mode: 'htmlmixed',
   },
-  javascript: { 
-  	ext: 'js',
+  java: {
+    name: 'Java',
+    mode: 'text/x-java',
+  },
+  javascript: {
+  	name: 'Javascript',
     mode: 'text/javascript',
   },
   json: {
-    ext: 'json',
+    name: 'JSON',
     mode: 'application/json',
   },
+  kotlin: {
+    name: 'Kotlin',
+    mode: 'text/x-kotlin',
+  },
   less: {
-    ext: 'less',
+    name: 'Less',
     mode: 'text/x-less',
   },
   scss: {
-    ext: 'scss',
+    name: 'SCSS',
     mode: 'text/x-scss',
   },
   typescript: {
-    ext: 'ts',
+    name: 'Typescript',
     mode: 'text/typescript',
   },
   vue: {
-    ext: 'vue',
+    name: 'Vue',
     mode: 'text/x-vue',
   },
 };

@@ -4,10 +4,10 @@
   </div>
 </template>
 <script>
-import { 
-  onMounted, 
-  ref, 
-  watch, 
+import {
+  onMounted,
+  ref,
+  watch,
   shallowRef,
 } from 'vue';
 import { useTheme } from 'comps-ui';
@@ -16,6 +16,7 @@ import 'codemirror/mode/javascript/javascript';
 import 'codemirror/mode/css/css';
 import 'codemirror/mode/htmlmixed/htmlmixed';
 import 'codemirror/mode/vue/vue';
+import 'codemirror/mode/clike/clike';
 import 'codemirror/keymap/sublime';
 import 'codemirror/addon/edit/closebrackets';
 import 'codemirror/lib/codemirror.css';
@@ -38,7 +39,7 @@ export default {
   	const theme = useTheme();
     const editor = shallowRef(null);
   	const container = ref(null);
-  	
+
   	onMounted(() => {
   		editor.value = new Codemirror(container.value, {
   			mode: 'text/javascript',
