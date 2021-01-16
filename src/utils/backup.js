@@ -1,6 +1,6 @@
 import store from '~/store';
 import { auth, apiFetch } from './firebase';
-import debounce from './debounce';
+import { debounce } from './helper';
 import dataFlag from './dataFlag';
 
 function isEmptyArray({ files, folders }) {

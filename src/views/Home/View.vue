@@ -34,11 +34,11 @@
 			:options="state.cmOptions"
 		></codemirror>
 		<div class="px-5 text-sm text-lighter py-2">
-			<popover-ui>
+			<popover-ui content-classes="overflow-hidden">
 				<button>{{ file.language }}</button>
 				<template #popover>
 					<list-ui
-            class="w-32 space-y-1 text-default text-base scroll overflow-auto"
+            class="space-y-1 text-default text-base scroll overflow-auto p-4"
             style="max-height: 250px"
           >
 						<list-item-ui

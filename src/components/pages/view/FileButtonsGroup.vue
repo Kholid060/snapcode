@@ -1,12 +1,12 @@
 <template>
 	<button-group-ui class="divide-x" @click.stop>
-    <button-ui 
+    <button-ui
       icon
-      v-tooltip:top.group="file.starred ? 'Starred' : 'Not starred'" 
+      v-tooltip:top.group="file.starred ? 'Starred' : 'Not starred'"
       @click="updateFile('starred', !file.starred)"
     >
-      <icon-ui 
-        size="20" 
+      <icon-ui
+        size="20"
         :name="file.starred ? 'starSolid' : 'star'"
         :class="{ 'text-warning': file.starred }"
       ></icon-ui>
@@ -18,41 +18,41 @@
       <template #popover>
         <div class="flex justify-between w-48">
           <span>Share snippet</span>
-          <switch-ui 
+          <switch-ui
             :model-value="file.isShared"
             @update:model-value="updateFile('isShared', !file.isShared)"
             v-if="store.state.user"
           ></switch-ui>
         </div>
         <slide-transition direction="top">
-          <input 
+          <input
             type="text"
             aria-label="share url"
             placeholder="url"
             @click="copyUrl"
             v-if="store.state.user && file.isShared"
             class="p-2 w-48 rounded-lg bg-input hover:bg-input-dark transition-colors duration-200 ease-in mt-4"
-            readonly 
+            readonly
             :value="`${location}/snippet/${file.id}`"
           >
         </slide-transition>
-        <p 
-          class="text-center my-2 text-light" 
+        <p
+          class="text-center my-2 text-light"
           v-if="!store.state.user"
         >You need to login first</p>
       </template>
     </popover-ui>
     <button-ui
-      class="hidden md:inline-block" 
+      class="hidden md:inline-block"
       icon
       v-tooltip:top.group="'Copy code'"
       @click="copyCode"
     >
       <icon-ui size="20" name="clipboardCopy"></icon-ui>
     </button-ui>
-    <button-ui 
-      icon 
-      class="text-danger hidden md:inline-block rounded-r-lg" 
+    <button-ui
+      icon
+      class="text-danger hidden md:inline-block rounded-r-lg"
       v-tooltip:top.group="'Delete'"
       @click="deleteFile"
     >
@@ -95,9 +95,10 @@
 import { onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
-import { useGroupTooltip, useNotification } from 'comps-ui';
+import { useToast } from 'vue-toastification';
+import { useGroupTooltip } from '~/composable';
 import { File } from '~/models';
-import copyToClipboard from '~/utils/copyToClipboard';
+import { copyToClipboard } from '~/utils/helper';
 
 export default {
   props: {
@@ -106,16 +107,17 @@ export default {
       default: () => ({}),
     },
   },
-  setup(props, { emit }) {    
+  setup(props, { emit }) {
     const store = useStore();
     const router = useRouter();
+    const toast = useToast();
 
     function copyUrl(event) {
       event.target.select();
       document.execCommand('copy');
-      useNotification({
-        content: 'Link copied',
-        duration: 2000,
+
+      toast.success('Link copied', {
+        timeout: 2000,
       });
     }
     function copyCode() {
@@ -123,9 +125,8 @@ export default {
       const code = cmContainer.CodeMirror.getValue();
 
       copyToClipboard(code);
-      useNotification({
-        content: 'Code copied',
-        duration: 2000,
+      toast.success('Code copied', {
+        timeout: 2000,
       });
     }
     function deleteFile() {

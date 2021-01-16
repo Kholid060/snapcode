@@ -1,0 +1,26 @@
+.button-ui {
+  transition-property: background-color, color, opacity, box-shadow;
+  transition-duration: 250ms;
+  transition-timing-function: ease
+}
+
+.button-ui__loading {
+  top: 0;
+  left: 0;
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  pointer-events: none
+}
+
+.button-ui__loading .path {
+  stroke: white
+}
+
+.button-ui.default .spinner .path {
+  stroke: #0070F3
+}
+
+.button-ui:focus {
+  outline: none
+}

@@ -2,28 +2,29 @@
   <div class="snippets relative h-full">
   	<div class="border-b px-5 py-3 flex items-center justify-between">
   		<div class="sort">
-	  		<button-ui 
-	  			icon 
+	  		<button-ui
+	  			icon
 	  			@click="sort.type = sort.type === 'asc' ? 'desc' : 'asc'"
 	  			v-tooltip="sort.type === 'asc' ? 'ascending' : 'descending'"
 	  			class="rounded-r-none border-r align-bottom"
 	  		>
-	  			<icon-ui 
+	  			<icon-ui
 	  				:name="sort.type === 'asc' ? 'sortAscending' : 'sortDescending'"
 	  			></icon-ui>
 	  		</button-ui>
-	  		<select-ui 
-	  			width="160px" 
-	  			class="select-sort"
-	  			:options="sortOptions"
-	  			item-label="name"
-	  			item-value="value"
-	  			v-model="sort.by"
-	  		></select-ui>
+        <select-ui class="rounded-l-none" v-model="sort.by">
+          <option
+            v-for="option in sortOptions"
+            :key="option.value"
+            :value="option.value"
+          >
+            {{ option.name }}
+          </option>
+        </select-ui>
 	  	</div>
-	  	<button-ui 
-	  		icon 
-	  		variant="primary" 
+	  	<button-ui
+	  		icon
+	  		variant="primary"
 	  		v-tooltip="'Add snippet'"
 	  		@click="addFile"
 	  		:disabled="activeFilter === 'starred' || activeFilter === 'all'"
@@ -32,43 +33,43 @@
 	  	</button-ui>
   	</div>
   	<transition-group name="snippet-list">
-  		<div 
+  		<div
   			class="snippet-container"
-  			v-for="snippet in snippets" 
+  			v-for="snippet in snippets"
 			  :key="snippet.id"
   		>
-		  	<router-link 
+		  	<router-link
 		  		:to="`/view/${snippet.id}`"
 		  		v-slot="{ navigate, href, isExactActive }"
 		  		custom
 		  		exact-active-class="bg-light text-primary"
 		  	>
-				  <div 
+				  <div
 				  	class="py-4 px-5 border-b snippet block hover:bg-light group"
 				  	:class="{ 'text-primary bg-light': isExactActive }"
 				  >
 			  		<div class="mb-3 flex items-center">
 			  			<icon-ui
-			  				name="link" 
-			  				size="18" 
-			  				class="text-primary mr-1" 
+			  				name="link"
+			  				size="18"
+			  				class="text-primary mr-1"
 			  				v-if="snippet.isShared"
 			  			></icon-ui>
-			  			<a 
+			  			<a
 			  				class="leading-tight text-overflow flex-1 pr-2 focus:text-primary"
 			  				v-bind="{ href }"
 			  				@click="navigate"
 			  				:title="snippet.name"
 			  			>{{ snippet.name }}</a>
-				  		<icon-ui 
-				  			:name="snippet.starred ? 'starSolid' : 'star'" 
+				  		<icon-ui
+				  			:name="snippet.starred ? 'starSolid' : 'star'"
 				  			size="22"
-				  			:class="[snippet.starred ? 'text-warning visible' : 'lg:invisible text-light']" 
+				  			:class="[snippet.starred ? 'text-warning visible' : 'lg:invisible text-light']"
 				  			class="group-hover:visible cursor-pointer"
 				  			@click="updateFile(snippet.id, { starred: !snippet.starred })"
 				  		></icon-ui>
 				  	</div>
-			  		<a 
+			  		<a
 			  			class="snippet__footer text-sm text-lighter flex items-center justify-between"
 			  			@click="navigate"
 			  			v-bind="{ href }"
@@ -105,8 +106,8 @@ export default {
   		{ name: 'Name', value: 'name' },
   		{ name: 'Language', value: 'language' },
   	];
-  	
-  	const store = useStore();  	
+
+  	const store = useStore();
   	const activeFilter = computed(() => store.state.filterBy);
   	const snippets = computed(() => {
   		const search = store.state.searchQuery;

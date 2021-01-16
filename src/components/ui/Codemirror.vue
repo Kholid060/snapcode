@@ -10,8 +10,8 @@ import {
   watch,
   shallowRef,
 } from 'vue';
-import { useTheme } from 'comps-ui';
 import Codemirror from 'codemirror';
+import { useTheme } from '~/composable';
 import 'codemirror/mode/javascript/javascript';
 import 'codemirror/mode/css/css';
 import 'codemirror/mode/htmlmixed/htmlmixed';

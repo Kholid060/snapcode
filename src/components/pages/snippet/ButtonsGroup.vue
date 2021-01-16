@@ -12,9 +12,9 @@
 					item-value="id"
 					v-model="selectedFolder"
 				></select-ui>
-				<button-ui 
-					block 
-					variant="primary" 
+				<button-ui
+					block
+					variant="primary"
 					class="mt-4"
 					:disabled="selectedFolder === ''"
 					@click="forkSnippet"
@@ -31,9 +31,10 @@
 </template>
 <script>
 import { onMounted, ref } from 'vue';
-import { useGroupTooltip, useNotification } from 'comps-ui';
+import { useToast } from 'vue-toastification';
+import { useGroupTooltip } from '~/composable';
 import { Folder, File } from '~/models';
-import copyToClipboard from '~/utils/copyToClipboard';
+import { copyToClipboard } from '~/utils/helper';
 
 export default {
   props: {
@@ -44,19 +45,20 @@ export default {
     isLocalFile: Boolean,
   },
   setup(props, { emit }) {
+    const toast = useToast();
   	const folders = Folder.all();
   	const selectedFolder = ref(folders[0]?.id || '');
 
   	function copyCode() {
   		copyToClipboard(props.file.value.code);
-  	  useNotification({
-        content: 'Code copied',
-        duration: 2000,
+
+      toast.success('Code copied', {
+        timeout: 2000,
       });
     }
   	function forkSnippet() {
   		const copyFile = { ...props.file };
-  		
+
   		delete copyFile.id;
 
   		File.$create({

@@ -1,14 +1,10 @@
-const customTheme = require('comps-ui/dist/theme');
 const switchTheme = require('switch-theme');
+const theme = require('./src/lib/theme');
 
 module.exports = {
   purge: false,
   theme: {
   	extend: {
-      backgroundOpacity: {
-        90: '0.9',
-        10: '0.1',
-      },
       container: {
         center: true,
         screens: {
@@ -22,5 +18,5 @@ module.exports = {
   variants: {
   	visibility: ['responsive', 'hover', 'focus', 'group-hover'],
   },
-  plugins: [switchTheme(customTheme)],
+  plugins: [switchTheme(theme)],
 };

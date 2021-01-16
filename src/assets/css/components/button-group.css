@@ -1,0 +1,9 @@
+.button-group-ui>.button-ui:not(:first-child):not(:last-child) {
+  border-radius: 0px;
+}
+.button-group-ui .button-ui:first-child {
+  @apply rounded-r-none;
+}
+.button-group-ui .button-ui:last-child {
+  @apply rounded-l-none;
+}

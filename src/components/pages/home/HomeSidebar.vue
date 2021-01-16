@@ -1,18 +1,18 @@
 <template>
-	<div 
+	<div
 		class="absolute z-50 lg:relative w-full lg:w-64 bg-black bg-opacity-25"
 		@click.self="closeSidebar"
 		:class="[store.state.showSidebar ? 'block' : 'hidden lg:block']"
 	>
-		<div 
+		<div
 			class="bg-light h-full p-5 h-screen overflow-auto scroll w-64 bg-opacity-100 shadow-xl lg:shadow-none"
 		>
 			<div class="mb-6 library">
 				<p class="mb-3 text-lighter">Library</p>
 				<list-ui class="space-y-1">
-					<list-item-ui 
-						small 
-						class="cursor-pointer" 
+					<list-item-ui
+						small
+						class="cursor-pointer"
 						:active="activeFilter === 'all'"
 						@click="filterBy('all')"
 					>
@@ -21,9 +21,9 @@
 						</template>
 						All snippets
 					</list-item-ui>
-					<list-item-ui 
-						small 
-						class="cursor-pointer" 
+					<list-item-ui
+						small
+						class="cursor-pointer"
 						:active="activeFilter === 'starred'"
 						@click="filterBy('starred')"
 					>
@@ -37,8 +37,8 @@
 			<div class="folders">
 				<div class="flex items-center text-lighter justify-between mb-3">
 					<p>Folders</p>
-					<icon-ui 
-						class="cursor-pointer" 
+					<icon-ui
+						class="cursor-pointer"
 						name="mdiPlus"
 						v-tooltip="'Add folder'"
 						@click="addFolder"
@@ -49,9 +49,9 @@
 				</p>
 				<list-ui class="space-y-1">
 					<list-item-ui
-						small 
-						v-for="folder in folders" 
-						:key="folder.id" 
+						small
+						v-for="folder in folders"
+						:key="folder.id"
 						class="cursor-pointer group"
 						@click="filterBy(folder.id)"
 						:active="folder.id === activeFilter"
@@ -69,9 +69,9 @@
 								></icon-ui>
 								<template #popover>
 									<list-ui class="w-40 space-y-1">
-										<list-item-ui 
-											v-close-popover 
-											small 
+										<list-item-ui
+											v-close-popover
+											small
 											@click="renameFolder(folder)"
 											class="cursor-pointer"
 										>
@@ -80,10 +80,10 @@
 											</template>
 											Rename
 										</list-item-ui>
-										<list-item-ui 
-											@click="deleteFolder(folder)" 
+										<list-item-ui
+											@click="deleteFolder(folder)"
 											small
-											v-close-popover 
+											v-close-popover
 											class="cursor-pointer"
 										>
 											<template #prepend>
@@ -104,7 +104,7 @@
 <script>
 import { computed } from 'vue';
 import { useStore } from 'vuex';
-import { useDialog } from 'comps-ui';
+import { useDialog } from '~/composable';
 import { Folder, File } from '~/models';
 
 export default {
@@ -125,7 +125,7 @@ export default {
   			},
   			onConfirm: (name) => {
   				Folder.$update({
-  					data: { 
+  					data: {
   						name,
   						isEdited: true,
   						isNew: true,
@@ -170,11 +170,11 @@ export default {
 	  		onConfirm: () => {
 		  		Folder.$delete(id).then(async () => {
 		  			await File.$delete((file) => file.folderId === id);
-		  			
+
 		  			store.commit('updateState', { key: 'filterBy', value: 'all' });
 		  		});
 	  		},
-	  	});	
+	  	});
   	}
   	function closeSidebar() {
   		store.commit('updateState', {

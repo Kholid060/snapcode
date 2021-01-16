@@ -4,3 +4,7 @@
 /* purgecss end ignore */
 
 @tailwind utilities;
+
+button, input, [tabindex] {
+	@apply focus:outline-none;
+}

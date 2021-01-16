@@ -2,9 +2,9 @@
 	<nav class="nav flex mb-12 items-center">
 		<div class="author flex items-center">
 			<avatar-ui class="mr-4">
-				<img 
-					:src="file.user.photoURL" 
-					alt="user photo" 
+				<img
+					:src="file.user.photoURL"
+					alt="user photo"
 					v-if="file.user.photoURL"
 				/>
 				<icon-ui name="user" v-else></icon-ui>
@@ -17,8 +17,8 @@
 			</div>
 		</div>
 		<div class="flex-grow"></div>
-		<button-ui 
-			@click="theme.toggle" 
+		<button-ui
+			@click="theme.toggle"
 			icon
 			v-tooltip="'Dark mode'"
 			:class="{ 'text-primary': theme.currentTheme.value === 'dark' }"
@@ -29,7 +29,7 @@
 </template>
 <script>
 import dayjs from 'dayjs';
-import { useTheme } from 'comps-ui';
+import { useTheme } from '~/composable';
 
 export default {
   props: {

@@ -1,0 +1,35 @@
+.switch-ui {
+  overflow: hidden;
+  transition: all 250ms ease
+}
+
+.switch-ui:active {
+  transform: scale(0.93)
+}
+
+.switch-ui__ball {
+  transition: all 250ms ease;
+  left: 6px
+}
+
+.switch-ui__background {
+  transition: all 250ms ease;
+  margin-left: -100%
+}
+
+.switch-ui:hover .switch-ui__ball {
+  transform: scale(1.1)
+}
+
+.switch-ui input:focus~.switch-ui__ball {
+  transform: scale(1.1)
+}
+
+.switch-ui input:checked~.switch-ui__ball {
+  color: white;
+  left: calc(100% - 21px)
+}
+
+.switch-ui input:checked~.switch-ui__background {
+  margin-left: 0
+}

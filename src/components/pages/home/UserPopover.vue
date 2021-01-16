@@ -1,15 +1,13 @@
 <template>
   <div class="user-popover inline-block">
   	<popover-ui class="align-middle">
-  	  <avatar-ui 
-        style="cursor: pointer;"
-        class="inline-block" 
-        size="small"
+  	  <avatar-ui
+        class="inline-block mt-1 cursor-pointer"
         type="round"
       >
-        <img 
-          :src="user.photoUrl" 
-          alt="user photo" 
+        <img
+          :src="user.photoUrl"
+          alt="user photo"
           v-if="user"
         />
   	  	<icon-ui name="user" v-else></icon-ui>
@@ -44,9 +42,9 @@
             <span>Settings</span>
           </list-item-ui> -->
           <div class="h1 border-b my-2"></div>
-          <list-item-ui 
-            small 
-            class="text-danger cursor-pointer" 
+          <list-item-ui
+            small
+            class="text-danger cursor-pointer"
             v-if="user"
             @click="logout"
           >
@@ -57,9 +55,9 @@
           </list-item-ui>
           <list-item-ui
             v-close-popover
-            @click="showAuthModal = true" 
-            small 
-            class="cursor-pointer" 
+            @click="showAuthModal = true"
+            small
+            class="cursor-pointer"
             v-else
           >
             <template #prepend>
@@ -76,10 +74,10 @@
 <script>
 import { ref, watch } from 'vue';
 import { useStore } from 'vuex';
-import { useTheme, useDialog } from 'comps-ui';
+import { useTheme, useDialog } from '~/composable';
 import { File, Folder } from '~/models';
 import { auth } from '~/utils/firebase';
-import AuthModal from '~/components/ui/AuthModal.vue';
+import AuthModal from '~/components/layout/AuthModal.vue';
 
 export default {
   components: { AuthModal },
@@ -105,7 +103,7 @@ export default {
           auth.signOut().then(async () => {
             await Folder.$deleteAll();
             await File.$deleteAll();
-            
+
             ['deletedFiles', 'deletedFolders', 'lastBackup', 'isDataChanged'].forEach((key) => {
               localStorage.removeItem(key);
             });
@@ -115,7 +113,7 @@ export default {
             }, 1000);
           });
         },
-      }); 
+      });
     }
 
     watch(isDark, (dark) => {

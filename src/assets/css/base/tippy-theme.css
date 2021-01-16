@@ -1,0 +1,7 @@
+.tippy-box[data-theme~='comps-ui'] {
+  @apply bg-dark px-4 py-1 shadow-xl rounded-lg text-gray-200;
+}
+
+.tippy-box[data-theme~='comps-ui'] > .tippy-svg-arrow {
+  fill: rgba(var(--bg-dark), var(--bg-opacity, 1));
+}

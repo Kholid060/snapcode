@@ -3,18 +3,10 @@
 * {
   @apply border-default;
 }
-*:focus, button:focus, input:focus {
-  outline: none !important;
-}
 
 body {
   @apply bg-lighter text-default;
   font-family: 'Inter', sans-serif;
-}
-
-html,
-body {
-  scroll-behavior: smooth;
 }
 
 .line-clamp {
@@ -48,6 +40,15 @@ body {
 .popover-ui {
   z-index: 9999;
 }
+
+.tippy-box[data-theme~='comps-ui'] {
+  @apply bg-dark px-4 py-1 shadow-xl rounded-lg text-gray-200;
+}
+
+.tippy-box[data-theme~='comps-ui'] > .tippy-svg-arrow {
+  fill: rgba(var(--bg-dark), var(--bg-opacity, 1));
+}
+
 
 .CodeMirror {
   font-size: 16px;

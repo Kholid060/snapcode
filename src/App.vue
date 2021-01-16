@@ -9,7 +9,7 @@
 <script>
 import { onMounted, ref } from 'vue';
 import { useStore } from 'vuex';
-import { useTheme } from 'comps-ui';
+import { useTheme } from '~/composable';
 import retrieveBackupData from './utils/retrieveBackupData';
 import getOldData from '~/utils/getOldData';
 

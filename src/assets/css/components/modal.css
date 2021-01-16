@@ -1,0 +1,28 @@
+.modal-enter-active,
+.modal-leave-active {
+  transition: opacity 0.3s ease
+}
+
+.modal-enter-active .modal-ui__content,
+.modal-leave-active .modal-ui__content {
+  transition: transform 0.3s ease;
+  transform: translateY(0px)
+}
+
+.modal-enter-from,
+.modal-leave-to {
+  opacity: 0
+}
+
+.modal-enter-from .modal-ui__content,
+.modal-leave-to .modal-ui__content {
+  transform: translateY(30px)
+}
+
+.modal-ui__content-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}

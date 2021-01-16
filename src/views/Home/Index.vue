@@ -20,9 +20,9 @@
 <script>
 import { onMounted } from 'vue';
 import { useRoute } from 'vue-router';
-import HomeSidebar from '../components/pages/home/HomeSidebar.vue';
-import Snippets from '../components/pages/home/Snippets.vue';
-import HomeNavigation from '../components/pages/home/HomeNavigation.vue';
+import HomeSidebar from '~/components/pages/home/HomeSidebar.vue';
+import Snippets from '~/components/pages/home/Snippets.vue';
+import HomeNavigation from '~/components/pages/home/HomeNavigation.vue';
 import backup from '~/utils/backup';
 
 export default {
