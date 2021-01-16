@@ -32,7 +32,17 @@
 	  		<icon-ui name="mdiPlus"></icon-ui>
 	  	</button-ui>
   	</div>
-  	<transition-group name="snippet-list">
+    <div class="skeletons" v-if="!isRetrieved">
+      <div
+        class="border-b py-4 px-5 w-full bg-input animate-pulse"
+        v-for="i in 5"
+        :key="i"
+      >
+        <div class="w-36 rounded-lg h-6 bg-input animate-pulse"></div>
+        <div class="w-24 mt-2 rounded-lg h-6 bg-input animate-pulse"></div>
+      </div>
+    </div>
+  	<transition-group name="snippet-list" v-else>
   		<div
   			class="snippet-container"
   			v-for="snippet in snippets"
@@ -81,7 +91,7 @@
 			  </router-link>
 			</div>
 		</transition-group>
-		<p class="text-lighter text-center my-6" v-if="snippets.length === 0">
+		<p class="text-lighter text-center my-6" v-if="isRetrieved && snippets.length === 0">
 			No data
 		</p>
   </div>
@@ -108,8 +118,10 @@ export default {
   	];
 
   	const store = useStore();
+
   	const activeFilter = computed(() => store.state.filterBy);
-  	const snippets = computed(() => {
+  	const isRetrieved = computed(() => store.state.isRetrieved);
+    const snippets = computed(() => {
   		const search = store.state.searchQuery;
   		const filtered = File.query()
   			.where((file) => {
@@ -161,6 +173,7 @@ export default {
   		updateFile,
   		formatTime,
   		sortOptions,
+      isRetrieved,
   		activeFilter,
   	};
   },

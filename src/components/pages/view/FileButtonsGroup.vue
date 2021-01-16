@@ -116,7 +116,7 @@ export default {
       event.target.select();
       document.execCommand('copy');
 
-      toast.success('Link copied', {
+      toast('Link copied', {
         timeout: 2000,
       });
     }
@@ -125,7 +125,7 @@ export default {
       const code = cmContainer.CodeMirror.getValue();
 
       copyToClipboard(code);
-      toast.success('Code copied', {
+      toast('Code copied', {
         timeout: 2000,
       });
     }

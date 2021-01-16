@@ -18,7 +18,6 @@
 import { computed } from 'vue';
 import icons from '~/lib/icons';
 
-console.log(icons);
 export default {
   props: {
     viewBox: {

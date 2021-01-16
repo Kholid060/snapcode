@@ -52,7 +52,7 @@ export default {
   	function copyCode() {
   		copyToClipboard(props.file.value.code);
 
-      toast.success('Code copied', {
+      toast('Code copied', {
         timeout: 2000,
       });
     }

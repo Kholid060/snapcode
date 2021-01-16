@@ -25,6 +25,7 @@ const store = createStore({
     user: null,
     lastBackup: Date.now(),
     isDataChanged: false,
+    isRetrieved: false,
   }),
   mutations: {
   	updateState(state, { key, value }) {

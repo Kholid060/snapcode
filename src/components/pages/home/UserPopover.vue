@@ -72,7 +72,7 @@
   </div>
 </template>
 <script>
-import { ref, watch } from 'vue';
+import { ref, watch, computed } from 'vue';
 import { useStore } from 'vuex';
 import { useTheme, useDialog } from '~/composable';
 import { File, Folder } from '~/models';
@@ -88,6 +88,7 @@ export default {
 
   	const isDark = ref(theme.currentTheme.value === 'dark');
     const showAuthModal = ref(false);
+    const user = computed(() => store.state.user);
 
   	function logout() {
       dialog.confirm({
@@ -121,7 +122,7 @@ export default {
     });
 
     return {
-    	user: store.state.user,
+    	user,
       isDark,
     	logout,
     	showAuthModal,

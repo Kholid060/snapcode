@@ -1,9 +1,9 @@
 <template>
   <div class="app">
-    <router-view v-if="isRetrieved"></router-view>
-    <div class="my-10" v-else>
+    <div class="my-10" v-if="$route.name === 'snippet' && !$store.state.isRetrieved">
       <spinner-ui class="mx-auto"></spinner-ui>
     </div>
+    <router-view v-else></router-view>
   </div>
 </template>
 <script>
@@ -17,14 +17,9 @@ export default {
   setup() {
     const store = useStore();
     const isRetrieved = ref(false);
-    const isError = ref(false);
 
   	const theme = useTheme();
   	theme.setTheme(localStorage.getItem('theme') || 'dark');
-
-    function reload() {
-      window.location.reload();
-    }
 
     onMounted(async () => {
       try {
@@ -32,16 +27,20 @@ export default {
         await retrieveBackupData();
         await getOldData();
 
-        isRetrieved.value = true;
+        store.commit('updateState', {
+          key: 'isRetrieved',
+          value: true,
+        });
       } catch (error) {
-        isRetrieved.value = true;
+        store.commit('updateState', {
+          key: 'isRetrieved',
+          value: true,
+        });
         console.error(error);
       }
     });
 
     return {
-      reload,
-      isError,
       isRetrieved,
     };
   },

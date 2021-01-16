@@ -47,7 +47,7 @@
   		    <icon-ui name="cloudUpload"></icon-ui>
   		  </button-ui>
       </div>
-		  <user-popover class="mt-1"></user-popover>
+		  <user-popover></user-popover>
 		</div>
   </nav>
 </template>

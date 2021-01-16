@@ -13,11 +13,10 @@
 		<input-ui
 			@keyup.enter="onConfirm"
 			:class="{ 'mt-2': mergeOptions.content !== '' }"
-			block
 			v-bind="mergeOptions.input"
 			autofocus
 			v-model="state.inputValue"
-			@change="validateInput"
+      class="w-full"
 			v-if="type === 'prompt'"
 		></input-ui>
 		<template #footer>
@@ -38,8 +37,11 @@
 	</modal-ui>
 </template>
 <script>
-import { getCurrentInstance, reactive } from 'vue';
+import { getCurrentInstance, reactive, watch } from 'vue';
 import deepmerge from 'deepmerge';
+import ButtonUi from '~/components/ui/ButtonUi.vue';
+import ModalUi from '~/components/ui/ModalUi.vue';
+import InputUi from '~/components/ui/InputUi.vue';
 
 const defaultOptions = {
   title: '',
@@ -48,8 +50,8 @@ const defaultOptions = {
     placeholder: '',
     modelValue: '',
     hideMessage: true,
-    validate: (value) => !!value,
   },
+  inputValidate: (value) => !!value,
   buttons: {
     cancel: {
       text: 'cancel',
@@ -64,6 +66,7 @@ const defaultOptions = {
 };
 
 export default {
+  components: { ModalUi, ButtonUi, InputUi },
   props: {
   	type: {
   		type: String,
@@ -102,11 +105,10 @@ export default {
   		mergeOptions.onConfirm(param);
   		unmount();
   	}
-  	function validateInput(value) {
-  		state.isValidInput = mergeOptions.input.validate(value);
-  	}
 
-  	validateInput();
+    watch(() => state.inputValue, (value) => {
+      state.isValidInput = mergeOptions.inputValidate(value);
+    }, { immediate: true });
 
   	return {
   		state,
@@ -114,7 +116,6 @@ export default {
   		onCancel,
   		onConfirm,
   		mergeOptions,
-  		validateInput,
   	};
   },
 };
