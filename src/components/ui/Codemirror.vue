@@ -17,6 +17,7 @@ import 'codemirror/mode/css/css';
 import 'codemirror/mode/htmlmixed/htmlmixed';
 import 'codemirror/mode/vue/vue';
 import 'codemirror/mode/clike/clike';
+import 'codemirror/mode/jsx/jsx';
 import 'codemirror/keymap/sublime';
 import 'codemirror/addon/edit/closebrackets';
 import 'codemirror/lib/codemirror.css';

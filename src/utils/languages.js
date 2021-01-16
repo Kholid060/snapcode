@@ -27,6 +27,10 @@ export default {
   	name: 'Javascript',
     mode: 'text/javascript',
   },
+  jsx: {
+    name: 'Javascript (JSX)',
+    mode: 'text/jsx',
+  },
   json: {
     name: 'JSON',
     mode: 'application/json',
@@ -46,6 +50,10 @@ export default {
   typescript: {
     name: 'Typescript',
     mode: 'text/typescript',
+  },
+  tsx: {
+    name: 'Typescript (TSX)',
+    mode: 'text/typescript-jsx',
   },
   vue: {
     name: 'Vue',

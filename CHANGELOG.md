@@ -1,3 +1,9 @@
+## 2.0.3 (2021-01-16)
+
+### Features
+* Support clike language (C, C#, C++, Kotlin) and JSX
+
+
 ## 2.0.2 (2021-01-06)
 
 ### Bug Fixes
