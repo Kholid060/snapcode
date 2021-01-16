@@ -1,6 +1,6 @@
 import { createApp } from 'vue';
 import Toast from 'vue-toastification';
-import CompsUi from './lib/comps-ui2';
+import CompsUi from './lib/comps-ui';
 import router from './router';
 import store from './store';
 import App from './App.vue';
