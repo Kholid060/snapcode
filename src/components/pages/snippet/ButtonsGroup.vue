@@ -50,7 +50,7 @@ export default {
   	const selectedFolder = ref(folders[0]?.id || '');
 
   	function copyCode() {
-  		copyToClipboard(props.file.value.code);
+  		copyToClipboard(props.file.code);
 
       toast('Code copied', {
         timeout: 2000,
