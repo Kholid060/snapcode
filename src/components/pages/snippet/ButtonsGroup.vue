@@ -5,13 +5,11 @@
 				<icon-ui name="mdiSourceFork"></icon-ui>
 			</button-ui>
 			<template #popover>
-				<select-ui
-					label="Select folder"
-					:options="folders"
-					item-label="name"
-					item-value="id"
-					v-model="selectedFolder"
-				></select-ui>
+				<select-ui class="w-full" v-model="selectedFolder">
+          <option v-for="folder in folders" :value="folder.id" :key="folder.id">
+            {{ folder.name }}
+          </option>
+        </select-ui>
 				<button-ui
 					block
 					variant="primary"
@@ -46,6 +44,7 @@ export default {
   },
   setup(props, { emit }) {
     const toast = useToast();
+
   	const folders = Folder.all();
   	const selectedFolder = ref(folders[0]?.id || '');
 
