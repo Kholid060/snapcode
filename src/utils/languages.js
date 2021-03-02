@@ -43,6 +43,10 @@ export default {
     name: 'Less',
     mode: 'text/x-less',
   },
+  python: {
+    name: 'Python',
+    mode: 'text/x-python',
+  },
   scss: {
     name: 'SCSS',
     mode: 'text/x-scss',
