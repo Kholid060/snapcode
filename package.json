@@ -17,7 +17,7 @@
     "deepmerge": "^4.2.2",
     "dexie": "^3.0.3",
     "firebase-auth-lite": "^0.8.7",
-    "nanoid": "^3.1.15",
+    "nanoid": "^3.1.22",
     "postcss": "7",
     "register-service-worker": "^1.6.2",
     "switch-theme": "0.3.0",
