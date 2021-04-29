@@ -22,7 +22,7 @@
     "register-service-worker": "^1.6.2",
     "switch-theme": "0.3.0",
     "tailwindcss": "npm:@tailwindcss/postcss7-compat",
-    "tippy.js": "^6.2.7",
+    "tippy.js": "^6.3.1",
     "vue": "^3.0.1",
     "vue-router": "^4.0.0-beta.13",
     "vue-toastification": "^2.0.0-rc.1",
