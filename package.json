@@ -13,7 +13,7 @@
     "@vuex-orm/core": "^0.36.3",
     "autoprefixer": "9",
     "codemirror": "^5.61.0",
-    "dayjs": "^1.8.26",
+    "dayjs": "^1.10.4",
     "deepmerge": "^4.2.2",
     "dexie": "^3.0.3",
     "firebase-auth-lite": "^0.8.7",
