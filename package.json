@@ -44,7 +44,7 @@
     "eslint-plugin-import": "^2.20.1",
     "eslint-plugin-vue": "^6.1.2",
     "lint-staged": "^10.5.4",
-    "vue-template-compiler": "^2.6.11"
+    "vue-template-compiler": "^2.6.12"
   },
   "gitHooks": {
     "pre-commit": "lint-staged"
