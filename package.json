@@ -9,7 +9,7 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "@tailwindcss/postcss7-compat": "^2.0.2",
+    "@tailwindcss/postcss7-compat": "^2.1.2",
     "@vuex-orm/core": "^0.36.3",
     "autoprefixer": "9",
     "codemirror": "^5.61.0",
