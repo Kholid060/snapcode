@@ -7,11 +7,7 @@
     >
       <slot></slot>
     </select>
-    <icon-ui
-      name="chevronDown"
-      class="absolute select-ui__chevron"
-      size="20"
-    ></icon-ui>
+    <icon-ui name="chevronDown" class="absolute select-ui__chevron" size="20"></icon-ui>
   </div>
 </template>
 <script>
@@ -22,6 +18,7 @@ export default {
       default: '',
     },
   },
+  emits: ['update:modelValue'],
 };
 </script>
 <style>

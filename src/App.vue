@@ -1,6 +1,6 @@
 <template>
   <div class="app">
-    <div class="my-10" v-if="$route.name === 'snippet' && !$store.state.isRetrieved">
+    <div v-if="$route.name === 'snippet' && !$store.state.isRetrieved" class="my-10">
       <spinner-ui class="mx-auto"></spinner-ui>
     </div>
     <router-view v-else></router-view>
@@ -18,8 +18,8 @@ export default {
     const store = useStore();
     const isRetrieved = ref(false);
 
-  	const theme = useTheme();
-  	theme.setTheme(localStorage.getItem('theme') || 'dark');
+    const theme = useTheme();
+    theme.setTheme(localStorage.getItem('theme') || 'dark');
 
     onMounted(async () => {
       try {

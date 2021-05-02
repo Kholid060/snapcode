@@ -5,14 +5,12 @@ export const auth = new Auth({
   redirectUri: `${window.location.origin}/auth`,
 });
 
-export const apiFetch = (path, options) => (
-  auth.authorizedRequest(
-    `${process.env.VUE_APP_API_BASE_URL}${path}`,
-    {
-    	headers: {
-	      'Content-Type': 'application/json',
-	    },
-    	...options,
-    },
-  ).then((response) => response.json())
-);
+export const apiFetch = (path, options) =>
+  auth
+    .authorizedRequest(`${process.env.VUE_APP_API_BASE_URL}${path}`, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      ...options,
+    })
+    .then((response) => response.json());

@@ -1,40 +1,40 @@
 <template>
-	<modal-ui
-		:model-value="state.show"
-		disabled-teleport
-		style="z-index: 9999"
-		@close="unmount"
-		content-class="md:max-w-sm"
-	>
-		<template #header>
-			<p class="font-semibold text-lg leading-tight">{{ mergeOptions.title }}</p>
-		</template>
-		<p>{{ mergeOptions.content }}</p>
-		<input-ui
-			@keyup.enter="onConfirm"
-			:class="{ 'mt-2': mergeOptions.content !== '' }"
-			v-bind="mergeOptions.input"
-			autofocus
-			v-model="state.inputValue"
+  <modal-ui
+    :model-value="state.show"
+    disabled-teleport
+    style="z-index: 9999"
+    content-class="md:max-w-sm"
+    @close="unmount"
+  >
+    <template #header>
+      <p class="font-semibold text-lg leading-tight">{{ mergeOptions.title }}</p>
+    </template>
+    <p>{{ mergeOptions.content }}</p>
+    <input-ui
+      v-if="type === 'prompt'"
+      v-model="state.inputValue"
+      :class="{ 'mt-2': mergeOptions.content !== '' }"
+      v-bind="mergeOptions.input"
+      autofocus
       class="w-full"
-			v-if="type === 'prompt'"
-		></input-ui>
-		<template #footer>
-			<div class="flex space-x-2 mt-4">
-				<button-ui class="flex-1" @click="onCancel" v-if="mergeOptions.buttons.cancel">
-					{{ mergeOptions.buttons.cancel.text }}
-				</button-ui>
-				<button-ui
-					@click="onConfirm"
-					class="flex-1"
-					v-bind="mergeOptions.buttons.confirm"
-					:disabled="type === 'prompt' && !state.isValidInput"
-				>
-					{{ mergeOptions.buttons.confirm.text }}
-				</button-ui>
-			</div>
-		</template>
-	</modal-ui>
+      @keyup.enter="onConfirm"
+    ></input-ui>
+    <template #footer>
+      <div class="flex space-x-2 mt-4">
+        <button-ui v-if="mergeOptions.buttons.cancel" class="flex-1" @click="onCancel">
+          {{ mergeOptions.buttons.cancel.text }}
+        </button-ui>
+        <button-ui
+          class="flex-1"
+          v-bind="mergeOptions.buttons.confirm"
+          :disabled="type === 'prompt' && !state.isValidInput"
+          @click="onConfirm"
+        >
+          {{ mergeOptions.buttons.confirm.text }}
+        </button-ui>
+      </div>
+    </template>
+  </modal-ui>
 </template>
 <script>
 import { getCurrentInstance, reactive, watch } from 'vue';
@@ -68,55 +68,59 @@ const defaultOptions = {
 export default {
   components: { ModalUi, ButtonUi, InputUi },
   props: {
-  	type: {
-  		type: String,
-  		default: 'confirm',
-  	},
-  	options: {
-  		type: Object,
-  		default: () => ({}),
-  	},
+    type: {
+      type: String,
+      default: 'confirm',
+    },
+    options: {
+      type: Object,
+      default: () => ({}),
+    },
   },
   setup(props) {
-  	const mergeOptions = deepmerge(defaultOptions, props.options);
-  	const state = reactive({
-  		show: true,
-  		inputValue: mergeOptions.input.modelValue,
-  		isValidInput: false,
-  	});
-  	const insance = getCurrentInstance();
+    const mergeOptions = deepmerge(defaultOptions, props.options);
+    const state = reactive({
+      show: true,
+      inputValue: mergeOptions.input.modelValue,
+      isValidInput: false,
+    });
+    const insance = getCurrentInstance();
 
-  	function unmount() {
-  		state.show = false;
+    function unmount() {
+      state.show = false;
 
-  		setTimeout(() => {
-  			insance.appContext.app.unmount();
-  		}, 500);
-  	}
-  	function onCancel() {
-  		mergeOptions.onCancel();
-  		unmount();
-  	}
-  	function onConfirm() {
-  		if (props.type === 'prompt' && !state.isValidInput) return;
+      setTimeout(() => {
+        insance.appContext.app.unmount();
+      }, 500);
+    }
+    function onCancel() {
+      mergeOptions.onCancel();
+      unmount();
+    }
+    function onConfirm() {
+      if (props.type === 'prompt' && !state.isValidInput) return;
 
-  		const param = props.type === 'prompt' ? state.inputValue : true;
+      const param = props.type === 'prompt' ? state.inputValue : true;
 
-  		mergeOptions.onConfirm(param);
-  		unmount();
-  	}
+      mergeOptions.onConfirm(param);
+      unmount();
+    }
 
-    watch(() => state.inputValue, (value) => {
-      state.isValidInput = mergeOptions.inputValidate(value);
-    }, { immediate: true });
+    watch(
+      () => state.inputValue,
+      (value) => {
+        state.isValidInput = mergeOptions.inputValidate(value);
+      },
+      { immediate: true }
+    );
 
-  	return {
-  		state,
-  		unmount,
-  		onCancel,
-  		onConfirm,
-  		mergeOptions,
-  	};
+    return {
+      state,
+      unmount,
+      onCancel,
+      onConfirm,
+      mergeOptions,
+    };
   },
 };
 </script>

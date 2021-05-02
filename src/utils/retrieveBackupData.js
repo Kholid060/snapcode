@@ -7,28 +7,28 @@ function mergeData(modelName, newData) {
   const data = model.all();
 
   data.forEach((item) => {
-  	const itemIndex = newData.findIndex(({ id }) => id === item.id);
+    const itemIndex = newData.findIndex(({ id }) => id === item.id);
 
-  	if (itemIndex === -1 && !item.isNew) {
-  		model.$delete(item.id);
-  	} else if (itemIndex !== -1) {
-		  model.$update({
-		    where: item.id,
-		    data: {
-		    	...newData[itemIndex],
-		    	createdAt: getTimestamp(newData[itemIndex].createdAt),
-		    },
-		  });
-    
-    	newData.splice(itemIndex, 1);
-  	}
+    if (itemIndex === -1 && !item.isNew) {
+      model.$delete(item.id);
+    } else if (itemIndex !== -1) {
+      model.$update({
+        where: item.id,
+        data: {
+          ...newData[itemIndex],
+          createdAt: getTimestamp(newData[itemIndex].createdAt),
+        },
+      });
+
+      newData.splice(itemIndex, 1);
+    }
   });
 
   model.$update({
-  	data: newData.map((item) => ({
-  		...item,
-  		createdAt: getTimestamp(item.createdAt),
-  	})),
+    data: newData.map((item) => ({
+      ...item,
+      createdAt: getTimestamp(item.createdAt),
+    })),
   });
 }
 
@@ -43,7 +43,5 @@ export default async function () {
   mergeData('folders', data.folders);
   mergeData('files', data.files);
 
-  localStorage.setItem(
-  	'lastBackup', data.lastBackup ? getTimestamp(data.lastBackup) : Date.now(),
-  );
+  localStorage.setItem('lastBackup', data.lastBackup ? getTimestamp(data.lastBackup) : Date.now());
 }

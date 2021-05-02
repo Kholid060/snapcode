@@ -19,7 +19,7 @@ VuexORM.use(VuexORMLocalForage, {
 const store = createStore({
   plugins: [VuexORM.install(database)],
   state: () => ({
-  	searchQuery: '',
+    searchQuery: '',
     filterBy: 'all',
     showSidebar: false,
     user: null,
@@ -28,9 +28,9 @@ const store = createStore({
     isRetrieved: false,
   }),
   mutations: {
-  	updateState(state, { key, value }) {
-    	state[key] = value;
-  	},
+    updateState(state, { key, value }) {
+      state[key] = value;
+    },
   },
   actions: {
     async retrieveData({ commit }) {
@@ -43,7 +43,7 @@ const store = createStore({
             files: [
               {
                 name: 'First snippet',
-                code: 'console.log(\'hello world\')',
+                code: "console.log('hello world')",
               },
             ],
           },

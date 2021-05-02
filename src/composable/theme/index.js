@@ -4,9 +4,9 @@ const currentTheme = ref('dark');
 
 export default function (params = {}) {
   const options = {
-	  root: document.body,
-	  toggleTheme: ['dark', 'light'], 
-	  ...params,
+    root: document.body,
+    toggleTheme: ['dark', 'light'],
+    ...params,
   };
 
   function setTheme(theme) {
@@ -20,7 +20,7 @@ export default function (params = {}) {
     if (currentThemeIndex === -1) return;
 
     const theme = options.toggleTheme[currentThemeIndex === 0 ? 1 : 0];
-    
+
     setTheme(theme);
   }
 

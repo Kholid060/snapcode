@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "lint": "eslint --ext .js,.vue --ignore-path .gitignore ."
+    "lint": "eslint --ext .js,.vue --ignore-path .gitignore .",
+    "commit": "cz"
   },
   "dependencies": {
     "@vuex-orm/core": "^0.36.3",
@@ -31,25 +32,21 @@
     "@vue/compiler-sfc": "^3.0.11",
     "autoprefixer": "^10.2.5",
     "babel-eslint": "^10.0.3",
+    "cz-conventional-changelog": "^3.3.0",
     "eslint": "^7.25.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^3.4.0",
     "eslint-plugin-prettier-vue": "^3.0.0",
     "eslint-plugin-vue": "^7.9.0",
-    "lint-staged": "^10.5.4",
     "postcss": "^8.2.13",
     "prettier": "^2.2.1",
     "tailwindcss": "^2.1.2",
     "vite": "^2.2.3",
     "vite-plugin-pwa": "^0.7.3"
   },
-  "gitHooks": {
-    "pre-commit": "lint-staged"
-  },
-  "lint-staged": {
-    "*.{js,jsx,vue}": [
-      "yarn lint --fix",
-      "git add"
-    ]
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
   }
 }

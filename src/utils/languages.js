@@ -12,11 +12,11 @@ export default {
     mode: 'text/x-csrc',
   },
   css: {
-  	name: 'CSS',
+    name: 'CSS',
     mode: 'text/css',
   },
   html: {
-  	name: 'HTML',
+    name: 'HTML',
     mode: 'htmlmixed',
   },
   java: {
@@ -24,7 +24,7 @@ export default {
     mode: 'text/x-java',
   },
   javascript: {
-  	name: 'Javascript',
+    name: 'Javascript',
     mode: 'text/javascript',
   },
   jsx: {

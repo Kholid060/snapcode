@@ -1,5 +1,5 @@
 <template>
-  <component 
+  <component
     :is="tag"
     class="list-item-ui rounded-lg flex items-center py-2 transition-colors duration-200 ease-in-out"
     tabindex="0"
@@ -10,13 +10,13 @@
       { 'pointer-events-none bg-opacity-75': disabled },
     ]"
   >
-    <div class="mr-3" v-if="$slots.prepend">
+    <div v-if="$slots.prepend" class="mr-3">
       <slot name="prepend"></slot>
     </div>
     <div class="flex-1">
       <slot></slot>
     </div>
-    <div class="ml-3" v-if="$slots.append">
+    <div v-if="$slots.append" class="ml-3">
       <slot name="append"></slot>
     </div>
   </component>
@@ -28,8 +28,8 @@ export default {
     disabled: Boolean,
     small: Boolean,
     tag: {
-    	type: String,
-    	default: 'div',
+      type: String,
+      default: 'div',
     },
   },
 };

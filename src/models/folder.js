@@ -4,46 +4,46 @@ import { updateDataChange } from '~/utils/helper';
 import File from './file';
 
 class Folder extends Model {
-	static entity = 'folders'
-	
-	static primaryKey = 'id';
+  static entity = 'folders';
 
-	static fields() {
-	  return {
-	    id: this.uid(() => nanoid()),
-	    name: this.string(''),
-	    createdAt: this.number(Date.now()),
-	    files: this.hasMany(File, 'folderId'),
-	    isEdited: this.boolean(false),
-	    isNew: this.boolean(false),
-	  };
-	}
+  static primaryKey = 'id';
 
-	static afterUpdate(model) {
-	  updateDataChange(model);
-	}
+  static fields() {
+    return {
+      id: this.uid(() => nanoid()),
+      name: this.string(''),
+      createdAt: this.number(Date.now()),
+      files: this.hasMany(File, 'folderId'),
+      isEdited: this.boolean(false),
+      isNew: this.boolean(false),
+    };
+  }
 
-	static afterWhere(folders) {
-	  /* eslint-disable no-param-reassign */
-	  return folders.map((folder) => {
-	    delete folder.$id;
-	    delete folder.isEdited;
+  static afterUpdate(model) {
+    updateDataChange(model);
+  }
 
-	    return folder;
-	  });
-	}
+  static afterWhere(folders) {
+    /* eslint-disable no-param-reassign */
+    return folders.map((folder) => {
+      delete folder.$id;
+      delete folder.isEdited;
 
-	static afterDelete(model) {
-	  if (model.isNew) return;
-		
-	  updateDataChange(model);
+      return folder;
+    });
+  }
 
-	  const deletedFolderIds = JSON.parse(localStorage.getItem('deletedFolders')) || [];
+  static afterDelete(model) {
+    if (model.isNew) return;
 
-	  deletedFolderIds.push(model.id);
-	
-	  localStorage.setItem('deletedFolders', JSON.stringify(deletedFolderIds));
-	}
+    updateDataChange(model);
+
+    const deletedFolderIds = JSON.parse(localStorage.getItem('deletedFolders')) || [];
+
+    deletedFolderIds.push(model.id);
+
+    localStorage.setItem('deletedFolders', JSON.stringify(deletedFolderIds));
+  }
 }
 
 export default Folder;

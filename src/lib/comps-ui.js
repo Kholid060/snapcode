@@ -22,22 +22,22 @@ import VTooltip from '~/directives/VTooltip';
 import '~/assets/css/base/tippy-theme.css';
 
 export default function (app) {
-  app.component('avatar-ui', AvatarUi);
-  app.component('button-group-ui', ButtonGroupUi);
-  app.component('button-ui', ButtonUi);
-  app.component('card-ui', CardUi);
-  app.component('icon-ui', IconUi);
-  app.component('input-ui', InputUi);
-  app.component('list-item-ui', ListItemUi);
-  app.component('list-ui', ListUi);
-  app.component('modal-ui', ModalUi);
-  app.component('popover-ui', PopoverUi);
-  app.component('select-ui', SelectUi);
-  app.component('spinner-ui', SpinnerUi);
-  app.component('switch-ui', SwitchUi);
+  app.component('AvatarUi', AvatarUi);
+  app.component('ButtonGroupUi', ButtonGroupUi);
+  app.component('ButtonUi', ButtonUi);
+  app.component('CardUi', CardUi);
+  app.component('IconUi', IconUi);
+  app.component('InputUi', InputUi);
+  app.component('ListItemUi', ListItemUi);
+  app.component('ListUi', ListUi);
+  app.component('ModalUi', ModalUi);
+  app.component('PopoverUi', PopoverUi);
+  app.component('SelectUi', SelectUi);
+  app.component('SpinnerUi', SpinnerUi);
+  app.component('SwitchUi', SwitchUi);
 
-  app.component('expand-transition', ExpandTransition);
-  app.component('slide-transition', SlideTransition);
+  app.component('ExpandTransition', ExpandTransition);
+  app.component('SlideTransition', SlideTransition);
 
   app.directive('autoresize', VAutoresize);
   app.directive('close-popover', VClosePopover);
