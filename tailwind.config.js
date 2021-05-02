@@ -2,7 +2,8 @@ const switchTheme = require('switch-theme');
 const theme = require('./src/lib/theme');
 
 module.exports = {
-  purge: false,
+  mode: 'jit',
+  purge: ['./public/**/*.html', './src/**/*.{js,jsx,ts,tsx,vue}'],
   theme: {
   	extend: {
       container: {

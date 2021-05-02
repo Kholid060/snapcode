@@ -4,7 +4,6 @@ import CompsUi from './lib/comps-ui';
 import router from './router';
 import store from './store';
 import App from './App.vue';
-import './registerServiceWorker';
 import 'vue-toastification/dist/index.css';
 import './assets/css/base/tailwind.css';
 import './assets/css/base/style.css';
