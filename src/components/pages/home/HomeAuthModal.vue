@@ -1,23 +1,14 @@
 <template>
-  <modal-ui v-bind="{ modelValue }" content-class="max-w-sm" @close="updateModal">
+  <modal-ui v-model="show" content-class="max-w-sm">
     <template #header> Login </template>
     <div class="space-y-2 mt-2">
-      <!-- <button
-				@click="loginWith('github.com')"
-				class="flex items-center px-4 w-full rounded-lg"
-				style="height: 52px; background-color: #24292e"
-			>
-				<img :src="require('~/assets/svg/github-logo.svg')" class="h-8 w-8" />
-				<span class="ml-3">Continue with Github</span>
-			</button>
- -->
       <button
         class="flex items-center px-4 w-full rounded-lg"
         style="height: 52px; background-color: #4285f4"
         @click="loginWith('google.com')"
       >
         <div class="p-1 rounded-lg bg-white">
-          <img :src="require('~/assets/svg/google-logo.svg')" class="h-6 w-6" />
+          <img :src="googleLogoSvg" class="h-6 w-6" />
         </div>
         <span class="ml-3">Continue with Google</span>
       </button>
@@ -25,7 +16,10 @@
   </modal-ui>
 </template>
 <script>
+import { ref } from 'vue';
+import emitter from 'tiny-emitter/instance';
 import { auth } from '~/utils/firebase';
+import googleLogoSvg from '~/assets/svg/google-logo.svg';
 
 export default {
   props: {
@@ -33,19 +27,23 @@ export default {
   },
   emits: ['update:modelValue'],
   setup(props, { emit }) {
+    const show = ref(false);
+
     function loginWith(provider) {
       auth.signInWithProvider({
         provider,
         oauthScope: 'https://www.googleapis.com/auth/userinfo.profile',
       });
     }
-    function updateModal() {
-      emit('update:modelValue', false);
-    }
+
+    emitter.on('show-auth', (value = true) => {
+      show.value = value;
+    });
 
     return {
+      show,
       loginWith,
-      updateModal,
+      googleLogoSvg,
     };
   },
 };

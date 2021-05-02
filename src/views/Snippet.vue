@@ -18,9 +18,12 @@
           <icon-ui name="lockClosed" size="20"></icon-ui>
           <span class="ml-1 text-sm">Private</span>
         </div>
-        <buttons-group v-bind="{ file, isLocalFile }" @fork="isLocalFile = true"></buttons-group>
+        <snippet-buttons-group
+          v-bind="{ file, isLocalFile }"
+          @fork="isLocalFile = true"
+        ></snippet-buttons-group>
       </div>
-      <codemirror :model-value="file.code" :options="cmOptions"></codemirror>
+      <app-codemirror :model-value="file.code" :options="cmOptions"></app-codemirror>
     </div>
   </div>
 </template>
@@ -32,12 +35,12 @@ import { File } from '~/models';
 import languages from '~/utils/languages';
 import { apiFetch } from '~/utils/firebase';
 import SnippetNavigation from '~/components/pages/snippet/SnippetNavigation.vue';
-import ButtonsGroup from '~/components/pages/snippet/ButtonsGroup.vue';
+import SnippetButtonsGroup from '~/components/pages/snippet/SnippetButtonsGroup.vue';
 
 export default {
   components: {
-    ButtonsGroup,
-    Codemirror: defineAsyncComponent(() => import('~/components/ui/Codemirror.vue')),
+    SnippetButtonsGroup,
+    AppCodemirror: defineAsyncComponent(() => import('~/components/app/AppCodemirror.vue')),
     SnippetNavigation,
   },
   setup() {

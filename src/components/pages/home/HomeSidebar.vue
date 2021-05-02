@@ -1,36 +1,27 @@
 <template>
   <div
-    class="absolute z-50 lg:relative w-full lg:w-64 bg-black bg-opacity-25"
+    class="absolute z-50 lg:relative w-full lg:w-64 bg-black bg-opacity-25 h-screen"
     :class="[store.state.showSidebar ? 'block' : 'hidden lg:block']"
     @click.self="closeSidebar"
   >
     <div
-      class="bg-light h-full p-5 h-screen overflow-auto scroll w-64 bg-opacity-100 shadow-xl lg:shadow-none"
+      class="bg-light h-full p-5 overflow-auto scroll w-64 bg-opacity-100 shadow-xl lg:shadow-none"
     >
       <div class="mb-6 library">
         <p class="mb-3 text-lighter">Library</p>
         <list-ui class="space-y-1">
           <list-item-ui
+            v-for="filter in filters"
+            :key="filter.id"
             small
             class="cursor-pointer"
-            :active="activeFilter === 'all'"
-            @click="filterBy('all')"
+            :active="activeFilter === filter.id"
+            @click="filterBy(filter.id)"
           >
             <template #prepend>
-              <icon-ui name="archive"></icon-ui>
+              <icon-ui :name="filter.icon"></icon-ui>
             </template>
-            All snippets
-          </list-item-ui>
-          <list-item-ui
-            small
-            class="cursor-pointer"
-            :active="activeFilter === 'starred'"
-            @click="filterBy('starred')"
-          >
-            <template #prepend>
-              <icon-ui name="star"></icon-ui>
-            </template>
-            Starred
+            {{ filter.name }}
           </list-item-ui>
         </list-ui>
       </div>
@@ -44,7 +35,10 @@
             @click="addFolder"
           ></icon-ui>
         </div>
-        <folder-list v-bind="{ activeFilter }" @update-filter="filterBy($event)"></folder-list>
+        <sidebar-folders
+          v-bind="{ activeFilter }"
+          @update-filter="filterBy($event)"
+        ></sidebar-folders>
       </div>
     </div>
   </div>
@@ -54,13 +48,19 @@ import { computed } from 'vue';
 import { useStore } from 'vuex';
 import { useDialog } from '~/composable';
 import { Folder } from '~/models';
-import FolderList from './FolderList.vue';
+import SidebarFolders from './sidebar/SidebarFolders.vue';
 
 export default {
-  components: { FolderList },
+  components: { SidebarFolders },
   setup() {
+    const filters = [
+      { id: 'all', name: 'All Snippets', icon: 'archive' },
+      { id: 'starred', name: 'Starred', icon: 'star' },
+    ];
+
     const store = useStore();
     const dialog = useDialog();
+
     const activeFilter = computed(() => store.state.filterBy);
 
     function filterBy(name) {
@@ -96,6 +96,7 @@ export default {
 
     return {
       store,
+      filters,
       filterBy,
       addFolder,
       closeSidebar,

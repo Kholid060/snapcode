@@ -18,10 +18,10 @@
             Created at: {{ formatDate(file.createdAt) }}
           </p>
         </div>
-        <file-buttons-group v-bind="{ file }" @change="updateFile"></file-buttons-group>
+        <view-buttons-group v-bind="{ file }" @change="updateFile"></view-buttons-group>
       </div>
     </expand-transition>
-    <codemirror
+    <app-codemirror
       class="flex-1 overflow-auto scroll mt-2"
       :model-value="file.code"
       :options="state.cmOptions"
@@ -29,7 +29,7 @@
       @cursor-activity="state.cursorPosition = $event"
       @focus="state.isEditorFocused = true"
       @blur="state.isEditorFocused = false"
-    ></codemirror>
+    ></app-codemirror>
     <div class="px-5 text-sm text-lighter py-2">
       <popover-ui content-classes="overflow-hidden">
         <button>{{ file.language }}</button>
@@ -63,12 +63,12 @@ import { useRouter, useRoute } from 'vue-router';
 import dayjs from 'dayjs';
 import { File } from '~/models';
 import languages from '~/utils/languages';
-import FileButtonsGroup from '~/components/pages/view/FileButtonsGroup.vue';
+import ViewButtonsGroup from '~/components/pages/view/ViewButtonsGroup.vue';
 
 export default {
   components: {
-    Codemirror: defineAsyncComponent(() => import('~/components/ui/Codemirror.vue')),
-    FileButtonsGroup,
+    AppCodemirror: defineAsyncComponent(() => import('~/components/app/AppCodemirror.vue')),
+    ViewButtonsGroup,
   },
   setup() {
     const route = useRoute();

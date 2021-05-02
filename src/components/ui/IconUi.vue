@@ -31,7 +31,7 @@ export default {
       default: 24,
     },
     name: {
-      type: String
+      type: String,
       default: '',
     },
   },

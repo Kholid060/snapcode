@@ -32,66 +32,21 @@
         <div class="w-24 mt-2 rounded-lg h-6 bg-input animate-pulse"></div>
       </div>
     </div>
-    <transition-group v-else name="snippet-list">
-      <div v-for="snippet in snippets" :key="snippet.id" class="snippet-container">
-        <router-link
-          v-slot="{ navigate, href, isExactActive }"
-          :to="`/view/${snippet.id}`"
-          custom
-          exact-active-class="bg-light text-primary"
-        >
-          <div
-            class="py-4 px-5 border-b snippet block hover:bg-light group"
-            :class="{ 'text-primary bg-light': isExactActive }"
-          >
-            <div class="mb-3 flex items-center">
-              <icon-ui
-                v-if="snippet.isShared"
-                name="link"
-                size="18"
-                class="text-primary mr-1"
-              ></icon-ui>
-              <a
-                class="leading-tight text-overflow flex-1 pr-2 focus:text-primary"
-                v-bind="{ href }"
-                :title="snippet.name"
-                @click="navigate"
-                >{{ snippet.name }}</a
-              >
-              <icon-ui
-                :name="snippet.starred ? 'starSolid' : 'star'"
-                size="22"
-                :class="[snippet.starred ? 'text-warning visible' : 'lg:invisible text-light']"
-                class="group-hover:visible cursor-pointer"
-                @click="updateFile(snippet.id, { starred: !snippet.starred })"
-              ></icon-ui>
-            </div>
-            <a
-              class="snippet__footer text-sm text-lighter flex items-center justify-between"
-              v-bind="{ href }"
-              @click="navigate"
-            >
-              <span>{{ snippet.language }}</span>
-              <span>{{ formatTime(snippet.createdAt) }}</span>
-            </a>
-          </div>
-        </router-link>
-      </div>
-    </transition-group>
+    <snippet-list v-else v-bind="{ snippets }"></snippet-list>
     <p v-if="isRetrieved && snippets.length === 0" class="text-lighter text-center my-6">No data</p>
   </div>
 </template>
 <script>
 import { computed, shallowReactive } from 'vue';
 import { useStore } from 'vuex';
-import dayjs from 'dayjs';
-import relativeTime from 'dayjs/plugin/relativeTime';
 import { File } from '~/models';
-
-dayjs.extend(relativeTime);
+import SnippetList from './snippet/SnippetList.vue';
 
 export default {
+  components: { SnippetList },
   setup() {
+    const store = useStore();
+
     const sort = shallowReactive({
       by: 'createdAt',
       type: 'desc',
@@ -101,8 +56,6 @@ export default {
       { name: 'Name', value: 'name' },
       { name: 'Language', value: 'language' },
     ];
-
-    const store = useStore();
 
     const activeFilter = computed(() => store.state.filterBy);
     const isRetrieved = computed(() => store.state.isRetrieved);
@@ -125,15 +78,6 @@ export default {
       return filtered;
     });
 
-    function updateFile(id, data) {
-      File.$update({
-        where: id,
-        data: {
-          ...data,
-          isEdited: true,
-        },
-      });
-    }
     function addFile() {
       File.$update({
         data: {
@@ -148,16 +92,11 @@ export default {
         value: true,
       });
     }
-    function formatTime(time) {
-      return dayjs(time).fromNow();
-    }
 
     return {
       sort,
       addFile,
       snippets,
-      updateFile,
-      formatTime,
       sortOptions,
       isRetrieved,
       activeFilter,

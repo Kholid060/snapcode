@@ -28,12 +28,12 @@
               <switch-ui v-model="isDark" class="align-middle"></switch-ui>
             </template>
           </list-item-ui>
-          <!-- <list-item-ui small class="cursor-pointer">
+          <list-item-ui small class="cursor-pointer" @click="emitEvent('import-gist')">
             <template #prepend>
-              <icon-ui name="cog"></icon-ui>
+              <icon-ui name="mdiGithub"></icon-ui>
             </template>
-            <span>Settings</span>
-          </list-item-ui> -->
+            <span>Import Gists</span>
+          </list-item-ui>
           <div class="h1 border-b my-2"></div>
           <list-item-ui v-if="user" small class="text-danger cursor-pointer" @click="logout">
             <template #prepend>
@@ -46,7 +46,7 @@
             v-close-popover
             small
             class="cursor-pointer"
-            @click="showAuthModal = true"
+            @click="emitEvent('show-auth')"
           >
             <template #prepend>
               <icon-ui name="login"></icon-ui>
@@ -56,28 +56,29 @@
         </list-ui>
       </template>
     </popover-ui>
-    <auth-modal v-model="showAuthModal"></auth-modal>
   </div>
 </template>
 <script>
 import { ref, watch, computed } from 'vue';
 import { useStore } from 'vuex';
+import emitter from 'tiny-emitter/instance';
 import { useTheme, useDialog } from '~/composable';
 import { File, Folder } from '~/models';
 import { auth } from '~/utils/firebase';
-import AuthModal from '~/components/layout/AuthModal.vue';
 
 export default {
-  components: { AuthModal },
   setup() {
     const store = useStore();
     const theme = useTheme();
     const dialog = useDialog();
 
     const isDark = ref(theme.currentTheme.value === 'dark');
-    const showAuthModal = ref(false);
+
     const user = computed(() => store.state.user);
 
+    function emitEvent(name) {
+      emitter.emit(name);
+    }
     function logout() {
       dialog.confirm({
         title: 'Are you sure?',
@@ -113,7 +114,7 @@ export default {
       user,
       isDark,
       logout,
-      showAuthModal,
+      emitEvent,
     };
   },
 };

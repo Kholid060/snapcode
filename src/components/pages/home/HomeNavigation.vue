@@ -41,7 +41,7 @@
           <icon-ui name="cloudUpload"></icon-ui>
         </button-ui>
       </div>
-      <user-popover></user-popover>
+      <navigation-user></navigation-user>
     </div>
   </nav>
 </template>
@@ -51,12 +51,12 @@ import { useStore } from 'vuex';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import backup from '~/utils/backup';
-import UserPopover from './UserPopover.vue';
+import NavigationUser from './navigation/NavigationUser.vue';
 
 dayjs.extend(relativeTime);
 
 export default {
-  components: { UserPopover },
+  components: { NavigationUser },
   setup() {
     const store = useStore();
 
