@@ -4,25 +4,23 @@
   "private": false,
   "license": "MIT",
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint --ext .js,.vue --ignore-path .gitignore .",
+    "commit": "cz"
   },
   "dependencies": {
-    "@tailwindcss/postcss7-compat": "^2.1.2",
     "@vuex-orm/core": "^0.36.3",
-    "autoprefixer": "9",
-    "codemirror": "^5.61.0",
+    "codemirror": "^5.58.1",
     "dayjs": "^1.8.26",
     "deepmerge": "^4.2.2",
-    "dexie": "^3.0.3",
+    "dexie": "^3.0.2",
     "firebase-auth-lite": "^0.8.7",
-    "nanoid": "^3.1.22",
-    "postcss": "7",
+    "nanoid": "^3.1.15",
     "register-service-worker": "^1.6.2",
     "switch-theme": "0.3.0",
-    "tailwindcss": "npm:@tailwindcss/postcss7-compat",
-    "tippy.js": "^6.3.1",
+    "tiny-emitter": "^2.1.0",
+    "tippy.js": "^6.2.7",
     "vue": "^3.0.1",
     "vue-router": "^4.0.0-beta.13",
     "vue-toastification": "^2.0.0-rc.1",
@@ -30,29 +28,26 @@
     "vuex-orm-localforage": "^0.3.2"
   },
   "devDependencies": {
-    "@fullhuman/postcss-purgecss": "^3.0.0",
-    "@vue/cli-plugin-babel": "~4.5.7",
-    "@vue/cli-plugin-eslint": "~4.5.7",
-    "@vue/cli-plugin-pwa": "~4.5.12",
-    "@vue/cli-plugin-router": "~4.5.7",
-    "@vue/cli-plugin-vuex": "~4.5.7",
-    "@vue/cli-service": "~4.5.12",
-    "@vue/compiler-sfc": "^3.0.1",
-    "@vue/eslint-config-airbnb": "^5.0.2",
+    "@rollup/plugin-eslint": "^8.0.1",
+    "@vitejs/plugin-vue": "^1.2.2",
+    "@vue/compiler-sfc": "^3.0.11",
+    "autoprefixer": "^10.2.5",
     "babel-eslint": "^10.0.3",
-    "eslint": "^6.7.2",
-    "eslint-plugin-import": "^2.20.1",
-    "eslint-plugin-vue": "^6.1.2",
-    "lint-staged": "^10.5.4",
-    "vue-template-compiler": "^2.6.11"
+    "cz-conventional-changelog": "^3.3.0",
+    "eslint": "^7.25.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^3.4.0",
+    "eslint-plugin-prettier-vue": "^3.0.0",
+    "eslint-plugin-vue": "^7.9.0",
+    "postcss": "^8.2.13",
+    "prettier": "^2.2.1",
+    "tailwindcss": "^2.1.2",
+    "vite": "^2.2.3",
+    "vite-plugin-pwa": "^0.7.3"
   },
-  "gitHooks": {
-    "pre-commit": "lint-staged"
-  },
-  "lint-staged": {
-    "*.{js,jsx,vue}": [
-      "vue-cli-service lint",
-      "git add"
-    ]
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
   }
 }

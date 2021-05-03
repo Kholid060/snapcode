@@ -6,10 +6,12 @@ function capitalize(string) {
 
 export default {
   getAllUpdated(model) {
-    return store.$db().model(model)
-		  .query()
-		  .where(({ isEdited, isNew }) => isEdited || isNew)
-		  .get();
+    return store
+      .$db()
+      .model(model)
+      .query()
+      .where(({ isEdited, isNew }) => isEdited || isNew)
+      .get();
   },
   getAllDeleted(model) {
     return JSON.parse(localStorage.getItem(`deleted${capitalize(model)}`)) || [];
@@ -17,18 +19,21 @@ export default {
   cleanAllFlag(model, ids) {
     return new Promise((resolve) => {
       ids.forEach((item) => {
-		    store.$db().model(model).$update({
-		      where: typeof item === 'string' ? item : item.id,
-		      data: {
-		        isEdited: false,
-		        isNew: false,
-		      },
-		    });
-		  });
+        store
+          .$db()
+          .model(model)
+          .$update({
+            where: typeof item === 'string' ? item : item.id,
+            data: {
+              isEdited: false,
+              isNew: false,
+            },
+          });
+      });
 
-		  localStorage.setItem(`deleted${capitalize(model)}`, JSON.stringify([]));
+      localStorage.setItem(`deleted${capitalize(model)}`, JSON.stringify([]));
 
-		  resolve();
+      resolve();
     });
   },
 };

@@ -1,17 +1,14 @@
 <template>
-  <div class="select-ui inline-block relative bg-input transition rounded-lg">
+  <div class="select-ui inline-block relative bg-input transition rounded-lg cursor-pointer">
     <select
-      class="pr-12 pl-4 py-2 bg-transparent appearance-none w-full focus:outline-none"
+      class="pr-12 pl-4 py-2 bg-transparent appearance-none cursor-pointer w-full focus:outline-none"
       :value="modelValue"
       @change="$emit('update:modelValue', $event.target.value)"
     >
+      <option v-if="placeholder" value="" disabled selected>{{ placeholder }}</option>
       <slot></slot>
     </select>
-    <icon-ui
-      name="chevronDown"
-      class="absolute select-ui__chevron"
-      size="20"
-    ></icon-ui>
+    <icon-ui name="chevronDown" class="absolute select-ui__chevron z-0" size="20"></icon-ui>
   </div>
 </template>
 <script>
@@ -21,7 +18,12 @@ export default {
       type: [String, Number],
       default: '',
     },
+    placeholder: {
+      type: String,
+      default: '',
+    },
   },
+  emits: ['update:modelValue'],
 };
 </script>
 <style>

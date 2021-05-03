@@ -1,28 +1,24 @@
 <template>
   <div class="folder-list">
-    <p class="text-lighter text-center mt-8" v-if="isRetrieved && folders.length === 0">
+    <p v-if="isRetrieved && folders.length === 0" class="text-lighter text-center mt-8">
       You have no folder
     </p>
-    <div class="space-y-2" v-if="!isRetrieved">
-      <div
-        class="bg-input animate-pulse rounded-lg h-10"
-        v-for="i in 3"
-        :key="i"
-      ></div>
+    <div v-if="!isRetrieved" class="space-y-2">
+      <div v-for="i in 3" :key="i" class="bg-input animate-pulse rounded-lg h-10"></div>
     </div>
-    <list-ui class="space-y-1" v-else>
+    <list-ui v-else class="space-y-1">
       <list-item-ui
-        small
         v-for="folder in folders"
         :key="folder.id"
+        small
         class="cursor-pointer group"
-        @click="$emit('update-filter', folder.id)"
         :active="folder.id === activeFilter"
+        @click="$emit('update-filter', folder.id)"
       >
         <template #prepend>
           <icon-ui name="folder"></icon-ui>
         </template>
-        <p class="text-overflow w-32">{{ folder.name }}</p>
+        <p class="text-overflow flex-1">{{ folder.name }}</p>
         <template #append>
           <popover-ui class="text-default">
             <icon-ui
@@ -35,8 +31,8 @@
                 <list-item-ui
                   v-close-popover
                   small
-                  @click="renameFolder(folder)"
                   class="cursor-pointer"
+                  @click="renameFolder(folder)"
                 >
                   <template #prepend>
                     <icon-ui name="pencil"></icon-ui>
@@ -44,10 +40,10 @@
                   Rename
                 </list-item-ui>
                 <list-item-ui
-                  @click="deleteFolder(folder)"
-                  small
                   v-close-popover
+                  small
                   class="cursor-pointer"
+                  @click="deleteFolder(folder)"
                 >
                   <template #prepend>
                     <icon-ui name="trash" class="text-danger"></icon-ui>
@@ -70,8 +66,12 @@ import { Folder, File } from '~/models';
 
 export default {
   props: {
-    activeFilter: String,
+    activeFilter: {
+      type: String,
+      default: '',
+    },
   },
+  emits: ['update-filter'],
   setup() {
     const store = useStore();
     const dialog = useDialog();

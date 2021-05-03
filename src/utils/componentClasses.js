@@ -1,4 +1,3 @@
-/* eslint-disable */
 export const buttonUi = {
   bgColors: {
     default: 'bg-input',
@@ -9,7 +8,8 @@ export const buttonUi = {
   variants: {
     primary: {
       default: 'hover:bg-opacity-90 text-white focus:bg-opacity-90',
-      flat: 'focus:bg-primary hover:bg-opacity-100 focus:bg-opacity-100 focus:text-white hover:text-white text-primary hover:bg-primary',
+      flat:
+        'focus:bg-primary hover:bg-opacity-100 focus:bg-opacity-100 focus:text-white hover:text-white text-primary hover:bg-primary',
     },
     default: {
       default: 'hover:bg-input-dark focus:bg-input-dark',
@@ -17,11 +17,13 @@ export const buttonUi = {
     },
     danger: {
       default: 'hover:bg-opacity-90 text-white focus:bg-opacity-90',
-      flat: 'focus:bg-danger hover:bg-opacity-100 focus:bg-opacity-100 focus:text-white hover:text-white text-danger hover:bg-danger',
+      flat:
+        'focus:bg-danger hover:bg-opacity-100 focus:bg-opacity-100 focus:text-white hover:text-white text-danger hover:bg-danger',
     },
     dark: {
       default: 'hover:bg-opacity-90 text-white focus:bg-opacity-90',
-      flat: 'focus:bg-dark hover:bg-opacity-100 focus:bg-opacity-100 focus:text-white hover:text-white text-dark hover:bg-dark',
+      flat:
+        'focus:bg-dark hover:bg-opacity-100 focus:bg-opacity-100 focus:text-white hover:text-white text-dark hover:bg-dark',
     },
   },
   size: {
