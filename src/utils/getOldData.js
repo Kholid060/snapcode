@@ -23,24 +23,22 @@ function convertFiles(files) {
   if (fileIds.length === 0) return null;
 
   const convertedFiles = fileIds.map((id) => {
-  	const {
-      content, star, title, createDate, mode, 
-    } = files[id];
-  	const language = getLanguageByMode(mode);
-  	
-  	/* eslint-disable-next-line */
+    const { content, star, title, createDate, mode } = files[id];
+    const language = getLanguageByMode(mode);
+
+    /* eslint-disable-next-line */
   	delete files[id].folderId;
 
-  	return {
-	  	id: nanoid(),
-	  	language,
-	  	code: content,
-	  	starred: star,
-	  	name: title,
-	  	createdAt: createDate,
-	  	isEdited: true,
-	  	isNew: true,
-  	};
+    return {
+      id: nanoid(),
+      language,
+      code: content,
+      starred: star,
+      name: title,
+      createdAt: createDate,
+      isEdited: true,
+      isNew: true,
+    };
   });
 
   return convertedFiles;
@@ -52,20 +50,20 @@ function getFolderById(folders, id) {
 
 function convertData(files, folders) {
   const convertedData = files.reduce((data, file) => {
-  	const { name } = getFolderById(folders, file.folderId);
-  	const convertedFiles = convertFiles(file.data);
+    const { name } = getFolderById(folders, file.folderId);
+    const convertedFiles = convertFiles(file.data);
 
-  	data.push({
-  		name,
-  		id: nanoid(),
-  		isNew: true,
-  		isEdited: true,
-  		files: convertedFiles,
-  	});
+    data.push({
+      name,
+      id: nanoid(),
+      isNew: true,
+      isEdited: true,
+      files: convertedFiles,
+    });
 
-  	db.folders.delete(file.folderId);
+    db.folders.delete(file.folderId);
 
-  	return data;
+    return data;
   }, []);
 
   return convertedData;
@@ -73,17 +71,17 @@ function convertData(files, folders) {
 
 export default async function () {
   try {
-	  const files = await db.files.toArray();
-	  const folders = await db.folders.toArray();
+    const files = await db.files.toArray();
+    const folders = await db.folders.toArray();
 
-	  if (files.length === 0 && folders.length === 0) return;
+    if (files.length === 0 && folders.length === 0) return;
 
-	  const convertedData = convertData(files, folders);
+    const convertedData = convertData(files, folders);
 
-	  await Folder.$update({
-	  	data: convertedData,
-	  });
-	  await db.delete();
+    await Folder.$update({
+      data: convertedData,
+    });
+    await db.delete();
   } catch (error) {
     console.error(error);
   }

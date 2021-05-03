@@ -5,12 +5,12 @@ import dataFlag from './dataFlag';
 
 function isEmptyArray({ files, folders }) {
   const keys = ['updated', 'deleted'];
-  const isValidFiles = keys.every((key) => files[key].length === 0);
-  const isValidFolders = keys.every((key) => folders[key].length === 0);
+  const isFilesEmpty = keys.every((key) => files[key].length === 0);
+  const isFoldersEmpty = keys.every((key) => folders[key].length === 0);
 
-  return isValidFolders && isValidFiles;
+  return isFoldersEmpty && isFilesEmpty;
 }
-/* eslint-disable no-unused-expressions */
+
 class Backup {
   constructor() {
     this.init = debounce(this.fetch.bind(this), 1000);

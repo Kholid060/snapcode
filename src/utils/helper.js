@@ -1,5 +1,5 @@
 export function getTimestamp(date) {
-  return (new Date(date)).getTime();
+  return new Date(date).getTime();
 }
 
 export function updateDataChange(model) {
@@ -10,7 +10,7 @@ export function updateDataChange(model) {
     value: true,
   });
 
-  localStorage.setItem('isDataChanged', 'true');
+  localStorage.setItem('isDataChanged', true);
 }
 
 export function debounce(callback, time = 200) {

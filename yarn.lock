@@ -4243,10 +4243,12 @@ vite-plugin-pwa@^0.7.3:
     workbox-build "^6.1.5"
     workbox-window "^6.1.5"
 
+
 vite@^2.2.4:
   version "2.2.4"
   resolved "https://registry.yarnpkg.com/vite/-/vite-2.2.4.tgz#8f9cc85aacab04c850085894b086c8717f12ed16"
   integrity sha512-vnIwSNci+phFMp6krhy+FbYzKL0R67Sdt9mVZ96S27AewrApSJjTqncJcalk8sf60BgcbW4+1C6DFIWkxquO9g==
+
   dependencies:
     esbuild "^0.9.3"
     postcss "^8.2.1"

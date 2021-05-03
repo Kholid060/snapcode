@@ -1,18 +1,20 @@
 <template>
-	<svg v-bind="{
-		viewBox: icon.viewBox || viewBox,
-		height: size,
-		width: size
-	}"
-	class="icon-ui">
+  <svg
+    v-bind="{
+      viewBox: icon.viewBox || viewBox,
+      height: size,
+      width: size,
+    }"
+    class="icon-ui"
+  >
     <path
-    	fill="currentColor"
-    	v-for="(path, index) in icon.paths"
-    	:key="index"
-    	:d="path"
+      v-for="(path, index) in icon.paths"
+      :key="index"
+      fill="currentColor"
+      :d="path"
       v-bind="icon.pathAttrs || {}"
     />
-	</svg>
+  </svg>
 </template>
 <script>
 import { computed } from 'vue';
@@ -28,29 +30,32 @@ export default {
       type: [String, Number],
       default: 24,
     },
-    name: String,
+    name: {
+      type: String,
+      default: '',
+    },
   },
   setup(props) {
-  	return {
-  		icon: computed(() => {
-	  		try {
-	  			const icon = icons[props.name];
+    return {
+      icon: computed(() => {
+        try {
+          const icon = icons[props.name];
 
-	  			if (icon) {
-	  				return {
-	  					...icon,
-	  					paths: Array.isArray(icon.paths) ? icon.paths : [icon.paths],
-	  				};
-	  			}
+          if (icon) {
+            return {
+              ...icon,
+              paths: Array.isArray(icon.paths) ? icon.paths : [icon.paths],
+            };
+          }
 
-	  			throw new Error(`[${props.name}] icon not found`);
-	  		} catch (err) {
-	  			console.error(err);
+          throw new Error(`[${props.name}] icon not found`);
+        } catch (err) {
+          console.error(err);
 
-	  			return [];
-	  		}
-  		}),
-  	};
+          return [];
+        }
+      }),
+    };
   },
 };
 </script>

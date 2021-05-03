@@ -1,25 +1,23 @@
 <template>
   <div class="popover-ui inline-block">
     <div
-      class="inline-block popover-ui__activator"
       ref="activator"
+      class="inline-block popover-ui__activator"
       v-bind="{ tabindex: trigger === 'focusin' || !disabled ? 0 : null }"
     >
       <slot></slot>
     </div>
-		<div
+    <div
+      ref="content"
       class="rounded-lg popover-ui__content bg-card bg-opacity-100 shadow-xl focus:outline-none"
       :class="contentClasses"
-      ref="content"
     >
-			<slot name="popover"></slot>
-		</div>
+      <slot name="popover"></slot>
+    </div>
   </div>
 </template>
 <script>
-import {
-  ref, shallowRef, onMounted, watch,
-} from 'vue';
+import { ref, shallowRef, onMounted, watch } from 'vue';
 import createTippy from '~/utils/createTippy';
 
 export default {
@@ -46,19 +44,26 @@ export default {
       default: 'p-4',
     },
   },
+  emits: ['update:modelValue'],
   setup(props, { emit }) {
     const content = ref(null);
     const activator = ref(null);
     const popover = shallowRef({});
 
-    watch(() => props.modelValue, (value) => {
-      if (props.trigger !== 'manual') return;
+    watch(
+      () => props.modelValue,
+      (value) => {
+        if (props.trigger !== 'manual') return;
 
-      popover.value[value ? 'show' : 'hide']();
-    });
-    watch(() => props.disabled, () => {
-      popover.value[props.disabled ? 'disable' : 'enable']();
-    });
+        popover.value[value ? 'show' : 'hide']();
+      }
+    );
+    watch(
+      () => props.disabled,
+      () => {
+        popover.value[props.disabled ? 'disable' : 'enable']();
+      }
+    );
 
     onMounted(() => {
       popover.value = createTippy(activator.value, {
@@ -88,7 +93,7 @@ export default {
 };
 </script>
 <style>
-.tippy-box[role~="popover"] > .tippy-svg-arrow {
+.tippy-box[role~='popover'] > .tippy-svg-arrow {
   fill: rgba(var(--bg-card), var(--bg-opacity, 1));
 }
 </style>

@@ -5,15 +5,15 @@
   >
     <input
       :checked="modelValue"
-      @input="emitEvent"
       type="checkbox"
       class="absolute h-full w-full opacity-0 cursor-pointer left-0 top-0 z-50"
       v-bind="{ disabled, readonly: disabled || null }"
+      @input="emitEvent"
     />
     <div
       class="switch-ui__ball z-40 rounded-full absolute h-4 w-4 shadow-xl bg-white flex justify-center items-center"
     >
-      <slot name="ball" v-if="$slots.ball"></slot>
+      <slot v-if="$slots.ball" name="ball"></slot>
     </div>
     <div
       class="switch-ui__background absolute h-full rounded-md w-full left-0 top-0 bg-primary"
@@ -29,6 +29,7 @@ export default {
     },
     disabled: Boolean,
   },
+  emits: ['update:modelValue', 'change'],
   setup(props, { emit }) {
     return {
       emitEvent: () => {

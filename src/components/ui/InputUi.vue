@@ -1,10 +1,15 @@
 <template>
   <div class="inline-block input-ui">
-    <label>
-      <span class="text-sm mb-1" v-if="label">{{ label }}</span>
+    <label class="relative">
+      <span v-if="label" class="text-sm mb-1">{{ label }}</span>
       <div class="flex items-center">
-        <icon-ui class="ml-2 absolute left-0" v-if="prependIcon" :name="prependIcon"></icon-ui>
+        <icon-ui
+          v-if="prependIcon"
+          class="ml-2 text-lighter absolute left-0"
+          :name="prependIcon"
+        ></icon-ui>
         <input
+          v-autofocus="autofocus"
           class="py-2 px-4 rounded-lg bg-input hover:bg-input-dark w-full focus:bg-input-dark transition"
           :class="{
             'opacity-75 pointer-events-none': disabled,
@@ -12,8 +17,7 @@
           }"
           v-bind="{ readonly: disabled || null, placeholder, type }"
           :value="modelValue"
-          v-autofocus="autofocus"
-          @input="$emit('update:model-value', $event.target.value)"
+          @input="$emit('update:modelValue', $event.target.value)"
         />
       </div>
     </label>
@@ -24,6 +28,11 @@ import IconUi from './IconUi.vue';
 
 export default {
   components: { IconUi },
+  directives: {
+    autofocus: (el, { value }) => {
+      if (value) el.focus();
+    },
+  },
   props: {
     disabled: {
       type: Boolean,
@@ -54,10 +63,6 @@ export default {
       default: '',
     },
   },
-  directives: {
-    autofocus: (el, { value }) => {
-      if (value) el.focus();
-    },
-  },
+  emits: ['update:modelValue'],
 };
 </script>

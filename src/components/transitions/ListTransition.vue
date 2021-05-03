@@ -1,0 +1,25 @@
+<template>
+  <transition-group name="list" v-bind="$attrs">
+    <slot></slot>
+  </transition-group>
+</template>
+<style>
+.list-item-transition {
+  transition: all 0.4s ease;
+}
+
+.list-leave-active {
+  position: absolute;
+  width: 100%;
+}
+
+.list-enter-from,
+.list-leave-to {
+  opacity: 0;
+}
+
+.list-enter-from,
+.list-enter-from {
+  transform: translateY(30px);
+}
+</style>

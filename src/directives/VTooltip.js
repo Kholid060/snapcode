@@ -13,9 +13,7 @@ function getContent(content) {
 }
 
 export default {
-  mounted(el, {
-    value, arg = 'top', instance, modifiers,
-  }) {
+  mounted(el, { value, arg = 'top', instance, modifiers }) {
     const content = getContent(value);
 
     const tooltip = createTippy(el, {

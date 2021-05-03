@@ -13,11 +13,11 @@
         'pointer-events-none': disabled || loading,
         'block w-full': block,
         'bg-opacity-25': flat,
-      }
+      },
     ]"
     class="button-ui focus:ring-4 relative"
   >
-    <div class="button-ui__loading rounded-lg flex justify-center items-center z-10" v-if="loading">
+    <div v-if="loading" class="button-ui__loading rounded-lg flex justify-center items-center z-10">
       <spinner-ui size="25" stroke-width="7"></spinner-ui>
     </div>
     <span class="flex justify-center items-center" :class="[buttonSize, { 'opacity-50': loading }]">

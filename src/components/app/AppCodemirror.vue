@@ -4,12 +4,7 @@
   </div>
 </template>
 <script>
-import {
-  onMounted,
-  ref,
-  watch,
-  shallowRef,
-} from 'vue';
+import { onMounted, ref, watch, shallowRef } from 'vue';
 import Codemirror from 'codemirror';
 import { useTheme } from '~/composable';
 import 'codemirror/mode/javascript/javascript';
@@ -26,36 +21,36 @@ import '~/assets/css/themes/one-dark.css';
 import '~/assets/css/themes/one-light.css';
 
 export default {
-  emits: ['change', 'update:modelValue', 'cursorActivity', 'focus', 'blur'],
   props: {
     modelValue: {
       type: String,
       default: '',
     },
     options: {
-    	type: Object,
-    	default: () => ({}),
+      type: Object,
+      default: () => ({}),
     },
   },
+  emits: ['change', 'update:modelValue', 'cursorActivity', 'focus', 'blur'],
   setup(props, { emit }) {
-  	const theme = useTheme();
+    const theme = useTheme();
     const editor = shallowRef(null);
-  	const container = ref(null);
+    const container = ref(null);
 
-  	onMounted(() => {
-  		editor.value = new Codemirror(container.value, {
-  			mode: 'text/javascript',
-			  theme: 'one-dark',
-			  keymap: 'sublime',
-			  value: props.modelValue,
+    onMounted(() => {
+      editor.value = new Codemirror(container.value, {
+        mode: 'text/javascript',
+        theme: 'one-dark',
+        keymap: 'sublime',
+        value: props.modelValue,
         tabSize: 2,
         closeBrackets: true,
-			  matchBrackets: true,
-			  autoCloseBrackets: true,
-			  lineNumbers: true,
-			  line: true,
-			  ...props.options,
-  		});
+        matchBrackets: true,
+        autoCloseBrackets: true,
+        lineNumbers: true,
+        line: true,
+        ...props.options,
+      });
 
       editor.value.on('change', (cm) => {
         const value = cm.getValue();
@@ -79,27 +74,34 @@ export default {
       ['.CodeMirror-vscrollbar', '.CodeMirror-hscrollbar'].forEach((selector) => {
         document.querySelector(selector).classList.add('scroll');
       });
-  	});
+    });
 
     watch(theme.currentTheme, (value) => {
       editor.value.setOption('theme', value === 'light' ? 'one-light' : 'one-dark');
     });
-    watch(() => props.options, (options) => {
-      Object.keys(options).forEach((key) => {
-        editor.value.setOption(key, options[key]);
-      });
-    }, { deep: true });
-    watch(() => props.modelValue, (newValue) => {
-      const currentValue = editor.value.getValue();
+    watch(
+      () => props.options,
+      (options) => {
+        Object.keys(options).forEach((key) => {
+          editor.value.setOption(key, options[key]);
+        });
+      },
+      { deep: true }
+    );
+    watch(
+      () => props.modelValue,
+      (newValue) => {
+        const currentValue = editor.value.getValue();
 
-      if (newValue !== currentValue) {
-        editor.value.setValue(newValue);
+        if (newValue !== currentValue) {
+          editor.value.setValue(newValue);
+        }
       }
-    });
+    );
 
-  	return {
-  		container,
-  	};
+    return {
+      container,
+    };
   },
 };
 </script>
