@@ -23,7 +23,7 @@
             <template #prepend>
               <icon-ui name="moon"></icon-ui>
             </template>
-            <span>Dark Mode</span>
+            <span class="flex-1">Dark Mode</span>
             <template #append>
               <switch-ui v-model="isDark" class="align-middle"></switch-ui>
             </template>

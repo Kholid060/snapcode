@@ -13,9 +13,7 @@
     <div v-if="$slots.prepend" class="mr-3">
       <slot name="prepend"></slot>
     </div>
-    <div class="flex-1">
-      <slot></slot>
-    </div>
+    <slot></slot>
     <div v-if="$slots.append" class="ml-3">
       <slot name="append"></slot>
     </div>

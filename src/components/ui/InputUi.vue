@@ -1,9 +1,13 @@
 <template>
   <div class="inline-block input-ui">
-    <label>
+    <label class="relative">
       <span v-if="label" class="text-sm mb-1">{{ label }}</span>
       <div class="flex items-center">
-        <icon-ui v-if="prependIcon" class="ml-2 absolute left-0" :name="prependIcon"></icon-ui>
+        <icon-ui
+          v-if="prependIcon"
+          class="ml-2 text-lighter absolute left-0"
+          :name="prependIcon"
+        ></icon-ui>
         <input
           v-autofocus="autofocus"
           class="py-2 px-4 rounded-lg bg-input hover:bg-input-dark w-full focus:bg-input-dark transition"

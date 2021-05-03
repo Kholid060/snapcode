@@ -24,12 +24,14 @@ class File extends Model {
 
   static afterWhere(files) {
     /* eslint-disable no-param-reassign */
-    return files.map((file) => {
-      delete file.$id;
-      delete file.isEdited;
+    return files
+      .map((file) => {
+        delete file.$id;
+        delete file.isEdited;
 
-      return file;
-    });
+        return file;
+      })
+      .filter((file) => file.name !== '' && file.folderId !== null);
   }
 
   static afterUpdate(model) {

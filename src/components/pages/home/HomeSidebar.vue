@@ -31,7 +31,7 @@
           <icon-ui
             v-tooltip="'Add folder'"
             class="cursor-pointer"
-            name="mdiPlus"
+            name="plus"
             @click="addFolder"
           ></icon-ui>
         </div>

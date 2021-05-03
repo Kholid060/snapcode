@@ -1,6 +1,6 @@
 <template>
-  <transition-group name="snippet-list">
-    <div v-for="snippet in snippets" :key="snippet.id" class="snippet-container">
+  <list-transition>
+    <div v-for="snippet in snippets" :key="snippet.id" class="list-item-transition">
       <router-link
         v-slot="{ navigate, href, isExactActive }"
         :to="`/view/${snippet.id}`"
@@ -44,7 +44,7 @@
         </div>
       </router-link>
     </div>
-  </transition-group>
+  </list-transition>
 </template>
 <script>
 import dayjs from 'dayjs';

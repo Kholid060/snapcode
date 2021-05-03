@@ -18,7 +18,7 @@
         <template #prepend>
           <icon-ui name="folder"></icon-ui>
         </template>
-        <p class="text-overflow w-28">{{ folder.name }}</p>
+        <p class="text-overflow flex-1">{{ folder.name }}</p>
         <template #append>
           <popover-ui class="text-default">
             <icon-ui

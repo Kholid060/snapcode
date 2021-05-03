@@ -10,7 +10,7 @@ export function updateDataChange(model) {
     value: true,
   });
 
-  localStorage.setItem('isDataChanged', 'true');
+  localStorage.setItem('isDataChanged', true);
 }
 
 export function debounce(callback, time = 200) {

@@ -23,7 +23,7 @@
         :disabled="activeFilter === 'starred' || activeFilter === 'all'"
         @click="addFile"
       >
-        <icon-ui name="mdiPlus"></icon-ui>
+        <icon-ui name="plus"></icon-ui>
       </button-ui>
     </div>
     <div v-if="!isRetrieved" class="skeletons">
@@ -107,24 +107,5 @@ export default {
 <style>
 .select-sort > button {
   @apply rounded-l-none;
-}
-
-.snippet-container {
-  transition: all 0.4s ease;
-}
-
-.snippet-list-leave-active {
-  position: absolute;
-  width: 100%;
-}
-
-.snippet-list-enter-from,
-.snippet-list-leave-to {
-  opacity: 0;
-}
-
-.snippet-list-enter-from,
-.snippet-list-enter-from {
-  transform: translateY(30px);
 }
 </style>

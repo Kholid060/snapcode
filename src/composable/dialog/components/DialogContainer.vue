@@ -10,15 +10,16 @@
       <p class="font-semibold text-lg leading-tight">{{ mergeOptions.title }}</p>
     </template>
     <p>{{ mergeOptions.content }}</p>
-    <input-ui
-      v-if="type === 'prompt'"
-      v-model="state.inputValue"
-      :class="{ 'mt-2': mergeOptions.content !== '' }"
-      v-bind="mergeOptions.input"
-      autofocus
-      class="w-full"
-      @keyup.enter="onConfirm"
-    ></input-ui>
+    <form @submit.prevent="onConfirm">
+      <input-ui
+        v-if="type === 'prompt'"
+        v-model="state.inputValue"
+        :class="{ 'mt-2': mergeOptions.content !== '' }"
+        v-bind="mergeOptions.input"
+        autofocus
+        class="w-full"
+      ></input-ui>
+    </form>
     <template #footer>
       <div class="flex space-x-2 mt-4">
         <button-ui v-if="mergeOptions.buttons.cancel" class="flex-1" @click="onCancel">

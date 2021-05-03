@@ -16,6 +16,13 @@
                 <span class="content-header">
                   <slot name="header"></slot>
                 </span>
+                <icon-ui
+                  v-show="!persist"
+                  class="text-lighter cursor-pointer"
+                  name="close"
+                  size="20"
+                  @click="closeModal"
+                ></icon-ui>
               </div>
             </template>
             <slot></slot>
@@ -31,9 +38,10 @@
 <script>
 import { ref, watch, onMounted } from 'vue';
 import CardUi from './CardUi.vue';
+import IconUi from './IconUi.vue';
 
 export default {
-  components: { CardUi },
+  components: { CardUi, IconUi },
   props: {
     modelValue: {
       type: Boolean,
