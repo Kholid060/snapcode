@@ -1,3 +1,12 @@
+## 2.1.0 (2021-05-04)
+
+### Features
+* Import Github gists
+
+### Bug Fixes
+* Google redirect uri is not working
+
+
 ## 2.0.3 (2021-01-16)
 
 ### Features
