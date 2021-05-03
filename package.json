@@ -42,7 +42,7 @@
     "postcss": "^8.2.13",
     "prettier": "^2.2.1",
     "tailwindcss": "^2.1.2",
-    "vite": "^2.2.3",
+    "vite": "^2.2.4",
     "vite-plugin-pwa": "^0.7.3"
   },
   "config": {
