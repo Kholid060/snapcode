@@ -2237,10 +2237,10 @@ findup-sync@^3.0.0:
     micromatch "^3.0.4"
     resolve-dir "^1.0.1"
 
-firebase-auth-lite@^0.8.7:
-  version "0.8.8"
-  resolved "https://registry.yarnpkg.com/firebase-auth-lite/-/firebase-auth-lite-0.8.8.tgz#79965844d0f1bb1c24675a4f6af93b90ecdceaa7"
-  integrity sha512-KXSA1FSpZhR6VcgYxGxjMLIn1Il1Pqs2Clalb07/PeU8DBW6sm8j/uO1xaKqvahN2GGk4jC7m6HRMDmbfK46Iw==
+firebase-auth-lite@^0.8.9:
+  version "0.8.9"
+  resolved "https://registry.yarnpkg.com/firebase-auth-lite/-/firebase-auth-lite-0.8.9.tgz#7c2451373cff979b31436b3e16173222ebec04f1"
+  integrity sha512-dvO1X9jju4Kw3jZoh5TypYByJYcYOyZFtCSElE8rOFCBuzQADNvEXRaWanwQZOJOHRxm6zGHONWVQvEqg2MI6Q==
 
 flat-cache@^3.0.4:
   version "3.0.4"
