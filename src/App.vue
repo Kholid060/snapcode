@@ -4,16 +4,19 @@
       <spinner-ui class="mx-auto"></spinner-ui>
     </div>
     <router-view v-else></router-view>
+    <app-reload-prompt></app-reload-prompt>
   </div>
 </template>
 <script>
 import { onMounted, ref } from 'vue';
 import { useStore } from 'vuex';
 import { useTheme } from '~/composable';
+import AppReloadPrompt from './components/app/AppReloadPrompt.vue';
 import retrieveBackupData from './utils/retrieveBackupData';
-import getOldData from '~/utils/getOldData';
+import getOldData from './utils/getOldData';
 
 export default {
+  components: { AppReloadPrompt },
   setup() {
     const store = useStore();
     const isRetrieved = ref(false);

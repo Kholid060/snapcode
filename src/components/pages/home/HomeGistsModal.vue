@@ -6,7 +6,6 @@
       </button>
       <p class="font-semibold inline-block">Import Gists</p>
     </template>
-    <!-- <button-ui @click="state.showList = !state.showList">test</button-ui> -->
     <slide-transition direction="right" mode="out-in">
       <form v-if="!state.showList" class="mt-3" @submit.prevent="importGists">
         <input-ui
