@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@vuex-orm/core": "^0.36.4",
-    "codemirror": "^5.61.1",
+    "codemirror": "^5.62.0",
     "dayjs": "^1.10.5",
     "deepmerge": "^4.2.2",
     "dexie": "^3.0.2",
