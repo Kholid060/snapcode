@@ -20,7 +20,7 @@
         v-tooltip="'Add snippet'"
         icon
         variant="primary"
-        :disabled="activeFilter === 'starred' || activeFilter === 'all'"
+        :disabled="activeFilter === 'starred'"
         @click="addFile"
       >
         <icon-ui name="plus"></icon-ui>
@@ -82,7 +82,7 @@ export default {
       File.$update({
         data: {
           name: 'untitled snippet',
-          folderId: store.state.filterBy,
+          folderId: store.state.filterBy || '',
           isNew: true,
           isEdited: true,
         },

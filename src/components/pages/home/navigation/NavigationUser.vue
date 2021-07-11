@@ -28,7 +28,12 @@
               <switch-ui v-model="isDark" class="align-middle"></switch-ui>
             </template>
           </list-item-ui>
-          <list-item-ui small class="cursor-pointer" @click="emitEvent('import-gist')">
+          <list-item-ui
+            v-close-popover
+            small
+            class="cursor-pointer"
+            @click="emitEvent('import-gist')"
+          >
             <template #prepend>
               <icon-ui name="mdiGithub"></icon-ui>
             </template>
