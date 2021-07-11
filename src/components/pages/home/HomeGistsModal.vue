@@ -2,7 +2,7 @@
   <modal-ui v-model="state.showModal" content-class="max-w-md">
     <template #header>
       <button v-if="state.showList" class="mr-4" @click="state.showList = false">
-        <icon-ui name="arrowLeft"></icon-ui>
+        <v-mdi name="mdi-arrow-left"></v-mdi>
       </button>
       <p class="font-semibold inline-block">Import Gists</p>
     </template>

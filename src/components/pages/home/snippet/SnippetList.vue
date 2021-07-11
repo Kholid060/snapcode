@@ -12,12 +12,12 @@
           :class="{ 'text-primary bg-light': isExactActive }"
         >
           <div class="mb-3 flex items-center">
-            <icon-ui
+            <v-mdi
               v-if="snippet.isShared"
-              name="link"
+              name="mdi-link-variant"
               size="18"
               class="text-primary mr-1"
-            ></icon-ui>
+            ></v-mdi>
             <a
               class="leading-tight text-overflow flex-1 pr-2 focus:text-primary"
               v-bind="{ href }"
@@ -25,13 +25,13 @@
               @click="navigate"
               >{{ snippet.name }}</a
             >
-            <icon-ui
-              :name="snippet.starred ? 'starSolid' : 'star'"
+            <v-mdi
+              :name="snippet.starred ? 'mdi-star' : 'mdi-star-outline'"
               size="22"
               :class="[snippet.starred ? 'text-warning visible' : 'lg:invisible text-light']"
               class="group-hover:visible cursor-pointer"
               @click="updateFile(snippet.id, { starred: !snippet.starred })"
-            ></icon-ui>
+            ></v-mdi>
           </div>
           <a
             class="snippet__footer text-sm text-lighter flex items-center justify-between"

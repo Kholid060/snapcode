@@ -8,7 +8,7 @@
           class="rounded-r-none border-r align-bottom"
           @click="sort.type = sort.type === 'asc' ? 'desc' : 'asc'"
         >
-          <icon-ui :name="sort.type === 'asc' ? 'sortAscending' : 'sortDescending'"></icon-ui>
+          <v-mdi :name="sort.type === 'asc' ? 'mdiSortAscending' : 'mdiSortDescending'"></v-mdi>
         </button-ui>
         <select-ui v-model="sort.by" class="rounded-l-none">
           <option v-for="option in sortOptions" :key="option.value" :value="option.value">
@@ -23,7 +23,7 @@
         :disabled="activeFilter === 'starred'"
         @click="addFile"
       >
-        <icon-ui name="plus"></icon-ui>
+        <v-mdi name="mdi-plus"></v-mdi>
       </button-ui>
     </div>
     <div v-if="!isRetrieved" class="skeletons">

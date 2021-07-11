@@ -7,7 +7,18 @@
       <transition name="modal" mode="out-in">
         <div
           v-if="show"
-          class="bg-black p-5 overflow-y-auto bg-opacity-50 modal-ui__content-container z-50 flex justify-center items-end md:items-center"
+          class="
+            bg-black
+            p-5
+            overflow-y-auto
+            bg-opacity-50
+            modal-ui__content-container
+            z-50
+            flex
+            justify-center
+            items-end
+            md:items-center
+          "
           @click.self="closeModal"
         >
           <card-ui class="modal-ui__content shadow-lg w-full" :class="[contentClass]">
@@ -16,13 +27,13 @@
                 <span class="content-header">
                   <slot name="header"></slot>
                 </span>
-                <icon-ui
+                <v-mdi
                   v-show="!persist"
                   class="text-lighter cursor-pointer"
-                  name="close"
+                  name="mdi-close"
                   size="20"
                   @click="closeModal"
-                ></icon-ui>
+                ></v-mdi>
               </div>
             </template>
             <slot></slot>
@@ -38,10 +49,9 @@
 <script>
 import { ref, watch, onMounted } from 'vue';
 import CardUi from './CardUi.vue';
-import IconUi from './IconUi.vue';
 
 export default {
-  components: { CardUi, IconUi },
+  components: { CardUi },
   props: {
     modelValue: {
       type: Boolean,

@@ -15,7 +15,7 @@
           v-tooltip:bottom="'Only you can see this snippet'"
           class="px-3 py-2 rounded-full bg-danger self-center bg-opacity-25 text-danger mr-4"
         >
-          <icon-ui name="lockClosed" size="20"></icon-ui>
+          <v-mdi name="mdi-lock-outline" size="20"></v-mdi>
           <span class="ml-1 text-sm">Private</span>
         </div>
         <snippet-buttons-group

@@ -5,15 +5,15 @@
       icon
       @click="updateFile('starred', !file.starred)"
     >
-      <icon-ui
+      <v-mdi
         size="20"
-        :name="file.starred ? 'starSolid' : 'star'"
+        :name="file.starred ? 'mdi-star' : 'mdi-star-outline'"
         :class="{ 'text-warning': file.starred }"
-      ></icon-ui>
+      ></v-mdi>
     </button-ui>
     <popover-ui>
       <button-ui v-tooltip:top.group="'Share'" icon :class="{ 'text-primary': file.isShared }">
-        <icon-ui size="20" name="link"></icon-ui>
+        <v-mdi size="20" name="mdi-link-variant"></v-mdi>
       </button-ui>
       <template #popover>
         <div class="flex justify-between w-48">
@@ -30,7 +30,17 @@
             type="text"
             aria-label="share url"
             placeholder="url"
-            class="p-2 w-48 rounded-lg bg-input hover:bg-input-dark transition-colors duration-200 ease-in mt-4"
+            class="
+              p-2
+              w-48
+              rounded-lg
+              bg-input
+              hover:bg-input-dark
+              transition-colors
+              duration-200
+              ease-in
+              mt-4
+            "
             readonly
             :value="`${location}/snippet/${file.id}`"
             @click="copyUrl"
@@ -45,7 +55,7 @@
       icon
       @click="copyCode"
     >
-      <icon-ui size="20" name="clipboardCopy"></icon-ui>
+      <v-mdi size="20" name="mdi-clipboard-outline"></v-mdi>
     </button-ui>
     <button-ui
       v-tooltip:top.group="'Delete'"
@@ -53,17 +63,17 @@
       class="text-danger hidden md:inline-block rounded-r-lg"
       @click="deleteFile"
     >
-      <icon-ui size="20" name="trash"></icon-ui>
+      <v-mdi size="20" name="mdi-delete-outline"></v-mdi>
     </button-ui>
     <popover-ui class="md:hidden">
       <button-ui icon>
-        <icon-ui size="20" name="dotsHorizontal"></icon-ui>
+        <v-mdi size="20" name="mdi-dots-horizontal"></v-mdi>
       </button-ui>
       <template #popover>
         <list-ui class="space-y-1 w-48">
           <list-item-ui v-close-popover class="cursor-pointer" small @click="copyCode">
             <template #prepend>
-              <icon-ui name="clipboardCopy"></icon-ui>
+              <v-mdi name="mdi-clipboard-outline"></v-mdi>
             </template>
             Copy code
           </list-item-ui>
@@ -74,7 +84,7 @@
             @click="deleteFile"
           >
             <template #prepend>
-              <icon-ui name="trash"></icon-ui>
+              <v-mdi name="mdi-delete-outline"></v-mdi>
             </template>
             Delete snippet
           </list-item-ui>

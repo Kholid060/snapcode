@@ -8,12 +8,12 @@
         icon
         @click="toggleSelectFiles(state.selectedFiles.length >= files.length)"
       >
-        <icon-ui :name="files.length === state.selectedFiles ? 'close' : 'check'"></icon-ui>
+        <v-mdi :name="files.length === state.selectedFiles ? 'mdi-close' : 'mdi-check'"></v-mdi>
       </button-ui>
       <input-ui
         v-model="state.query"
         placeholder="Search file"
-        prepend-icon="search"
+        prepend-icon="mdi-magnify"
         class="w-full"
       ></input-ui>
     </div>

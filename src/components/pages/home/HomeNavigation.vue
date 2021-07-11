@@ -2,15 +2,15 @@
   <nav class="h-16 px-5 border-b flex items-center">
     <div class="lg:hidden">
       <router-link v-if="$route.name === 'view'" to="/" class="md:hidden">
-        <icon-ui name="arrowLeft" class="mr-4"></icon-ui>
+        <v-mdi name="mdi-arrow-left" class="mr-4"></v-mdi>
       </router-link>
       <button :class="{ 'hidden md:block': $route.name === 'view' }">
-        <icon-ui name="menu" class="mr-4 lg:hidden cursor-pointer" @click="toggleSidebar"></icon-ui>
+        <v-mdi name="mdi-menu" class="mr-4 lg:hidden cursor-pointer" @click="toggleSidebar"></v-mdi>
       </button>
     </div>
     <div class="search-container flex-1">
       <div class="md:block" :class="{ hidden: $route.name === 'view' }">
-        <icon-ui name="search" class="text-lighter mr-2"></icon-ui>
+        <v-mdi name="mdi-magnify" class="text-lighter mr-2"></v-mdi>
         <input
           type="text"
           placeholder="Search..."
@@ -27,7 +27,7 @@
         target="_blank"
         rel="noopener"
       >
-        <icon-ui name="mdiGithub" class="text-light" size="28"></icon-ui>
+        <v-mdi name="mdiGithub" class="text-light" size="28"></v-mdi>
       </a>
       <div v-tooltip="!state.isDataChanged ? `Last backup: ${lastBackup}` : 'Backup data'">
         <button-ui
@@ -38,7 +38,7 @@
           variant="primary"
           @click="backupData"
         >
-          <icon-ui name="cloudUpload"></icon-ui>
+          <v-mdi name="mdi-cloud-upload-outline"></v-mdi>
         </button-ui>
       </div>
       <navigation-user></navigation-user>

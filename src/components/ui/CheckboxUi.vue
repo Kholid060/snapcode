@@ -9,9 +9,18 @@
         @change="changeHandler"
       />
       <div
-        class="border border-gray-600 rounded absolute top-0 left-0 bg-input checkbox-ui__mark cursor-pointer"
+        class="
+          border border-gray-600
+          rounded
+          absolute
+          top-0
+          left-0
+          bg-input
+          checkbox-ui__mark
+          cursor-pointer
+        "
       >
-        <icon-ui name="check" size="20" class="text-white"></icon-ui>
+        <v-mdi name="mdi-check" size="20" class="text-white"></v-mdi>
       </div>
     </div>
     <span v-if="$slots.default" class="ml-2">
@@ -51,14 +60,14 @@ export default {
   align-items: center;
   justify-content: center;
 }
-.checkbox-ui__mark .icon-ui {
+.checkbox-ui__mark .mdi-icon {
   transform: scale(0);
   transition: transform 200ms ease;
 }
 .checkbox-ui__input:checked ~ .checkbox-ui__mark {
   @apply bg-primary border-primary bg-opacity-100;
 }
-.checkbox-ui__input:checked ~ .checkbox-ui__mark .icon-ui {
+.checkbox-ui__input:checked ~ .checkbox-ui__mark .mdi-icon {
   transform: scale(1);
 }
 .checkbox-ui__input:focus ~ .checkbox-ui__mark {

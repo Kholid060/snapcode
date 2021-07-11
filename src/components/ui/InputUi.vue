@@ -3,14 +3,23 @@
     <label class="relative">
       <span v-if="label" class="text-sm mb-1">{{ label }}</span>
       <div class="flex items-center">
-        <icon-ui
+        <v-mdi
           v-if="prependIcon"
           class="ml-2 text-lighter absolute left-0"
           :name="prependIcon"
-        ></icon-ui>
+        ></v-mdi>
         <input
           v-autofocus="autofocus"
-          class="py-2 px-4 rounded-lg bg-input hover:bg-input-dark w-full focus:bg-input-dark transition"
+          class="
+            py-2
+            px-4
+            rounded-lg
+            bg-input
+            hover:bg-input-dark
+            w-full
+            focus:bg-input-dark
+            transition
+          "
           :class="{
             'opacity-75 pointer-events-none': disabled,
             'pl-10': prependIcon,
@@ -24,10 +33,7 @@
   </div>
 </template>
 <script>
-import IconUi from './IconUi.vue';
-
 export default {
-  components: { IconUi },
   directives: {
     autofocus: (el, { value }) => {
       if (value) el.focus();

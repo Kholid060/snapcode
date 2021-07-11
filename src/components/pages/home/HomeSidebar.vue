@@ -19,7 +19,7 @@
             @click="filterBy(filter.id)"
           >
             <template #prepend>
-              <icon-ui :name="filter.icon"></icon-ui>
+              <v-mdi :name="filter.icon"></v-mdi>
             </template>
             {{ filter.name }}
           </list-item-ui>
@@ -28,12 +28,12 @@
       <div class="folders">
         <div class="flex items-center text-lighter justify-between mb-3">
           <p>Folders</p>
-          <icon-ui
+          <v-mdi
             v-tooltip="'Add folder'"
             class="cursor-pointer"
-            name="plus"
+            name="mdi-plus"
             @click="addFolder"
-          ></icon-ui>
+          ></v-mdi>
         </div>
         <sidebar-folders
           v-bind="{ activeFilter }"
@@ -54,8 +54,8 @@ export default {
   components: { SidebarFolders },
   setup() {
     const filters = [
-      { id: 'all', name: 'All Snippets', icon: 'archive' },
-      { id: 'starred', name: 'Starred', icon: 'star' },
+      { id: 'all', name: 'All Snippets', icon: 'mdi-archive-outline' },
+      { id: 'starred', name: 'Starred', icon: 'mdi-star-outline' },
     ];
 
     const store = useStore();

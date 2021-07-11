@@ -1,11 +1,13 @@
 import { createApp } from 'vue';
 import DialogContainer from './components/DialogContainer.vue';
+import compsUi from '~/lib/comps-ui';
+import VMdijs from '~/lib/vue-mdijs';
 
 function mountDialog(type, options) {
   const dialog = createApp(DialogContainer, {
     type,
     options,
-  });
+  }).use(VMdijs);
   const component = dialog.mount(document.createElement('div'));
 
   document.body.appendChild(component.$el);

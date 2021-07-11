@@ -2,7 +2,7 @@
   <button-group-ui class="divide-x">
     <popover-ui v-if="!isLocalFile">
       <button-ui v-tooltip.group="'Fork snippet'" icon>
-        <icon-ui name="mdiSourceFork"></icon-ui>
+        <v-mdi name="mdiSourceFork"></v-mdi>
       </button-ui>
       <template #popover>
         <select-ui v-model="selectedFolder" class="w-full">
@@ -23,7 +23,7 @@
       </template>
     </popover-ui>
     <button-ui v-tooltip.group="'Copy code'" icon @click="copyCode">
-      <icon-ui name="clipboardCopy"></icon-ui>
+      <v-mdi name="mdi-clipboard-outline"></v-mdi>
     </button-ui>
   </button-group-ui>
 </template>
