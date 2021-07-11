@@ -109,33 +109,46 @@ export default {
     async function importGists() {
       state.loadingImport = true;
 
-      for (const id of state.selectedFiles) {
-        const { content, language, raw_url, filename } =
-          props.files.find((file) => file.id === id) || {};
-        const file = {
-          name: filename,
-          isEdited: true,
-          isNew: true,
-          folderId: state.selectedFolder,
-          language: language.toLowerCase(),
-          code: content,
-        };
+      const promises = state.selectedFiles.map(async (id) => {
+        try {
+          const { content, language, raw_url, filename } =
+            props.files.find((file) => file.id === id) || {};
+          const file = {
+            name: filename,
+            isEdited: true,
+            isNew: true,
+            folderId: state.selectedFolder,
+            language: language.toLowerCase(),
+            code: content,
+            createdAt: Date.now(),
+          };
 
-        if (typeof content === 'undefined') {
-          const response = await fetch(raw_url);
-          const code = await response.text();
+          if (typeof content === 'undefined') {
+            const response = await fetch(raw_url);
+            const code = await response.text();
 
-          file.code = code;
+            file.code = code;
+          }
+
+          return file;
+        } catch (error) {
+          return error;
         }
+      });
+      const snippets = await Promise.allSettled(promises);
 
-        File.$update({
-          data: file,
-        });
-        store.commit('updateState', {
-          key: 'isDataChanged',
-          value: true,
-        });
-      }
+      snippets.forEach(({ status, value }) => {
+        if (status === 'fulfilled') {
+          File.$update({
+            data: value,
+          });
+        }
+      });
+
+      store.commit('updateState', {
+        key: 'isDataChanged',
+        value: true,
+      });
 
       state.loadingImport = false;
       state.selectedFiles = [];

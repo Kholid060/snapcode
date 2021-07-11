@@ -26,6 +26,7 @@ import {
   mdiPencilOutline,
   mdiLogout,
   mdiLogin,
+  mdiCompassOutline,
 } from '@mdi/js';
 
 VMdijs.add({
@@ -55,6 +56,7 @@ VMdijs.add({
   mdiPencilOutline,
   mdiLogout,
   mdiLogin,
+  mdiCompassOutline,
 });
 
 export default VMdijs;

@@ -4,6 +4,7 @@ import View from '../views/Home/View.vue';
 import Snippet from '../views/Snippet.vue';
 import Auth from '../views/Auth.vue';
 import PageNotFound from '../views/404.vue';
+import Explore from '../views/Explore.vue';
 
 const routes = [
   {
@@ -27,6 +28,11 @@ const routes = [
     path: '/auth',
     name: 'auth',
     component: Auth,
+  },
+  {
+    path: '/explore',
+    name: 'explore',
+    component: Explore,
   },
   {
     path: '/404',

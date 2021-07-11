@@ -85,6 +85,7 @@ export default {
           folderId: store.state.filterBy || '',
           isNew: true,
           isEdited: true,
+          createdAt: Date.now(),
         },
       });
       store.commit('updateState', {

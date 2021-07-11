@@ -1,6 +1,6 @@
 <template>
   <div
-    class="absolute z-50 lg:relative w-full lg:w-64 bg-black bg-opacity-25 h-screen"
+    class="fixed top-0 left-0 z-50 w-full lg:w-64 bg-black bg-opacity-25 h-screen"
     :class="[store.state.showSidebar ? 'block' : 'hidden lg:block']"
     @click.self="closeSidebar"
   >
@@ -8,24 +8,38 @@
       class="bg-light h-full p-5 overflow-auto scroll w-64 bg-opacity-100 shadow-xl lg:shadow-none"
     >
       <div class="mb-6 library">
-        <p class="mb-3 text-lighter">Library</p>
+        <!-- <p class="mb-3 text-lighter">Library</p> -->
         <list-ui class="space-y-1">
-          <list-item-ui
-            v-for="filter in filters"
-            :key="filter.id"
-            small
-            class="cursor-pointer"
-            :active="activeFilter === filter.id"
-            @click="filterBy(filter.id)"
-          >
+          <list-item-ui small tag="router-link" :active="$route.name === 'explore'" to="/explore">
             <template #prepend>
-              <v-mdi :name="filter.icon"></v-mdi>
+              <v-mdi name="mdi-compass-outline"></v-mdi>
             </template>
-            {{ filter.name }}
+            Explore
           </list-item-ui>
+          <list-item-ui v-if="$route.name === 'explore'" small tag="router-link" to="/">
+            <template #prepend>
+              <v-mdi name="mdi-archive-outline"></v-mdi>
+            </template>
+            My Snippets
+          </list-item-ui>
+          <template v-else>
+            <list-item-ui
+              v-for="filter in filters"
+              :key="filter.id"
+              small
+              class="cursor-pointer"
+              :active="activeFilter === filter.id"
+              @click="filterBy(filter.id)"
+            >
+              <template #prepend>
+                <v-mdi :name="filter.icon"></v-mdi>
+              </template>
+              {{ filter.name }}
+            </list-item-ui>
+          </template>
         </list-ui>
       </div>
-      <div class="folders">
+      <div v-if="$route.name !== 'explore'" class="folders">
         <div class="flex items-center text-lighter justify-between mb-3">
           <p>Folders</p>
           <v-mdi

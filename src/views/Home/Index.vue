@@ -1,6 +1,6 @@
 <template>
   <div class="home flex">
-    <home-sidebar></home-sidebar>
+    <!-- <home-sidebar></home-sidebar> -->
     <div class="flex-1 overflow-hidden">
       <home-navigation></home-navigation>
       <div class="flex" style="height: calc(100vh - 64px)">
@@ -21,7 +21,7 @@
 </template>
 <script>
 import { onMounted } from 'vue';
-import HomeSidebar from '~/components/pages/home/HomeSidebar.vue';
+// import HomeSidebar from '~/components/pages/home/HomeSidebar.vue';
 import HomeSnippets from '~/components/pages/home/HomeSnippets.vue';
 import HomeNavigation from '~/components/pages/home/HomeNavigation.vue';
 import HomeAuthModal from '~/components/pages/home/HomeAuthModal.vue';
@@ -30,7 +30,6 @@ import backup from '~/utils/backup';
 
 export default {
   components: {
-    HomeSidebar,
     HomeSnippets,
     HomeAuthModal,
     HomeNavigation,

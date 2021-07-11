@@ -15,7 +15,6 @@
     "codemirror": "^5.62.0",
     "dayjs": "^1.10.5",
     "deepmerge": "^4.2.2",
-    "dexie": "^3.0.2",
     "firebase-auth-lite": "^0.8.9",
     "nanoid": "^3.1.23",
     "register-service-worker": "^1.6.2",

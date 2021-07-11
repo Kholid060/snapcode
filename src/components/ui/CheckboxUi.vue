@@ -61,14 +61,14 @@ export default {
   justify-content: center;
 }
 .checkbox-ui__mark .mdi-icon {
-  transform: scale(0);
+  transform: scale(0) !important;
   transition: transform 200ms ease;
 }
 .checkbox-ui__input:checked ~ .checkbox-ui__mark {
   @apply bg-primary border-primary bg-opacity-100;
 }
 .checkbox-ui__input:checked ~ .checkbox-ui__mark .mdi-icon {
-  transform: scale(1);
+  transform: scale(1) !important;
 }
 .checkbox-ui__input:focus ~ .checkbox-ui__mark {
   @apply ring ring-blue-500 ring-opacity-50;

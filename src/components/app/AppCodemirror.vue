@@ -87,7 +87,7 @@ export default {
         Object.keys(options).forEach((key) => {
           editor.value.setOption(key, options[key]);
         });
-        console.log(options, oldOptions);
+
         // if (options.mode && (options.mode !== oldOptions.mode))
       },
       { deep: true }
