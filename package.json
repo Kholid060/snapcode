@@ -1,6 +1,6 @@
 {
   "name": "Snapcode",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "private": false,
   "license": "MIT",
   "scripts": {
@@ -10,18 +10,19 @@
     "commit": "cz"
   },
   "dependencies": {
+    "@mdi/js": "^5.9.55",
     "@vuex-orm/core": "^0.36.4",
     "codemirror": "^5.62.0",
-    "dayjs": "^1.10.5",
+    "dayjs": "1.10.6",
     "deepmerge": "^4.2.2",
-    "dexie": "^3.0.2",
     "firebase-auth-lite": "^0.8.9",
     "nanoid": "^3.1.23",
     "register-service-worker": "^1.6.2",
     "switch-theme": "0.3.0",
     "tiny-emitter": "^2.1.0",
-    "tippy.js": "^6.2.7",
+    "tippy.js": "6.3.1",
     "vue": "^3.1.1",
+    "vue-mdijs": "^0.5.12",
     "vue-router": "^4.0.10",
     "vue-toastification": "^2.0.0-rc.1",
     "vuex": "^4.0.2",
@@ -41,8 +42,8 @@
     "eslint-plugin-vue": "^7.11.1",
     "postcss": "^8.3.5",
     "prettier": "^2.3.1",
-    "vite": "^2.3.7",
     "tailwindcss": "^2.2.0",
+    "vite": "^2.3.7",
     "vite-plugin-pwa": "^0.8.1"
   },
   "config": {

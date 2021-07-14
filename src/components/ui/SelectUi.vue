@@ -1,14 +1,23 @@
 <template>
   <div class="select-ui inline-block relative bg-input transition rounded-lg cursor-pointer">
     <select
-      class="pr-12 pl-4 py-2 bg-transparent appearance-none cursor-pointer w-full focus:outline-none"
+      class="
+        pr-12
+        pl-4
+        py-2
+        bg-transparent
+        appearance-none
+        cursor-pointer
+        w-full
+        focus:outline-none
+      "
       :value="modelValue"
-      @change="$emit('update:modelValue', $event.target.value)"
+      @change="emitValue"
     >
       <option v-if="placeholder" value="" disabled selected>{{ placeholder }}</option>
       <slot></slot>
     </select>
-    <icon-ui name="chevronDown" class="absolute select-ui__chevron z-0" size="20"></icon-ui>
+    <v-mdi name="mdi-chevron-down" class="absolute select-ui__chevron z-0"></v-mdi>
   </div>
 </template>
 <script>
@@ -23,7 +32,17 @@ export default {
       default: '',
     },
   },
-  emits: ['update:modelValue'],
+  emits: ['update:modelValue', 'change'],
+  setup(props, { emit }) {
+    function emitValue({ target: { value } }) {
+      emit('update:modelValue', value);
+      emit('change', value);
+    }
+
+    return {
+      emitValue,
+    };
+  },
 };
 </script>
 <style>
@@ -37,7 +56,7 @@ export default {
 
 .select-ui__chevron {
   right: 0.7rem;
-  top: 50%;
-  transform: translateY(-50%);
+  top: 50% !important;
+  transform: translateY(-50%) !important;
 }
 </style>

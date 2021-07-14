@@ -16,16 +16,16 @@
         @click="$emit('update-filter', folder.id)"
       >
         <template #prepend>
-          <icon-ui name="folder"></icon-ui>
+          <v-mdi name="mdi-folder-outline"></v-mdi>
         </template>
         <p class="text-overflow flex-1">{{ folder.name }}</p>
         <template #append>
           <popover-ui class="text-default">
-            <icon-ui
-              name="dotsHorizontal"
+            <v-mdi
+              name="mdi-dots-horizontal"
               :class="[folder.id === activeFilter ? 'visibile' : 'md:invisible']"
               class="group-hover:visible"
-            ></icon-ui>
+            ></v-mdi>
             <template #popover>
               <list-ui class="w-40 space-y-1">
                 <list-item-ui
@@ -35,7 +35,7 @@
                   @click="renameFolder(folder)"
                 >
                   <template #prepend>
-                    <icon-ui name="pencil"></icon-ui>
+                    <v-mdi name="mdi-pencil-outline"></v-mdi>
                   </template>
                   Rename
                 </list-item-ui>
@@ -46,7 +46,7 @@
                   @click="deleteFolder(folder)"
                 >
                   <template #prepend>
-                    <icon-ui name="trash" class="text-danger"></icon-ui>
+                    <v-mdi name="mdi-delete-outline" class="text-danger"></v-mdi>
                   </template>
                   Delete
                 </list-item-ui>

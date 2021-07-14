@@ -1,7 +1,8 @@
 import { createApp } from 'vue';
 import Toast from 'vue-toastification';
 import { registerSW } from 'virtual:pwa-register';
-import CompsUi from './lib/comps-ui';
+import compsUi from './lib/comps-ui';
+import VMdijs from './lib/vue-mdijs';
 import router from './router';
 import store from './store';
 import App from './App.vue';
@@ -14,4 +15,4 @@ const app = createApp(App);
 
 registerSW();
 
-app.use(store).use(router).use(CompsUi).use(Toast).mount('#app');
+app.use(store).use(router).use(compsUi).use(VMdijs).use(Toast).mount('#app');

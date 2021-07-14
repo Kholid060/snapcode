@@ -37,10 +37,6 @@ body {
   background: transparent;
 }
 
-.popover-ui {
-  z-index: 9999;
-}
-
 .Vue-Toastification__toast {
   font-family: inherit !important;
 }

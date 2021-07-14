@@ -52,6 +52,8 @@ export default {
         ...props.options,
       });
 
+      window.CodeMirror = Codemirror;
+
       editor.value.on('change', (cm) => {
         const value = cm.getValue();
 
@@ -72,7 +74,7 @@ export default {
       });
 
       ['.CodeMirror-vscrollbar', '.CodeMirror-hscrollbar'].forEach((selector) => {
-        document.querySelector(selector).classList.add('scroll');
+        document.querySelector(selector)?.classList.add('scroll');
       });
     });
 
@@ -81,10 +83,12 @@ export default {
     });
     watch(
       () => props.options,
-      (options) => {
+      (options, oldOptions) => {
         Object.keys(options).forEach((key) => {
           editor.value.setOption(key, options[key]);
         });
+
+        // if (options.mode && (options.mode !== oldOptions.mode))
       },
       { deep: true }
     );

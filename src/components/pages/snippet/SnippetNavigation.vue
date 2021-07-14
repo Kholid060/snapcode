@@ -3,7 +3,7 @@
     <div class="author flex items-center">
       <avatar-ui class="mr-4">
         <img v-if="file.user.photoURL" :src="file.user.photoURL" alt="user photo" />
-        <icon-ui v-else name="user"></icon-ui>
+        <v-mdi v-else name="mdi-account-outline"></v-mdi>
       </avatar-ui>
       <div class="author__name">
         <p>{{ file.user.displayName }}</p>
@@ -17,12 +17,12 @@
       :class="{ 'text-primary': theme.currentTheme.value === 'dark' }"
       @click="theme.toggle"
     >
-      <icon-ui name="moon"></icon-ui>
+      <v-mdi name="mdi-weather-night"></v-mdi>
     </button-ui>
   </nav>
 </template>
 <script>
-import dayjs from 'dayjs';
+import dayjs from '~/lib/dayjs';
 import { useTheme } from '~/composable';
 
 export default {

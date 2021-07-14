@@ -1,3 +1,10 @@
+## 2.2.0 (2021-07-15)
+
+### Features
+* Explore snippets
+* Add snippet without folder
+* Change icons
+
 ## 2.1.0 (2021-05-04)
 
 ### Features

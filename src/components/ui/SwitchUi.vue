@@ -1,6 +1,17 @@
 <template>
   <div
-    class="switch-ui relative inline-flex h-6 w-12 justify-center items-center bg-input p-1 rounded-full"
+    class="
+      switch-ui
+      relative
+      inline-flex
+      h-6
+      w-12
+      justify-center
+      items-center
+      bg-input
+      p-1
+      rounded-full
+    "
     :class="{ 'pointer-events-none opacity-50': disabled }"
   >
     <input
@@ -11,7 +22,19 @@
       @input="emitEvent"
     />
     <div
-      class="switch-ui__ball z-40 rounded-full absolute h-4 w-4 shadow-xl bg-white flex justify-center items-center"
+      class="
+        switch-ui__ball
+        z-40
+        rounded-full
+        absolute
+        h-4
+        w-4
+        shadow-xl
+        bg-white
+        flex
+        justify-center
+        items-center
+      "
     >
       <slot v-if="$slots.ball" name="ball"></slot>
     </div>

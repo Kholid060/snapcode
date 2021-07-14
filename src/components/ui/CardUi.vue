@@ -1,7 +1,16 @@
 <template>
   <div
     :class="{ 'hover:shadow-xl': hover, flex: horizontal }"
-    class="card-ui rounded-lg transition-shadow ease duration-300 bg-card inline-block bg-opacity-100"
+    class="
+      card-ui
+      rounded-lg
+      transition-shadow
+      ease
+      duration-300
+      bg-card
+      inline-block
+      bg-opacity-100
+    "
   >
     <div v-show="$slots.image" class="px-4 pt-4" :class="{ 'pb-4': horizontal }">
       <slot name="image"></slot>

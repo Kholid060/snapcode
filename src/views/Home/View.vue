@@ -2,7 +2,7 @@
   <div v-if="file" class="h-full snippet relative flex flex-col">
     <expand-transition>
       <button v-if="state.isEditorFocused" class="bg-light absolute top-0 z-50 rounded-br-lg">
-        <icon-ui name="chevronDown" size="18"></icon-ui>
+        <v-mdi name="mdi-chevron-down" size="18"></v-mdi>
       </button>
       <div v-else class="pt-3 px-5 flex items-center justify-between">
         <div class="md:w-7/12 w-6/12">
@@ -60,7 +60,7 @@
 <script>
 import { computed, reactive, watch, defineAsyncComponent } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import dayjs from 'dayjs';
+import dayjs from '~/lib/dayjs';
 import { File } from '~/models';
 import languages from '~/utils/languages';
 import ViewButtonsGroup from '~/components/pages/view/ViewButtonsGroup.vue';

@@ -19,20 +19,34 @@ VuexORM.use(VuexORMLocalForage, {
 const store = createStore({
   plugins: [VuexORM.install(database)],
   state: () => ({
-    searchQuery: '',
-    filterBy: 'all',
-    showSidebar: false,
     user: null,
-    lastBackup: Date.now(),
-    isDataChanged: false,
+    filterBy: 'all',
+    searchQuery: '',
+    snippetsCache: [],
     isRetrieved: false,
+    showSidebar: false,
+    isDataChanged: false,
+    lastBackup: Date.now(),
+    historyState: history.state || {},
   }),
+  getters: {
+    getSnippetCache: (state) => (id) => state.snippetsCache.find((item) => item.id === id),
+  },
   mutations: {
     updateState(state, { key, value }) {
       state[key] = value;
     },
+    addSnippetCache(state, data) {
+      state.snippetsCache.push(...data);
+    },
   },
   actions: {
+    toggleSidebar({ commit, state }) {
+      commit('updateState', {
+        key: 'showSidebar',
+        value: !state.showSidebar,
+      });
+    },
     async retrieveData({ commit }) {
       const isFirstTime = JSON.parse(localStorage.getItem('firstTime'));
 

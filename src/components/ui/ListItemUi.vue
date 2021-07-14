@@ -1,7 +1,16 @@
 <template>
   <component
     :is="tag"
-    class="list-item-ui rounded-lg flex items-center py-2 transition-colors duration-200 ease-in-out"
+    class="
+      list-item-ui
+      rounded-lg
+      flex
+      items-center
+      py-2
+      transition-colors
+      duration-200
+      ease-in-out
+    "
     tabindex="0"
     role="listitem"
     :class="[

@@ -3,7 +3,7 @@
     <popover-ui class="align-middle">
       <avatar-ui class="inline-block mt-1 cursor-pointer" type="round">
         <img v-if="user" :src="user.photoUrl" alt="user photo" />
-        <icon-ui v-else name="user"></icon-ui>
+        <v-mdi v-else name="mdi-account-outline"></v-mdi>
       </avatar-ui>
       <template #popover>
         <list-ui class="w-56">
@@ -21,23 +21,17 @@
           <div class="h1 border-b mt-4 mb-2"></div>
           <list-item-ui small class="mb-1">
             <template #prepend>
-              <icon-ui name="moon"></icon-ui>
+              <v-mdi name="mdi-weather-night"></v-mdi>
             </template>
             <span class="flex-1">Dark Mode</span>
             <template #append>
               <switch-ui v-model="isDark" class="align-middle"></switch-ui>
             </template>
           </list-item-ui>
-          <list-item-ui small class="cursor-pointer" @click="emitEvent('import-gist')">
-            <template #prepend>
-              <icon-ui name="mdiGithub"></icon-ui>
-            </template>
-            <span>Import Gists</span>
-          </list-item-ui>
           <div class="h1 border-b my-2"></div>
           <list-item-ui v-if="user" small class="text-danger cursor-pointer" @click="logout">
             <template #prepend>
-              <icon-ui name="logout"></icon-ui>
+              <v-mdi name="mdi-logout"></v-mdi>
             </template>
             <span>Logout</span>
           </list-item-ui>
@@ -49,7 +43,7 @@
             @click="emitEvent('show-auth')"
           >
             <template #prepend>
-              <icon-ui name="login"></icon-ui>
+              <v-mdi name="mdi-login"></v-mdi>
             </template>
             <span>Login</span>
           </list-item-ui>
