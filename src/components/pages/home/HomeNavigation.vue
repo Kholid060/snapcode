@@ -4,8 +4,11 @@
       <router-link v-if="$route.name === 'view'" to="/" class="md:hidden">
         <v-mdi name="mdi-arrow-left" class="mr-4"></v-mdi>
       </router-link>
-      <button :class="{ 'hidden md:block': $route.name === 'view' }">
-        <v-mdi name="mdi-menu" class="mr-4 lg:hidden cursor-pointer" @click="toggleSidebar"></v-mdi>
+      <button
+        :class="{ 'hidden md:block': $route.name === 'view' }"
+        @click="$store.dispatch('toggleSidebar')"
+      >
+        <v-mdi name="mdi-menu" class="mr-4 lg:hidden cursor-pointer"></v-mdi>
       </button>
     </div>
     <div class="search-container flex-1">
@@ -41,22 +44,19 @@
           <v-mdi name="mdi-cloud-upload-outline"></v-mdi>
         </button-ui>
       </div>
-      <navigation-user></navigation-user>
+      <app-user-popover></app-user-popover>
     </div>
   </nav>
 </template>
 <script>
 import { ref, computed } from 'vue';
 import { useStore } from 'vuex';
-import dayjs from 'dayjs';
-import relativeTime from 'dayjs/plugin/relativeTime';
+import dayjs from '~/lib/dayjs';
 import backup from '~/utils/backup';
-import NavigationUser from './navigation/NavigationUser.vue';
-
-dayjs.extend(relativeTime);
+import AppUserPopover from '../../app/AppUserPopover.vue';
 
 export default {
-  components: { NavigationUser },
+  components: { AppUserPopover },
   setup() {
     const store = useStore();
 
@@ -72,12 +72,6 @@ export default {
       store.commit('updateState', {
         key: 'searchQuery',
         value: target.value.toLowerCase(),
-      });
-    }
-    function toggleSidebar() {
-      store.commit('updateState', {
-        key: 'showSidebar',
-        value: !store.state.showSidebar,
       });
     }
     function backupData() {
@@ -101,7 +95,6 @@ export default {
       lastBackup,
       backupData,
       isBackingUp,
-      toggleSidebar,
       updateSearchQuery,
     };
   },

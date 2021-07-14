@@ -74,7 +74,7 @@ export default {
       });
 
       ['.CodeMirror-vscrollbar', '.CodeMirror-hscrollbar'].forEach((selector) => {
-        document.querySelector(selector).classList.add('scroll');
+        document.querySelector(selector)?.classList.add('scroll');
       });
     });
 

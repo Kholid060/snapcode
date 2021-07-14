@@ -41,12 +41,7 @@
           </option>
         </select-ui>
         <div class="flex-grow"></div>
-        <button-ui
-          variant="primary"
-          :disabled="state.selectedFolder === ''"
-          :loading="state.loadingImport"
-          @click="importGists"
-        >
+        <button-ui variant="primary" :loading="state.loadingImport" @click="importGists">
           Import ({{ state.selectedFiles.length }})
         </button-ui>
       </div>

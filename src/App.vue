@@ -14,7 +14,7 @@
 import { onMounted, ref } from 'vue';
 import { useStore } from 'vuex';
 import { useTheme } from '~/composable';
-import AppSidebar from './components/pages/home/HomeSidebar.vue';
+import AppSidebar from './components/app/AppSidebar.vue';
 import AppReloadPrompt from './components/app/AppReloadPrompt.vue';
 import retrieveBackupData from './utils/retrieveBackupData';
 

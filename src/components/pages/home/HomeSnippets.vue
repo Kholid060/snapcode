@@ -16,15 +16,32 @@
           </option>
         </select-ui>
       </div>
-      <button-ui
-        v-tooltip="'Add snippet'"
-        icon
-        variant="primary"
-        :disabled="activeFilter === 'starred'"
-        @click="addFile"
-      >
-        <v-mdi name="mdi-plus"></v-mdi>
-      </button-ui>
+      <popover-ui>
+        <button-ui icon variant="primary" :disabled="activeFilter === 'starred'">
+          <v-mdi name="mdi-plus"></v-mdi>
+        </button-ui>
+        <template #popover>
+          <list-ui class="space-y-1 w-44">
+            <list-item-ui v-close-popover small class="cursor-pointer" @click="addFile">
+              <template #prepend>
+                <v-mdi name="mdi-file-outline"></v-mdi>
+              </template>
+              <span>Add snippet</span>
+            </list-item-ui>
+            <list-item-ui
+              v-close-popover
+              small
+              class="cursor-pointer"
+              @click="emitter.emit('import-gist')"
+            >
+              <template #prepend>
+                <v-mdi name="mdi-github"></v-mdi>
+              </template>
+              <span>Import gists</span>
+            </list-item-ui>
+          </list-ui>
+        </template>
+      </popover-ui>
     </div>
     <div v-if="!isRetrieved" class="skeletons">
       <div v-for="i in 5" :key="i" class="border-b py-4 px-5 w-full bg-input animate-pulse">
@@ -39,6 +56,7 @@
 <script>
 import { computed, shallowReactive } from 'vue';
 import { useStore } from 'vuex';
+import emitter from 'tiny-emitter/instance';
 import { File } from '~/models';
 import SnippetList from './snippet/SnippetList.vue';
 
@@ -97,6 +115,7 @@ export default {
     return {
       sort,
       addFile,
+      emitter,
       snippets,
       sortOptions,
       isRetrieved,

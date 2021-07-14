@@ -22,7 +22,7 @@
   </nav>
 </template>
 <script>
-import dayjs from 'dayjs';
+import dayjs from '~/lib/dayjs';
 import { useTheme } from '~/composable';
 
 export default {

@@ -47,11 +47,8 @@
   </list-transition>
 </template>
 <script>
-import dayjs from 'dayjs';
-import relativeTime from 'dayjs/plugin/relativeTime';
+import dayjs from '~/lib/dayjs';
 import { File } from '~/models';
-
-dayjs.extend(relativeTime);
 
 export default {
   props: {

@@ -12,7 +12,7 @@
         focus:outline-none
       "
       :value="modelValue"
-      @change="$emit('update:modelValue', $event.target.value)"
+      @change="emitValue"
     >
       <option v-if="placeholder" value="" disabled selected>{{ placeholder }}</option>
       <slot></slot>
@@ -32,7 +32,17 @@ export default {
       default: '',
     },
   },
-  emits: ['update:modelValue'],
+  emits: ['update:modelValue', 'change'],
+  setup(props, { emit }) {
+    function emitValue({ target: { value } }) {
+      emit('update:modelValue', value);
+      emit('change', value);
+    }
+
+    return {
+      emitValue,
+    };
+  },
 };
 </script>
 <style>

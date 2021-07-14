@@ -28,17 +28,6 @@
               <switch-ui v-model="isDark" class="align-middle"></switch-ui>
             </template>
           </list-item-ui>
-          <list-item-ui
-            v-close-popover
-            small
-            class="cursor-pointer"
-            @click="emitEvent('import-gist')"
-          >
-            <template #prepend>
-              <v-mdi name="mdi-github"></v-mdi>
-            </template>
-            <span>Import Gists</span>
-          </list-item-ui>
           <div class="h1 border-b my-2"></div>
           <list-item-ui v-if="user" small class="text-danger cursor-pointer" @click="logout">
             <template #prepend>

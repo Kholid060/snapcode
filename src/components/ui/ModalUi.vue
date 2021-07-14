@@ -13,12 +13,12 @@
             overflow-y-auto
             bg-opacity-50
             modal-ui__content-container
-            z-50
             flex
             justify-center
             items-end
             md:items-center
           "
+          style="z-index: 9999"
           @click.self="closeModal"
         >
           <card-ui class="modal-ui__content shadow-lg w-full" :class="[contentClass]">

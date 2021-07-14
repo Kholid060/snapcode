@@ -33,6 +33,12 @@ const store = createStore({
     },
   },
   actions: {
+    toggleSidebar({ commit, state }) {
+      commit('updateState', {
+        key: 'showSidebar',
+        value: !state.showSidebar,
+      });
+    },
     async retrieveData({ commit }) {
       const isFirstTime = JSON.parse(localStorage.getItem('firstTime'));
 

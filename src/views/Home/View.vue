@@ -60,7 +60,7 @@
 <script>
 import { computed, reactive, watch, defineAsyncComponent } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import dayjs from 'dayjs';
+import dayjs from '~/lib/dayjs';
 import { File } from '~/models';
 import languages from '~/utils/languages';
 import ViewButtonsGroup from '~/components/pages/view/ViewButtonsGroup.vue';

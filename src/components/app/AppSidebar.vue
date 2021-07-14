@@ -1,14 +1,14 @@
 <template>
   <div
-    class="fixed top-0 left-0 z-50 w-full lg:w-64 bg-black bg-opacity-25 h-screen"
+    class="fixed top-0 left-0 w-full lg:w-64 bg-black bg-opacity-25 h-screen"
     :class="[store.state.showSidebar ? 'block' : 'hidden lg:block']"
+    style="z-index: 999"
     @click.self="closeSidebar"
   >
     <div
       class="bg-light h-full p-5 overflow-auto scroll w-64 bg-opacity-100 shadow-xl lg:shadow-none"
     >
       <div class="mb-6 library">
-        <!-- <p class="mb-3 text-lighter">Library</p> -->
         <list-ui class="space-y-1">
           <list-item-ui small tag="router-link" :active="$route.name === 'explore'" to="/explore">
             <template #prepend>
