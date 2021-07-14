@@ -4,6 +4,7 @@
     <router-view :route="routeWithModal"></router-view>
   </div>
   <app-reload-prompt></app-reload-prompt>
+  <app-auth-modal></app-auth-modal>
 </template>
 <script>
 import { onMounted, ref, computed } from 'vue';
@@ -12,10 +13,11 @@ import { useRouter } from 'vue-router';
 import { useTheme } from '~/composable';
 import AppSidebar from './components/app/AppSidebar.vue';
 import AppReloadPrompt from './components/app/AppReloadPrompt.vue';
+import AppAuthModal from './components/app/AppAuthModal.vue';
 import retrieveBackupData from './utils/retrieveBackupData';
 
 export default {
-  components: { AppReloadPrompt, AppSidebar },
+  components: { AppReloadPrompt, AppSidebar, AppAuthModal },
   setup() {
     const store = useStore();
     const theme = useTheme();

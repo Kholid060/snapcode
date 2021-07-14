@@ -62,15 +62,19 @@ export default {
       emit('update');
     }
 
-    watch(() => router.currentRoute.value.path, (value) => {
-      if (value.includes('explore')) {
-        Object.keys(query).forEach((key) => {
-          const value = router.currentRoute.value.query[key];
+    watch(
+      () => router.currentRoute.value.path,
+      (value) => {
+        if (value.includes('explore')) {
+          Object.keys(query).forEach((key) => {
+            const value = router.currentRoute.value.query[key];
 
-          if (value) query[key] = value;
-        });
-      }
-    }, { immediate: true });
+            if (value) query[key] = value;
+          });
+        }
+      },
+      { immediate: true }
+    );
 
     return {
       query,

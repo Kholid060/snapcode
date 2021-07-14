@@ -79,9 +79,12 @@ export default {
       }
     }
 
-    watch(() => route.params, () => {
-      if (!state.isRetrieved) fetchSnippet();
-    });
+    watch(
+      () => route.params,
+      () => {
+        if (!state.isRetrieved) fetchSnippet();
+      }
+    );
 
     onMounted(fetchSnippet);
 

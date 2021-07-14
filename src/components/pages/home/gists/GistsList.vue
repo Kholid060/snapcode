@@ -35,7 +35,8 @@
         </list-item-ui>
       </list-ui>
       <div class="flex items-center">
-        <select-ui v-model="state.selectedFolder" placeholder="Select folder" class="w-44">
+        <select-ui v-model="state.selectedFolder" class="w-44">
+          <option value="">Select folder</option>
           <option v-for="folder in state.folders" :key="folder.id" :value="folder.id">
             {{ folder.name }}
           </option>
@@ -157,7 +158,6 @@ export default {
       const folders = Folder.all();
 
       state.folders = folders;
-      state.selectedFolder = folders[0]?.id || '';
     });
 
     return {

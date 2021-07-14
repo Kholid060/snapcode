@@ -8,7 +8,7 @@
       />
       <div class="flex-1 w-4/12 text-overflow">
         <p class="leading-tight text-overflow">{{ snippet.user.displayName || '-' }}</p>
-        <span class="text-lighter leading-none">
+        <span class="text-lighter leading-tight">
           Created at
           {{ snippet.createdAt }}
         </span>
