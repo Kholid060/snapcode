@@ -5,7 +5,8 @@
         <v-mdi name="mdiSourceFork"></v-mdi>
       </button-ui>
       <template #popover>
-        <select-ui v-model="selectedFolder" class="w-full" placeholder="Select folder">
+        <select-ui v-model="selectedFolder" class="w-full">
+          <option value="">Select folder</option>
           <option v-for="folder in folders" :key="folder.id" :value="folder.id">
             {{ folder.name }}
           </option>
@@ -38,9 +39,9 @@ export default {
   setup(props, { emit }) {
     const toast = useToast();
 
-    const folders = Folder.all();
-    const selectedFolder = ref(folders[0]?.id || '');
+    const selectedFolder = ref('');
 
+    const folders = computed(() => Folder.all());
     const isFromFork = computed(() =>
       File.query()
         .where((file) => file.id.includes(props.file.id))
