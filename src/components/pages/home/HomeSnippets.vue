@@ -100,7 +100,7 @@ export default {
       File.$update({
         data: {
           name: 'untitled snippet',
-          folderId: store.state.filterBy || '',
+          folderId: store.state.filterBy === 'all' ? '' : store.state.filterBy,
           isNew: true,
           isEdited: true,
           createdAt: Date.now(),

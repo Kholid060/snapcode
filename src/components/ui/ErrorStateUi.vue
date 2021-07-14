@@ -1,8 +1,8 @@
 <template>
   <div class="error-stat-ui">
-    <img class="w-4/12 mx-auto" :src="error.img" />
+    <img class="w-4/12 mx-auto" style="min-width: 300px" :src="error.img" />
     <div class="mt-6 text-center">
-      <p class="mb-4" style="font-size: 1.25rem">{{ error.title }}</p>
+      <p class="text-xl mb-4">{{ error.title }}</p>
       <button-ui variant="primary" @click="action">
         {{ actionText || error.btn }}
       </button-ui>
@@ -16,7 +16,6 @@ import notFoundSvg from '~/assets/svg/404.svg';
 import sadFaceSvg from '~/assets/svg/sad-face.svg';
 
 export default {
-  emits: ['action'],
   props: {
     code: {
       type: [Number, String],
@@ -27,13 +26,14 @@ export default {
       default: '',
     },
   },
+  emits: ['action'],
   setup(props, { emit }) {
     const router = useRouter();
 
     const errors = {
       404: {
         img: notFoundSvg,
-        title: 'Oh no! This page doesn\'t exist.',
+        title: "Oh no! This page doesn't exist.",
         btn: 'Go to homepage',
       },
       500: {

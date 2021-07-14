@@ -1,4 +1,4 @@
-.button-group-ui>.button-ui:not(:first-child):not(:last-child) {
+.button-group-ui > .button-ui:not(:first-child):not(:last-child) {
   border-radius: 0px;
 }
 .button-group-ui .button-ui:first-child {

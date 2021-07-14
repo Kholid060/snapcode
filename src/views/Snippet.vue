@@ -12,28 +12,21 @@
           </div>
           <div v-else class="h-10 rounded-lg w-48 bg-input-dark animate-pulse"></div>
           <div class="flex-grow"></div>
-          <div
-            v-if="state.isLocalFile && !file.isShared"
-            v-tooltip:bottom="'Only you can see this snippet'"
-            class="px-3 py-2 rounded-full bg-danger self-center bg-opacity-25 text-danger mr-4"
-          >
-            <v-mdi name="mdi-lock-outline" size="20"></v-mdi>
-            <span class="ml-1 text-sm">Private</span>
-          </div>
-          <snippet-buttons-group
-            v-bind="{ file, isLocalFile: state.isLocalFile }"
-            @fork="state.isLocalFile = true"
-          ></snippet-buttons-group>
+          <snippet-buttons-group :file="file"></snippet-buttons-group>
         </div>
-        <app-codemirror :model-value="file.code" :options="cmOptions"></app-codemirror>
+        <app-codemirror
+          class="px-4 pb-4"
+          :model-value="file.code"
+          :options="cmOptions"
+        ></app-codemirror>
       </div>
     </template>
   </div>
 </template>
 <script>
-import { defineAsyncComponent, onMounted, ref, shallowReactive } from 'vue';
+import { defineAsyncComponent, onMounted, ref, shallowReactive, watch } from 'vue';
 import { useStore } from 'vuex';
-import { useRouter } from 'vue-router';
+import { useRoute } from 'vue-router';
 import { File } from '~/models';
 import languages from '~/utils/languages';
 import { apiFetch } from '~/utils/firebase';
@@ -46,36 +39,32 @@ export default {
     AppCodemirror: defineAsyncComponent(() => import('~/components/app/AppCodemirror.vue')),
     SnippetNavigation,
   },
-  setup() {
+  props: {
+    isModal: Boolean,
+  },
+  setup(props) {
     const store = useStore();
-    const router = useRouter();
-
-    const route = router.currentRoute.value;
+    const route = useRoute();
 
     const file = ref({ user: {} });
     const state = shallowReactive({
       status: 'idle',
-      isLocalFile: false,
+      isRetrieved: false,
     });
     const cmOptions = shallowReactive({
       readOnly: true,
       mode: '',
     });
 
-    onMounted(async () => {
+    async function fetchSnippet() {
+      if (!route.params.fileId) return;
+
       try {
         state.status = 'loading';
-        const localFile = File.find(route.params.fileId);
+        const cache = store.getters.getSnippetCache(route.params.fileId);
 
-        if (localFile !== null) {
-          state.isLocalFile = true;
-          file.value = {
-            ...localFile,
-            user: {
-              displayName: store.state.user.displayName || 'Guest',
-              photoURL: store.state.user?.photoUrl || null,
-            },
-          };
+        if (cache) {
+          file.value = cache;
         } else {
           const data = await apiFetch(`/files/${route.params.fileId}`);
           file.value = data;
@@ -83,11 +72,18 @@ export default {
 
         cmOptions.mode = languages[file.value.language]?.mode;
         state.status = 'idle';
+        state.isRetrieved = true;
       } catch (error) {
         console.error(error);
         state.status = 'error';
       }
+    }
+
+    watch(() => route.params, () => {
+      if (!state.isRetrieved) fetchSnippet();
     });
+
+    onMounted(fetchSnippet);
 
     return {
       file,

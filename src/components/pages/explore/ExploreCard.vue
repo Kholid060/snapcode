@@ -13,17 +13,23 @@
           {{ snippet.createdAt }}
         </span>
       </div>
-      <p class="w-6/12 text-right text-overflow pl-2" :title="snippet.name">
-        {{ snippet.name }}
+      <p
+        class="w-6/12 text-right text-overflow cursor-pointer pl-2"
+        :title="`${snippet.name} [${snippet.language}]`"
+        @click="$emit('modal')"
+      >
+        {{ snippet.name }} [{{ snippet.language }}]
       </p>
     </div>
     <app-codemirror
+      class="cursor-pointer"
       :options="{
         readOnly: 'nocursor',
         lineWrapping: true,
         mode: snippet.mode,
         value: snippet.code,
       }"
+      @click="$emit('modal')"
     ></app-codemirror>
     <div class="code-gradient absolute bottom-0 w-full left-0"></div>
   </div>
@@ -39,6 +45,7 @@ export default {
       default: () => ({}),
     },
   },
+  emits: ['modal'],
 };
 </script>
 <style>

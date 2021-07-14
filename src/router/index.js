@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
+import store from '../store';
 import Home from '../views/Home/Index.vue';
 import View from '../views/Home/View.vue';
 import Snippet from '../views/Snippet.vue';
@@ -53,6 +54,10 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(),
   routes,
+});
+
+router.afterEach(() => {
+  store.commit('updateState', { key: 'historyState', value: history.state });
 });
 
 export default router;

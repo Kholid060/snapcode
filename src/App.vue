@@ -1,18 +1,14 @@
 <template>
-  <div v-if="$route.name === 'snippet' && !$store.state.isRetrieved" class="my-10">
-    <spinner-ui class="mx-auto"></spinner-ui>
+  <app-sidebar></app-sidebar>
+  <div class="lg:pl-64">
+    <router-view :route="routeWithModal"></router-view>
   </div>
-  <template v-else>
-    <app-sidebar v-if="!$route.meta.hideSidebar"></app-sidebar>
-    <div :class="{ 'lg:pl-64': !$route.meta.hideSidebar }">
-      <router-view></router-view>
-    </div>
-  </template>
   <app-reload-prompt></app-reload-prompt>
 </template>
 <script>
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, computed } from 'vue';
 import { useStore } from 'vuex';
+import { useRouter } from 'vue-router';
 import { useTheme } from '~/composable';
 import AppSidebar from './components/app/AppSidebar.vue';
 import AppReloadPrompt from './components/app/AppReloadPrompt.vue';
@@ -22,10 +18,18 @@ export default {
   components: { AppReloadPrompt, AppSidebar },
   setup() {
     const store = useStore();
+    const theme = useTheme();
+    const router = useRouter();
+
     const isRetrieved = ref(false);
 
-    const theme = useTheme();
     theme.setTheme(localStorage.getItem('theme') || 'dark');
+
+    const routeWithModal = computed(() => {
+      const historyState = store.state.historyState.backgroundView;
+
+      return historyState ? router.resolve(historyState) : router.currentRoute.value;
+    });
 
     onMounted(async () => {
       try {
@@ -47,6 +51,7 @@ export default {
 
     return {
       isRetrieved,
+      routeWithModal,
     };
   },
 };

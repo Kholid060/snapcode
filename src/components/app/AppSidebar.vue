@@ -16,7 +16,7 @@
             </template>
             Explore
           </list-item-ui>
-          <list-item-ui v-if="$route.name === 'explore'" small tag="router-link" to="/">
+          <list-item-ui v-if="!isInHome" small tag="router-link" to="/">
             <template #prepend>
               <v-mdi name="mdi-archive-outline"></v-mdi>
             </template>
@@ -39,7 +39,7 @@
           </template>
         </list-ui>
       </div>
-      <div v-if="$route.name !== 'explore'" class="folders">
+      <div v-if="isInHome" class="folders">
         <div class="flex items-center text-lighter justify-between mb-3">
           <p>Folders</p>
           <v-mdi
@@ -60,6 +60,7 @@
 <script>
 import { computed } from 'vue';
 import { useStore } from 'vuex';
+import { useRoute } from 'vue-router';
 import { useDialog } from '~/composable';
 import { Folder } from '~/models';
 import SidebarFolders from './sidebar/SidebarFolders.vue';
@@ -73,9 +74,11 @@ export default {
     ];
 
     const store = useStore();
+    const route = useRoute();
     const dialog = useDialog();
 
     const activeFilter = computed(() => store.state.filterBy);
+    const isInHome = computed(() => ['home', 'view'].includes(route.name));
 
     function filterBy(name) {
       store.commit('updateState', { key: 'filterBy', value: name });
@@ -111,6 +114,7 @@ export default {
     return {
       store,
       filters,
+      isInHome,
       filterBy,
       addFolder,
       closeSidebar,

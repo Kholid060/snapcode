@@ -37,13 +37,14 @@
   </div>
 </template>
 <script>
-import { shallowReactive, onMounted } from 'vue';
+import { shallowReactive, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import AppUserPopover from '../../app/AppUserPopover.vue';
 
 export default {
   components: { AppUserPopover },
-  setup() {
+  emits: ['update'],
+  setup(props, { emit }) {
     const sorts = [];
 
     const router = useRouter();
@@ -53,19 +54,23 @@ export default {
       sortBy: 'recentSnippets',
     });
 
-    function updateQuery(key) {
+    async function updateQuery(key) {
       const currentQuery = router.currentRoute.value.query;
 
-      router.push({ query: { ...currentQuery, [key]: query[key] } });
+      await router.push({ query: { ...currentQuery, [key]: query[key] } });
+
+      emit('update');
     }
 
-    onMounted(() => {
-      Object.keys(query).forEach((key) => {
-        const value = router.currentRoute.value.query[key];
+    watch(() => router.currentRoute.value.path, (value) => {
+      if (value.includes('explore')) {
+        Object.keys(query).forEach((key) => {
+          const value = router.currentRoute.value.query[key];
 
-        if (value) query[key] = value;
-      });
-    });
+          if (value) query[key] = value;
+        });
+      }
+    }, { immediate: true });
 
     return {
       query,

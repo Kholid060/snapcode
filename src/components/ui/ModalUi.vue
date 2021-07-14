@@ -5,55 +5,62 @@
     </div>
     <teleport :to="teleportTo" :disabled="disabledTeleport">
       <transition name="modal" mode="out-in">
-        <div
-          v-if="show"
-          class="
-            bg-black
-            p-5
-            overflow-y-auto
-            bg-opacity-50
-            modal-ui__content-container
-            flex
-            justify-center
-            items-end
-            md:items-center
-          "
-          style="z-index: 9999"
-          @click.self="closeModal"
-        >
-          <card-ui class="modal-ui__content shadow-lg w-full" :class="[contentClass]">
-            <template #header>
-              <div class="flex items-center justify-between">
-                <span class="content-header">
-                  <slot name="header"></slot>
-                </span>
-                <v-mdi
-                  v-show="!persist"
-                  class="text-lighter cursor-pointer"
-                  name="mdi-close"
-                  size="20"
-                  @click="closeModal"
-                ></v-mdi>
-              </div>
-            </template>
-            <slot></slot>
-            <template #footer>
-              <slot name="footer"></slot>
-            </template>
-          </card-ui>
-        </div>
+        <template v-if="show">
+          <slot v-if="customContent"></slot>
+          <div
+            v-else
+            class="
+              bg-black
+              p-5
+              overflow-y-auto
+              bg-opacity-50
+              modal-ui__content-container
+              flex
+              justify-center
+              items-end
+              md:items-center
+            "
+            style="z-index: 9999"
+            @click.self="closeModal"
+          >
+            <card-ui class="modal-ui__content shadow-lg w-full" :class="[contentClass]">
+              <template #header>
+                <div class="flex items-center justify-between">
+                  <span class="content-header">
+                    <slot name="header"></slot>
+                  </span>
+                  <v-mdi
+                    v-show="!persist"
+                    class="text-lighter cursor-pointer"
+                    name="mdi-close"
+                    size="20"
+                    @click="closeModal"
+                  ></v-mdi>
+                </div>
+              </template>
+              <slot></slot>
+              <template #footer>
+                <slot name="footer"></slot>
+              </template>
+            </card-ui>
+          </div>
+        </template>
       </transition>
     </teleport>
   </div>
 </template>
 <script>
-import { ref, watch, onMounted } from 'vue';
+import { ref, watch } from 'vue';
 import CardUi from './CardUi.vue';
 
 export default {
   components: { CardUi },
   props: {
     modelValue: {
+      type: Boolean,
+      default: false,
+    },
+    customContent: {
       type: Boolean,
       default: false,
     },
@@ -71,31 +78,33 @@ export default {
   emits: ['close', 'update:modelValue'],
   setup(props, { emit }) {
     const show = ref(false);
-    const closeModal = () => {
+
+    function closeModal() {
       if (props.persist) return;
 
       show.value = false;
       emit('close', false);
       emit('update:modelValue', false);
-    };
+    }
+    function handleEsc({ code }) {
+      if (code === 'Escape') closeModal();
+    }
 
-    onMounted(() => {
-      const handleEsc = ({ code }) => {
-        if (code === 'Escape') closeModal();
-      };
-
-      watch(
-        () => props.modelValue,
-        (value) => {
-          show.value = value;
-        },
-        { immediate: true }
-      );
-
-      watch(show, (value) => {
-        if (value) window.addEventListener('keyup', handleEsc);
-        else window.removeEventListener('keyup', handleEsc);
-      });
+    watch(
+      () => props.modelValue,
+      (value) => {
+        show.value = value;
+      },
+      { immediate: true }
+    );
+    watch(show, (value) => {
+      if (value) {
+        window.addEventListener('keyup', handleEsc);
+        document.body.classList.add('overflow-hidden');
+      } else {
+        document.body.classList.remove('overflow-hidden');
+        window.removeEventListener('keyup', handleEsc);
+      }
     });
 
     return {
