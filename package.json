@@ -21,7 +21,7 @@
     "switch-theme": "0.3.0",
     "tiny-emitter": "^2.1.0",
     "tippy.js": "6.3.1",
-    "vue": "^3.1.1",
+    "vue": "^3.1.4",
     "vue-mdijs": "^0.5.12",
     "vue-router": "^4.0.10",
     "vue-toastification": "^2.0.0-rc.1",
@@ -31,7 +31,7 @@
   "devDependencies": {
     "@rollup/plugin-eslint": "^8.0.1",
     "@vitejs/plugin-vue": "^1.2.3",
-    "@vue/compiler-sfc": "^3.1.1",
+    "@vue/compiler-sfc": "^3.1.4",
     "autoprefixer": "^10.3.0",
     "babel-eslint": "^10.0.3",
     "cz-conventional-changelog": "^3.3.0",
