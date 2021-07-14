@@ -1,30 +1,33 @@
 <template>
   <div class="snippet-view container my-10 px-4">
-    <snippet-navigation v-if="isRetrieved" v-bind="{ file }"></snippet-navigation>
-    <div v-else class="w-64 bg-input-dark animate-pulse rounded-lg mb-12 h-12"></div>
-    <div class="editor bg-light rounded-lg pb-4">
-      <div class="rounded-t-lg p-4 mb-4 flex items-center border-b">
-        <div v-if="isRetrieved" class="file-info">
-          <p>{{ file.name }}</p>
-          <p class="text-sm leading-tight text-lighter">{{ file.language }}</p>
+    <error-state-ui v-if="state.status === 'error'" code="404"></error-state-ui>
+    <template v-else>
+      <snippet-navigation v-if="state.status === 'idle'" v-bind="{ file }"></snippet-navigation>
+      <div v-else class="w-64 bg-input-dark animate-pulse rounded-lg mb-12 h-12"></div>
+      <div class="editor bg-light rounded-lg pb-4">
+        <div class="rounded-t-lg p-4 mb-4 flex items-center border-b">
+          <div v-if="state.status === 'idle'" class="file-info">
+            <p>{{ file.name }}</p>
+            <p class="text-sm leading-tight text-lighter">{{ file.language }}</p>
+          </div>
+          <div v-else class="h-10 rounded-lg w-48 bg-input-dark animate-pulse"></div>
+          <div class="flex-grow"></div>
+          <div
+            v-if="state.isLocalFile && !file.isShared"
+            v-tooltip:bottom="'Only you can see this snippet'"
+            class="px-3 py-2 rounded-full bg-danger self-center bg-opacity-25 text-danger mr-4"
+          >
+            <v-mdi name="mdi-lock-outline" size="20"></v-mdi>
+            <span class="ml-1 text-sm">Private</span>
+          </div>
+          <snippet-buttons-group
+            v-bind="{ file, isLocalFile: state.isLocalFile }"
+            @fork="state.isLocalFile = true"
+          ></snippet-buttons-group>
         </div>
-        <div v-else class="h-10 rounded-lg w-48 bg-input-dark animate-pulse"></div>
-        <div class="flex-grow"></div>
-        <div
-          v-if="isLocalFile && !file.isShared"
-          v-tooltip:bottom="'Only you can see this snippet'"
-          class="px-3 py-2 rounded-full bg-danger self-center bg-opacity-25 text-danger mr-4"
-        >
-          <v-mdi name="mdi-lock-outline" size="20"></v-mdi>
-          <span class="ml-1 text-sm">Private</span>
-        </div>
-        <snippet-buttons-group
-          v-bind="{ file, isLocalFile }"
-          @fork="isLocalFile = true"
-        ></snippet-buttons-group>
+        <app-codemirror :model-value="file.code" :options="cmOptions"></app-codemirror>
       </div>
-      <app-codemirror :model-value="file.code" :options="cmOptions"></app-codemirror>
-    </div>
+    </template>
   </div>
 </template>
 <script>
@@ -49,9 +52,11 @@ export default {
 
     const route = router.currentRoute.value;
 
-    const isLocalFile = ref(false);
-    const isRetrieved = ref(false);
     const file = ref({ user: {} });
+    const state = shallowReactive({
+      status: 'idle',
+      isLocalFile: false,
+    });
     const cmOptions = shallowReactive({
       readOnly: true,
       mode: '',
@@ -59,10 +64,11 @@ export default {
 
     onMounted(async () => {
       try {
+        state.status = 'loading';
         const localFile = File.find(route.params.fileId);
 
         if (localFile !== null) {
-          isLocalFile.value = true;
+          state.isLocalFile = true;
           file.value = {
             ...localFile,
             user: {
@@ -75,20 +81,19 @@ export default {
           file.value = data;
         }
 
-        cmOptions.mode = languages[file.value.language].mode;
-        isRetrieved.value = true;
+        cmOptions.mode = languages[file.value.language]?.mode;
+        state.status = 'idle';
       } catch (error) {
         console.error(error);
-        router.replace('/404');
+        state.status = 'error';
       }
     });
 
     return {
       file,
+      state,
       cmOptions,
       languages,
-      isRetrieved,
-      isLocalFile,
     };
   },
 };

@@ -3,8 +3,8 @@
     <spinner-ui class="mx-auto"></spinner-ui>
   </div>
   <template v-else>
-    <app-sidebar></app-sidebar>
-    <div class="lg:pl-64">
+    <app-sidebar v-if="!$route.meta.hideSidebar"></app-sidebar>
+    <div :class="{ 'lg:pl-64': !$route.meta.hideSidebar }">
       <router-view></router-view>
     </div>
   </template>

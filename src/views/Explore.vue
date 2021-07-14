@@ -2,11 +2,11 @@
   <div class="container px-2 md:px-4 lg:px-0 py-4">
     <explore-navigation></explore-navigation>
     <spinner-ui v-if="state.status === 'loading'" size="36" class="mx-auto mt-6"></spinner-ui>
-    <div v-else-if="state.status === 'error'" class="py-12 text-center">
-      <img :src="sadFaceSvg" class="mx-auto" alt="error image" />
-      <p class="text-lg mb-4">Oppss... something went wrong.</p>
-      <button-ui variant="primary" @click="fetchData"> Try again </button-ui>
-    </div>
+    <error-state-ui
+      @action="fetchData"
+      v-else-if="state.status === 'error'"
+      code="500"
+    ></error-state-ui>
     <template v-else>
       <div class="grid grid-cols-1 lg:grid-cols-2 mb-8 gap-4">
         <explore-card
@@ -27,6 +27,7 @@ import { useRoute } from 'vue-router';
 import { useToast } from 'vue-toastification';
 import dayjs from '~/lib/dayjs';
 import languages from '~/utils/languages';
+import { apiFetch } from '~/utils/firebase';
 import sadFaceSvg from '~/assets/svg/sad-face.svg';
 import ExploreCard from '~/components/pages/explore/ExploreCard.vue';
 import ExploreNavigation from '~/components/pages/explore/ExploreNavigation.vue';
@@ -58,8 +59,7 @@ export default {
       return new Promise((resolve, reject) => {
         const searchParam = new URLSearchParams(query);
 
-        fetch(`${import.meta.env.VITE_API_BASE_URL}/explore?${searchParam.toString()}`)
-          .then((response) => response.json())
+        apiFetch(`/explore?${searchParam.toString()}`)
           .then((data) => {
             if (data.error) throw new Error(data.error);
 

@@ -5,12 +5,19 @@ export const auth = new Auth({
   redirectUri: `${window.location.origin}/auth`,
 });
 
-export const apiFetch = (path, options) =>
-  auth
+export function apiFetch(path, options = {}) {
+  return auth
     .authorizedRequest(`${import.meta.env.VITE_API_BASE_URL}${path}`, {
       headers: {
         'Content-Type': 'application/json',
       },
       ...options,
     })
-    .then((response) => response.json());
+    .then((response) => {
+      if (response.ok) {
+        return response.json();
+      }
+
+      return response.json().then((data) => Promise.reject(data));
+    });
+}

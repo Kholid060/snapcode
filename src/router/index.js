@@ -23,11 +23,17 @@ const routes = [
     path: '/snippet/:fileId',
     name: 'snippet',
     component: Snippet,
+    meta: {
+      hideSidebar: true,
+    },
   },
   {
     path: '/auth',
     name: 'auth',
     component: Auth,
+    meta: {
+      hideSidebar: true,
+    },
   },
   {
     path: '/explore',
@@ -35,14 +41,12 @@ const routes = [
     component: Explore,
   },
   {
-    path: '/404',
-    name: 'not-found',
-    component: PageNotFound,
-  },
-  {
     path: '/:pathMatch(.*)*',
     name: 'not-found',
     component: PageNotFound,
+    meta: {
+      hideSidebar: true,
+    },
   },
 ];
 
