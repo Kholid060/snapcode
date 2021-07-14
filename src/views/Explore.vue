@@ -111,7 +111,7 @@ export default {
         });
     }
     function fetchData(useCache) {
-      if (!route.path.includes('explore')) return;
+      if (!route.path.includes('explore') && store.state.snippetsCache.length !== 0) return;
 
       state.status = 'loading';
 
