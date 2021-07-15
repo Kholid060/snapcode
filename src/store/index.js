@@ -20,6 +20,7 @@ const store = createStore({
   plugins: [VuexORM.install(database)],
   state: () => ({
     user: null,
+    nextKey: null,
     filterBy: 'all',
     searchQuery: '',
     snippetsCache: [],
