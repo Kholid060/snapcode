@@ -16,7 +16,7 @@
           @modal="showModal(snippet)"
         ></explore-card>
       </div>
-      <div v-if="state.nextKey" class="text-center">
+      <div v-if="$store.state.nextKey" class="text-center">
         <button-ui :loading="state.btnLoading" @click="loadMore">Load more</button-ui>
       </div>
     </template>
@@ -56,7 +56,6 @@ export default {
     const store = useStore();
 
     const state = reactive({
-      nextKey: null,
       status: 'idle',
       showModal: false,
       btnLoading: false,
@@ -82,7 +81,7 @@ export default {
 
             const snippets = data.snippets.map(formatSnippet);
 
-            state.nextKey = data.nextKey;
+            store.commit('updateState', { key: 'nextKey', value: data.nextKey });
 
             if (replace) store.commit('updateState', { key: 'snippetsCache', value: snippets });
             else store.commit('addSnippetCache', snippets);
@@ -98,7 +97,7 @@ export default {
     function loadMore() {
       state.btnLoading = true;
 
-      const query = { ...route.query, nextPageId: JSON.stringify(state.nextKey) };
+      const query = { ...route.query, nextPageId: JSON.stringify(store.state.nextKey) };
 
       fetchSnippets(query)
         .then(() => {
