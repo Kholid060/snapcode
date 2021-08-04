@@ -1,25 +1,36 @@
 <template>
   <div class="snippet-view container my-10 px-4">
-    <error-state-ui v-if="state.status === 'error'" code="404"></error-state-ui>
+    <div v-if="state.isProtected">
+      <p class="mb-4">This snippet is protected, you need to input the password to get access</p>
+      <form @submit.prevent="fetchSnippet(`?password=${state.password}`)">
+        <input-ui v-model="state.password" autofocus label="Password:" type="password" />
+        <button-ui class="ml-4" :loading="state.status === 'loading'" variant="primary">
+          Submit
+        </button-ui>
+      </form>
+    </div>
     <template v-else>
-      <snippet-navigation v-if="state.status === 'idle'" v-bind="{ file }"></snippet-navigation>
-      <div v-else class="w-64 bg-input-dark animate-pulse rounded-lg mb-12 h-12"></div>
-      <div class="editor bg-light rounded-lg pb-4">
-        <div class="rounded-t-lg p-4 mb-4 flex items-center border-b">
-          <div v-if="state.status === 'idle'" class="file-info">
-            <p>{{ file.name }}</p>
-            <p class="text-sm leading-tight text-lighter">{{ file.language }}</p>
+      <error-state-ui v-if="state.status === 'error'" code="404"></error-state-ui>
+      <template v-else>
+        <snippet-navigation v-if="state.status === 'idle'" v-bind="{ file }"></snippet-navigation>
+        <div v-else class="w-64 bg-input-dark animate-pulse rounded-lg mb-12 h-12"></div>
+        <div class="editor bg-light rounded-lg pb-4">
+          <div class="rounded-t-lg p-4 mb-4 flex items-center border-b">
+            <div v-if="state.status === 'idle'" class="file-info">
+              <p>{{ file.name }}</p>
+              <p class="text-sm leading-tight text-lighter">{{ file.language }}</p>
+            </div>
+            <div v-else class="h-10 rounded-lg w-48 bg-input-dark animate-pulse"></div>
+            <div class="flex-grow"></div>
+            <snippet-buttons-group :file="file"></snippet-buttons-group>
           </div>
-          <div v-else class="h-10 rounded-lg w-48 bg-input-dark animate-pulse"></div>
-          <div class="flex-grow"></div>
-          <snippet-buttons-group :file="file"></snippet-buttons-group>
+          <app-codemirror
+            class="px-4 pb-4"
+            :model-value="file.code"
+            :options="cmOptions"
+          ></app-codemirror>
         </div>
-        <app-codemirror
-          class="px-4 pb-4"
-          :model-value="file.code"
-          :options="cmOptions"
-        ></app-codemirror>
-      </div>
+      </template>
     </template>
   </div>
 </template>
@@ -27,7 +38,7 @@
 import { defineAsyncComponent, onMounted, ref, shallowReactive, watch } from 'vue';
 import { useStore } from 'vuex';
 import { useRoute } from 'vue-router';
-import { File } from '~/models';
+import { useToast } from 'vue-toastification';
 import languages from '~/utils/languages';
 import { apiFetch } from '~/utils/firebase';
 import SnippetNavigation from '~/components/pages/snippet/SnippetNavigation.vue';
@@ -39,24 +50,24 @@ export default {
     AppCodemirror: defineAsyncComponent(() => import('~/components/app/AppCodemirror.vue')),
     SnippetNavigation,
   },
-  props: {
-    isModal: Boolean,
-  },
-  setup(props) {
+  setup() {
     const store = useStore();
     const route = useRoute();
+    const toast = useToast();
 
     const file = ref({ user: {} });
     const state = shallowReactive({
       status: 'idle',
+      password: '',
       isRetrieved: false,
+      isProtected: false,
     });
     const cmOptions = shallowReactive({
       readOnly: true,
       mode: '',
     });
 
-    async function fetchSnippet() {
+    async function fetchSnippet(query = '') {
       if (!route.params.fileId) return;
 
       try {
@@ -66,13 +77,21 @@ export default {
         if (cache) {
           file.value = cache;
         } else {
-          const data = await apiFetch(`/files/${route.params.fileId}`);
-          file.value = data;
+          const data = await apiFetch(`/files/${route.params.fileId}${query}`);
+
+          if (data.errorMessage) {
+            toast.error(data.errorMessage);
+          } else {
+            state.isProtected = data.isProtected || false;
+            file.value = data;
+          }
         }
 
         cmOptions.mode = languages[file.value.language]?.mode;
+
         state.status = 'idle';
         state.isRetrieved = true;
+        state.password = '';
       } catch (error) {
         console.error(error);
         state.status = 'error';
@@ -93,6 +112,7 @@ export default {
       state,
       cmOptions,
       languages,
+      fetchSnippet,
     };
   },
 };

@@ -18,6 +18,7 @@ class File extends Model {
       createdAt: this.number(Date.now()),
       isShared: this.boolean(false),
       isEdited: this.boolean(false),
+      isProtected: this.boolean(false),
       isNew: this.boolean(false),
     };
   }
