@@ -62,6 +62,7 @@ import { computed, reactive, watch, defineAsyncComponent } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import dayjs from '~/lib/dayjs';
 import { File } from '~/models';
+import { useStorage } from '~/composable';
 import languages from '~/utils/languages';
 import ViewButtonsGroup from '~/components/pages/view/ViewButtonsGroup.vue';
 
@@ -73,6 +74,7 @@ export default {
   setup() {
     const route = useRoute();
     const router = useRouter();
+    const storage = useStorage();
 
     const fileId = computed(() => route.params.fileId);
     const file = computed(() => {
@@ -98,7 +100,7 @@ export default {
     });
 
     function updateFile(data) {
-      File.$update({
+      storage.model('files').update({
         where: file.value.id,
         data: {
           ...data,

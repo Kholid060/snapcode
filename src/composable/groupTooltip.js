@@ -1,8 +1,8 @@
 import { getCurrentInstance, onMounted, shallowRef } from 'vue';
 import { createSingleton } from 'tippy.js';
-import createTippy, { defaultOptions } from '@/utils/createTippy';
+import createTippy, { defaultOptions } from '../utils/createTippy';
 
-export function useGroupTooltip(elements, options = {}) {
+export default function (elements, options = {}) {
   const singleton = shallowRef(null);
 
   onMounted(() => {

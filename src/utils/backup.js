@@ -19,7 +19,7 @@ class Backup {
     this.interval = null;
   }
 
-  fetchData() {
+  _fetchData() {
     this.data = {
       files: {
         updated: dataFlag.getAllUpdated('files'),
@@ -36,7 +36,7 @@ class Backup {
     if (!auth.user) return;
 
     try {
-      this.fetchData();
+      this._fetchData();
 
       if (isEmptyArray(this.data)) {
         store.commit('updateState', {

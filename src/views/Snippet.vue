@@ -84,6 +84,7 @@ export default {
           } else {
             state.isProtected = data.isProtected || false;
             file.value = data;
+            state.password = '';
           }
         }
 
@@ -91,7 +92,6 @@ export default {
 
         state.status = 'idle';
         state.isRetrieved = true;
-        state.password = '';
       } catch (error) {
         console.error(error);
         state.status = 'error';

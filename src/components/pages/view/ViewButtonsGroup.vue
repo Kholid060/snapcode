@@ -105,13 +105,11 @@
   </button-group-ui>
 </template>
 <script>
-import { shallowReactive } from 'vue';
+import { shallowReactive, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useToast } from 'vue-toastification';
 import { nanoid } from 'nanoid';
-import { useStore } from 'vuex';
-import { useGroupTooltip } from '~/composable';
-import { File } from '~/models';
+import { useGroupTooltip, useStorage } from '~/composable';
 import { copyToClipboard, transformFile } from '~/utils/helper';
 import { apiFetch } from '../../../utils/firebase';
 
@@ -127,7 +125,7 @@ export default {
     useGroupTooltip();
     const router = useRouter();
     const toast = useToast();
-    const store = useStore();
+    const storage = useStorage();
 
     const shareState = shallowReactive({
       isShared: props.file.isShared,
@@ -154,9 +152,12 @@ export default {
       });
     }
     function deleteFile() {
-      File.$delete(props.file.id).then(() => {
-        router.replace('/');
-      });
+      storage
+        .model('files')
+        .delete(props.file.id)
+        .then(() => {
+          router.replace('/');
+        });
     }
     async function shareSnippet() {
       const body = transformFile({ ...props.file, ...shareState }, ['loading']);
@@ -171,7 +172,7 @@ export default {
           method: 'POST',
           body: JSON.stringify(body),
         });
-        await File.$update({
+        await storage.model('files', { triggerBackup: false }).update({
           where: props.file.id,
           data: { ...shareState, isNew: false, isEdited: false },
         });
@@ -187,6 +188,14 @@ export default {
     function generatePassword(value) {
       shareState.password = !props.file.isProtected && value ? nanoid(8) : '';
     }
+
+    watch(
+      () => [props.file.isShared, props.file.isProtected],
+      () => {
+        shareState.isShared = props.file.isShared;
+        shareState.isProtected = props.file.isProtected;
+      }
+    );
 
     return {
       copyUrl,

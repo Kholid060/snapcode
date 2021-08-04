@@ -54,7 +54,7 @@ export default {
 
       window.CodeMirror = Codemirror;
 
-      editor.value.on('change', (cm) => {
+      editor.value.on('inputRead', (cm) => {
         const value = cm.getValue();
 
         emit('update:modelValue', value);

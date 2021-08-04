@@ -48,7 +48,7 @@
 </template>
 <script>
 import dayjs from '~/lib/dayjs';
-import { File } from '~/models';
+import { useStorage } from '~/composable';
 
 export default {
   props: {
@@ -58,11 +58,13 @@ export default {
     },
   },
   setup() {
+    const storage = useStorage();
+
     function formatTime(time) {
       return dayjs(time).fromNow();
     }
     function updateFile(id, data) {
-      File.$update({
+      storage.model('files').update({
         where: id,
         data: {
           ...data,

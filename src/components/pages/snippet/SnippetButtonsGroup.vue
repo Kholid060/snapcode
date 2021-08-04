@@ -25,7 +25,7 @@
 import { ref, computed } from 'vue';
 import { useToast } from 'vue-toastification';
 import { nanoid } from 'nanoid';
-import { useGroupTooltip } from '~/composable';
+import { useGroupTooltip, useStorage } from '~/composable';
 import { Folder, File } from '~/models';
 import { copyToClipboard } from '~/utils/helper';
 
@@ -39,6 +39,7 @@ export default {
   setup(props, { emit }) {
     useGroupTooltip();
     const toast = useToast();
+    const storage = useStorage();
 
     const selectedFolder = ref('');
 
@@ -59,7 +60,7 @@ export default {
     function forkSnippet() {
       const copyFile = { ...props.file };
 
-      File.$update({
+      storage.model('files').update({
         data: {
           ...copyFile,
           id: `${nanoid()}___${copyFile.id.split('___')[0]}`,

@@ -1,6 +1,5 @@
 import { Model } from '@vuex-orm/core';
 import { nanoid } from 'nanoid';
-import { updateDataChange } from '~/utils/helper';
 
 class File extends Model {
   static entity = 'files';
@@ -24,31 +23,20 @@ class File extends Model {
   }
 
   static afterWhere(files) {
-    /* eslint-disable no-param-reassign */
-    return files
-      .map((file) => {
+    const validFiles = [];
+
+    files.forEach((file) => {
+      const isValidFile = file.name !== '' && file.folderId !== null;
+
+      if (isValidFile) {
         delete file.$id;
         delete file.isEdited;
 
-        return file;
-      })
-      .filter((file) => file.name !== '' && file.folderId !== null);
-  }
+        validFiles.push(file);
+      }
+    });
 
-  static afterUpdate(model) {
-    updateDataChange(model);
-  }
-
-  static afterDelete(model) {
-    if (model.isNew) return;
-
-    updateDataChange(model);
-
-    const deletedFiles = JSON.parse(localStorage.getItem('deletedFiles')) || [];
-
-    deletedFiles.push(model.id);
-
-    localStorage.setItem('deletedFiles', JSON.stringify(deletedFiles));
+    return validFiles;
   }
 }
 
