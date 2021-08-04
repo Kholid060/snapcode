@@ -105,7 +105,7 @@
   </button-group-ui>
 </template>
 <script>
-import { onMounted, shallowReactive } from 'vue';
+import { shallowReactive } from 'vue';
 import { useRouter } from 'vue-router';
 import { useToast } from 'vue-toastification';
 import { nanoid } from 'nanoid';
@@ -124,6 +124,7 @@ export default {
   },
   emits: ['change'],
   setup(props) {
+    useGroupTooltip();
     const router = useRouter();
     const toast = useToast();
     const store = useStore();
@@ -186,8 +187,6 @@ export default {
     function generatePassword(value) {
       shareState.password = !props.file.isProtected && value ? nanoid(8) : '';
     }
-
-    onMounted(useGroupTooltip);
 
     return {
       copyUrl,

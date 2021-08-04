@@ -22,7 +22,7 @@
   </button-group-ui>
 </template>
 <script>
-import { onMounted, ref, computed } from 'vue';
+import { ref, computed } from 'vue';
 import { useToast } from 'vue-toastification';
 import { nanoid } from 'nanoid';
 import { useGroupTooltip } from '~/composable';
@@ -37,6 +37,7 @@ export default {
     },
   },
   setup(props, { emit }) {
+    useGroupTooltip();
     const toast = useToast();
 
     const selectedFolder = ref('');
@@ -69,8 +70,6 @@ export default {
         },
       });
     }
-
-    onMounted(useGroupTooltip);
 
     return {
       folders,
