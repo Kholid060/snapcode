@@ -19,7 +19,7 @@
 </template>
 <script>
 import { computed, ref } from 'vue';
-import CodeMirror from '~/lib/Codemirror';
+import CodeMirror from '~/lib/codemirror';
 import { getLangInfo } from '~/utils/languages';
 
 export default {

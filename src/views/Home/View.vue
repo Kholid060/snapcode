@@ -9,7 +9,7 @@
           <input
             type="text"
             :value="file.name"
-            class="bg-transparent text-lg"
+            class="bg-transparent text-lg w-full"
             maxlength="60"
             required
             @change="updateFileName"
