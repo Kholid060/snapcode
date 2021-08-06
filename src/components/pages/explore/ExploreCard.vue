@@ -18,15 +18,16 @@
         :title="`${snippet.name} [${snippet.language}]`"
         @click="$emit('modal')"
       >
-        {{ snippet.name }} [{{ snippet.language }}]
+        {{ snippet.name }} [{{ getLangInfo(snippet.language, 'name') }}]
       </p>
     </div>
+    {{ snippet.language }}
     <app-codemirror
       class="cursor-pointer"
       :options="{
         readOnly: 'nocursor',
         lineWrapping: true,
-        mode: snippet.mode,
+        mode: snippet.language,
         value: snippet.code,
       }"
       @click="$emit('modal')"
@@ -36,6 +37,7 @@
 </template>
 <script>
 import AppCodemirror from '~/components/app/AppCodemirror.vue';
+import { getLangInfo } from '~/utils/languages';
 
 export default {
   components: { AppCodemirror },
@@ -46,6 +48,11 @@ export default {
     },
   },
   emits: ['modal'],
+  setup() {
+    return {
+      getLangInfo,
+    };
+  },
 };
 </script>
 <style>

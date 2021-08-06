@@ -12,7 +12,7 @@
   "dependencies": {
     "@mdi/js": "^5.9.55",
     "@vuex-orm/core": "^0.36.4",
-    "codemirror": "^5.62.0",
+    "codemirror": "^5.62.2",
     "dayjs": "1.10.6",
     "deepmerge": "^4.2.2",
     "firebase-auth-lite": "^0.8.9",

@@ -11,7 +11,7 @@ class File extends Model {
       id: this.uid(() => nanoid()),
       folderId: this.attr(null),
       name: this.string(''),
-      language: this.string('javascript'),
+      language: this.string('text/javascript'),
       code: this.string(''),
       starred: this.boolean(false),
       createdAt: this.number(Date.now()),

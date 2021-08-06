@@ -18,7 +18,9 @@
           <div class="rounded-t-lg p-4 mb-4 flex items-center border-b">
             <div v-if="state.status === 'idle'" class="file-info">
               <p>{{ file.name }}</p>
-              <p class="text-sm leading-tight text-lighter">{{ file.language }}</p>
+              <p class="text-sm leading-tight text-lighter">
+                {{ getLangInfo(file.language, 'name') }}
+              </p>
             </div>
             <div v-else class="h-10 rounded-lg w-48 bg-input-dark animate-pulse"></div>
             <div class="flex-grow"></div>
@@ -39,7 +41,7 @@ import { defineAsyncComponent, onMounted, ref, shallowReactive, watch } from 'vu
 import { useStore } from 'vuex';
 import { useRoute } from 'vue-router';
 import { useToast } from 'vue-toastification';
-import languages from '~/utils/languages';
+import { getLangInfo } from '~/utils/languages';
 import { apiFetch } from '~/utils/firebase';
 import SnippetNavigation from '~/components/pages/snippet/SnippetNavigation.vue';
 import SnippetButtonsGroup from '~/components/pages/snippet/SnippetButtonsGroup.vue';
@@ -88,7 +90,7 @@ export default {
           }
         }
 
-        cmOptions.mode = languages[file.value.language]?.mode;
+        cmOptions.mode = file.value.language;
 
         state.status = 'idle';
         state.isRetrieved = true;
@@ -111,7 +113,7 @@ export default {
       file,
       state,
       cmOptions,
-      languages,
+      getLangInfo,
       fetchSnippet,
     };
   },
