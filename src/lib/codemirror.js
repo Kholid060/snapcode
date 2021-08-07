@@ -40,17 +40,19 @@ function injectCodemirrorScript(path) {
         scriptTag.setAttribute('type', 'text/javascript');
         scriptTag.setAttribute('src', url);
 
-        scriptTag.onload = resolve;
+        scriptTag.innerHTML = text;
 
         if (requiredModules.length !== 0) {
           Promise.allSettled(requiredModules).then(() => {
             document.body.appendChild(scriptTag);
+            resolve();
           });
 
           return;
         }
 
         document.body.appendChild(scriptTag);
+        resolve();
       });
   });
 }
