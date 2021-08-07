@@ -6,7 +6,7 @@
     style="z-index: 9999"
     dismissible
   >
-    Snapcode v2.2.0 is released!!
+    Snapcode v{{ latestVersion }} is released!!
     <a
       href="https://github.com/Kholid060/snapcode/blob/master/CHANGELOG.md"
       rel="noopener"
@@ -83,6 +83,7 @@ export default {
 
     return {
       isRetrieved,
+      latestVersion,
       routeWithModal,
       showVersionAlert,
     };
