@@ -6,6 +6,7 @@
       </router-link>
       <button
         :class="{ 'hidden md:block': $route.name === 'view' }"
+        aria-label="menu"
         @click="$store.dispatch('toggleSidebar')"
       >
         <v-mdi name="mdi-menu" class="mr-4 lg:hidden cursor-pointer"></v-mdi>

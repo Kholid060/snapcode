@@ -39,15 +39,15 @@ export default {
   setup(props, { emit }) {
     const variants = {
       primary: {
-        color: 'bg-primary',
+        color: 'text-white bg-primary',
         icon: 'mdi-information-outline',
       },
       error: {
-        color: 'bg-red-500',
+        color: 'text-white bg-red-500',
         icon: 'mdi-close-circle-outline',
       },
       warning: {
-        color: 'bg-yellow-500',
+        color: 'text-white bg-yellow-500',
         icon: 'mdi-alert-outline',
       },
     };

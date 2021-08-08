@@ -17,7 +17,6 @@
     "deepmerge": "^4.2.2",
     "firebase-auth-lite": "^0.8.9",
     "nanoid": "^3.1.23",
-    "register-service-worker": "^1.6.2",
     "switch-theme": "0.3.0",
     "tiny-emitter": "^2.1.0",
     "tippy.js": "6.3.1",

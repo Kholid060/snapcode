@@ -65,8 +65,10 @@ function loadMode(instance) {
 
   injectCodemirrorScript(`/mode/${currentMode}/${currentMode}.js`)
     .then(() => {
-      instance.setOption('mode', currentMode);
-      CodeMirror.autoLoadMode(instance, currentMode);
+      setTimeout(() => {
+        instance.setOption('mode', currentMode);
+        CodeMirror.autoLoadMode(instance, currentMode);
+      }, 100);
     })
     .catch(() => {});
 }

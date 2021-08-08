@@ -6,16 +6,15 @@
     style="z-index: 9999"
     dismissible
   >
-    Snapcode v{{ latestVersion }} is released!!
+    Snapcode v{{ latestVersion }} is released!! to see what's new open
     <a
       href="https://github.com/Kholid060/snapcode/blob/master/CHANGELOG.md"
       rel="noopener"
       target="_blank"
       class="border-b-2 border-white"
     >
-      Click here
+      changelog.
     </a>
-    to see what's new.
   </alert-ui>
   <div class="lg:pl-64">
     <router-view :route="routeWithModal"></router-view>
@@ -59,7 +58,7 @@ export default {
 
         const releaseCache = localStorage.getItem('snapcode-version') || '';
         const appLatestVersion = import.meta.env.VITE_SNAPCODE_VERSION;
-        const isFirstTime = JSON.parse(localStorage.getItem('firstTime'));
+        const isFirstTime = JSON.parse(localStorage.getItem('firstTime') || 'true');
 
         if (releaseCache !== appLatestVersion && !isFirstTime) {
           showVersionAlert.value = true;

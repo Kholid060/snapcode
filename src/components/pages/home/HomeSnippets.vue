@@ -5,6 +5,7 @@
         <button-ui
           v-tooltip="sort.type === 'asc' ? 'ascending' : 'descending'"
           icon
+          aria-label="sort"
           class="rounded-r-none border-r align-bottom"
           @click="sort.type = sort.type === 'asc' ? 'desc' : 'asc'"
         >
@@ -17,7 +18,7 @@
         </select-ui>
       </div>
       <popover-ui>
-        <button-ui icon variant="primary" :disabled="activeFilter === 'starred'">
+        <button-ui icon variant="primary" :disabled="activeFilter === 'starred'" aria-label="add">
           <v-mdi name="mdi-plus"></v-mdi>
         </button-ui>
         <template #popover>

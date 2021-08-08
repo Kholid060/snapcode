@@ -1,6 +1,6 @@
 <template>
   <div class="flex items-center mb-4 md:mb-8">
-    <button class="lg:hidden mr-2" @click="$store.dispatch('toggleSidebar')">
+    <button class="lg:hidden mr-2" aria-label="menu" @click="$store.dispatch('toggleSidebar')">
       <v-mdi name="mdi-menu" class="cursor-pointer"></v-mdi>
     </button>
     <popover-ui class="mr-4 z-0 md:hidden">
