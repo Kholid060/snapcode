@@ -33,7 +33,7 @@
     ></app-codemirror>
     <div class="px-5 text-sm text-lighter py-2">
       <button @click="state.showSelectLanguages = true">
-        {{ getLangInfo(file.language, 'name') }}
+        {{ getLangInfo(file.language, 'name') || file.language }}
       </button>
       <span class="float-right">
         Line {{ state.cursorPosition.line + 1 }}, Column {{ state.cursorPosition.column + 1 }}
