@@ -21,26 +21,21 @@
         {{ snippet.name }} [{{ getLangInfo(snippet.language, 'name') }}]
       </p>
     </div>
-    {{ snippet.language }}
-    <app-codemirror
-      class="cursor-pointer"
-      :options="{
-        readOnly: 'nocursor',
-        lineWrapping: true,
-        mode: snippet.language,
-        value: snippet.code,
-      }"
-      @click="$emit('modal')"
-    ></app-codemirror>
+    <pre
+      ref="snippetEl"
+      :class="theme.currentTheme.value === 'dark' ? 'cm-s-one-dark' : 'cm-s-one-light'"
+      class="CodeMirror cm-s-default overflow-x-auto scroll"
+    ></pre>
     <div class="code-gradient absolute bottom-0 w-full left-0"></div>
   </div>
 </template>
 <script>
-import AppCodemirror from '~/components/app/AppCodemirror.vue';
+import { onMounted, ref } from 'vue';
+import CodeMirror, { injectCodemirrorScript } from '~/lib/codemirror';
+import { useIntersect, useTheme } from '~/composable';
 import { getLangInfo } from '~/utils/languages';
 
 export default {
-  components: { AppCodemirror },
   props: {
     snippet: {
       type: Object,
@@ -48,8 +43,31 @@ export default {
     },
   },
   emits: ['modal'],
-  setup() {
+  setup(props) {
+    const intersect = useIntersect();
+    const theme = useTheme();
+
+    const snippetEl = ref(null);
+
+    function runMode(mode) {
+      CodeMirror.runMode(props.snippet.code, mode, snippetEl.value);
+    }
+
+    onMounted(() => {
+      const mode = getLangInfo(props.snippet.language);
+
+      intersect.observe(snippetEl.value, () => {
+        injectCodemirrorScript(`/mode/${mode}/${mode}.js`)
+          .then(() => runMode(mode))
+          .catch((scriptId) => {
+            if (scriptId.includes(mode)) runMode(mode);
+          });
+      });
+    });
+
     return {
+      theme,
+      snippetEl,
       getLangInfo,
     };
   },
@@ -59,19 +77,5 @@ export default {
 .explore-card .CodeMirror {
   max-height: 160px;
   @apply text-sm;
-}
-.explore-card .CodeMirror-linenumber,
-.explore-card .CodeMirror-linenumbers,
-.explore-card .CodeMirror-gutters {
-  background-color: transparent !important;
-}
-.explore-card .CodeMirror-scroll {
-  overflow: hidden;
-}
-.explore-card .CodeMirror-vscrollbar,
-.explore-card .CodeMirror-hscrollbar,
-.explore-card .CodeMirror-scrollbar-filler {
-  display: none !important;
-  overflow: hidden;
 }
 </style>

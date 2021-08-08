@@ -2,11 +2,11 @@
   <app-sidebar></app-sidebar>
   <alert-ui
     v-model="showVersionAlert"
-    class="fixed w-full max-w-xl new-version-alert rounded-b-none md:rounded-b-lg md:mb-4 bottom-0"
+    class="fixed w-full max-w-2xl new-version-alert rounded-b-none md:rounded-b-lg md:mb-4 bottom-0"
     style="z-index: 9999"
     dismissible
   >
-    Snapcode v{{ latestVersion }} is released!! to see what's new open
+    Snapcode v{{ latestVersion }} is released!! To see what's new open
     <a
       href="https://github.com/Kholid060/snapcode/blob/master/CHANGELOG.md"
       rel="noopener"

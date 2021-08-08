@@ -1,5 +1,5 @@
 <template>
-  <div class="codemirror bg-lighter">
+  <div class="codemirror">
     <div ref="container" class="h-full"></div>
   </div>
 </template>

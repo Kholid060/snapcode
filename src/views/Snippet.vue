@@ -14,7 +14,7 @@
       <template v-else>
         <snippet-navigation v-if="state.status === 'idle'" v-bind="{ file }"></snippet-navigation>
         <div v-else class="w-64 bg-input-dark animate-pulse rounded-lg mb-12 h-12"></div>
-        <div class="editor bg-light rounded-lg pb-4">
+        <div class="editor bg-light rounded-lg">
           <div class="rounded-t-lg p-4 mb-4 flex items-center border-b">
             <div v-if="state.status === 'idle'" class="file-info">
               <p>{{ file.name }}</p>
@@ -26,21 +26,23 @@
             <div class="flex-grow"></div>
             <snippet-buttons-group :file="file"></snippet-buttons-group>
           </div>
-          <app-codemirror
-            class="px-4 pb-4"
-            :model-value="file.code"
-            :options="cmOptions"
-          ></app-codemirror>
+          <pre
+            ref="snippetEl"
+            :class="theme.currentTheme.value === 'dark' ? 'cm-s-one-dark' : 'cm-s-one-light'"
+            class="CodeMirror overflow-x-auto scroll pb-4 px-4"
+          ></pre>
         </div>
       </template>
     </template>
   </div>
 </template>
 <script>
-import { defineAsyncComponent, onMounted, ref, shallowReactive, watch } from 'vue';
+import { onMounted, ref, shallowReactive, watch } from 'vue';
 import { useStore } from 'vuex';
 import { useRoute } from 'vue-router';
 import { useToast } from 'vue-toastification';
+import { useTheme } from '~/composable';
+import CodeMirror, { injectCodemirrorScript } from '~/lib/codemirror';
 import { getLangInfo } from '~/utils/languages';
 import { apiFetch } from '~/utils/firebase';
 import SnippetNavigation from '~/components/pages/snippet/SnippetNavigation.vue';
@@ -49,14 +51,15 @@ import SnippetButtonsGroup from '~/components/pages/snippet/SnippetButtonsGroup.
 export default {
   components: {
     SnippetButtonsGroup,
-    AppCodemirror: defineAsyncComponent(() => import('~/components/app/AppCodemirror.vue')),
     SnippetNavigation,
   },
   setup() {
+    const theme = useTheme();
     const store = useStore();
     const route = useRoute();
     const toast = useToast();
 
+    const snippetEl = ref(null);
     const file = ref({ user: {} });
     const state = shallowReactive({
       status: 'idle',
@@ -64,10 +67,48 @@ export default {
       isRetrieved: false,
       isProtected: false,
     });
-    const cmOptions = shallowReactive({
-      readOnly: true,
-      mode: '',
-    });
+
+    function highlightCode(file) {
+      let line = 0;
+      let colCodeEl = document.createElement('span');
+
+      function outputHandler(text, style) {
+        const codeEl = document.createElement('span');
+        if (style) codeEl.classList = `cm-${style}`.replace(/\s/, 'cm-');
+        codeEl.innerText = text;
+
+        if (text === '\n') {
+          line += 1;
+
+          const containerEl = document.createElement('div');
+
+          const lineEl = document.createElement('span');
+          lineEl.classList = 'CodeMirror-linenumber mr-2';
+          lineEl.innerText = line;
+
+          containerEl.appendChild(lineEl);
+          containerEl.appendChild(colCodeEl);
+
+          snippetEl.value?.appendChild(containerEl);
+
+          colCodeEl = document.createElement('span');
+        } else {
+          colCodeEl.appendChild(codeEl);
+        }
+      }
+
+      const mode = getLangInfo(file.language);
+
+      file.code += '\n';
+
+      injectCodemirrorScript(`/mode/${mode}/${mode}.js`)
+        .then(() => {
+          CodeMirror.runMode(file.code, mode, outputHandler);
+        })
+        .catch(() => {
+          CodeMirror.runMode(file.code, mode, outputHandler);
+        });
+    }
 
     async function fetchSnippet(query = '') {
       if (!route.params.fileId) return;
@@ -90,7 +131,7 @@ export default {
           }
         }
 
-        cmOptions.mode = file.value.language;
+        highlightCode(file.value);
 
         state.status = 'idle';
         state.isRetrieved = true;
@@ -107,12 +148,17 @@ export default {
       }
     );
 
-    onMounted(fetchSnippet);
+    onMounted(() => {
+      window.CodeMirror = CodeMirror;
+
+      fetchSnippet();
+    });
 
     return {
       file,
       state,
-      cmOptions,
+      theme,
+      snippetEl,
       getLangInfo,
       fetchSnippet,
     };

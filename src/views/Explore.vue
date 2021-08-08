@@ -40,6 +40,7 @@ import { reactive, watchEffect, onMounted, onUnmounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 import { useToast } from 'vue-toastification';
+import CodeMirror from '~/lib/codemirror';
 import dayjs from '~/lib/dayjs';
 import Snippet from './Snippet.vue';
 import { apiFetch } from '~/utils/firebase';
@@ -148,7 +149,11 @@ export default {
       { flush: 'post' }
     );
 
-    onMounted(fetchData);
+    onMounted(() => {
+      window.CodeMirror = CodeMirror;
+
+      fetchData();
+    });
     onUnmounted(stop);
 
     return {

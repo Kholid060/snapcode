@@ -1,20 +1,37 @@
 import Codemirror from 'codemirror';
 import { getLangInfo } from '~/utils/languages';
 import 'codemirror/mode/meta';
+import 'codemirror/addon/runmode/runmode';
 import 'codemirror/addon/mode/loadmode';
-import 'codemirror/keymap/sublime';
 import 'codemirror/addon/edit/closebrackets';
+import 'codemirror/keymap/sublime';
 import 'codemirror/lib/codemirror.css';
 import '~/assets/css/themes/one-dark.css';
 import '~/assets/css/themes/one-light.css';
 
-function injectCodemirrorScript(path) {
+function loadMode(instance) {
+  const languageMime = instance.getOption('mode');
+  const currentMode = getLangInfo(languageMime);
+
+  if (!currentMode) return;
+
+  injectCodemirrorScript(`/mode/${currentMode}/${currentMode}.js`)
+    .then(() => {
+      setTimeout(() => {
+        instance.setOption('mode', currentMode);
+        CodeMirror.autoLoadMode(instance, currentMode);
+      }, 100);
+    })
+    .catch(() => {});
+}
+
+export function injectCodemirrorScript(path) {
   return new Promise((resolve, reject) => {
     const url = import.meta.env.VITE_CODEMIRROR_CDN + path;
     const scriptId = `cm-${path.replace(/\//g, '-')}`;
     const isScriptExist = document.getElementById(scriptId);
 
-    if (isScriptExist || !path) return reject();
+    if (isScriptExist || !path) return reject(scriptId);
 
     fetch(url)
       .then((response) => response.text())
@@ -38,7 +55,6 @@ function injectCodemirrorScript(path) {
 
         scriptTag.setAttribute('id', scriptId);
         scriptTag.setAttribute('type', 'text/javascript');
-        scriptTag.setAttribute('src', url);
 
         scriptTag.innerHTML = text;
 
@@ -55,22 +71,6 @@ function injectCodemirrorScript(path) {
         resolve();
       });
   });
-}
-
-function loadMode(instance) {
-  const languageMime = instance.getOption('mode');
-  const currentMode = getLangInfo(languageMime);
-
-  if (!currentMode) return;
-
-  injectCodemirrorScript(`/mode/${currentMode}/${currentMode}.js`)
-    .then(() => {
-      setTimeout(() => {
-        instance.setOption('mode', currentMode);
-        CodeMirror.autoLoadMode(instance, currentMode);
-      }, 100);
-    })
-    .catch(() => {});
 }
 
 export function initCodemirror(element, options) {
