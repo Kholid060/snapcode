@@ -39,9 +39,9 @@
             v-bind="{ href }"
             @click="navigate"
           >
-            <span class="flex-1 pr-2 text-overflow">{{
-              getLangInfo(snippet.language, 'name')
-            }}</span>
+            <span class="flex-1 pr-2 text-overflow">
+              {{ getLangInfo(snippet.language, 'name') || snippet.language }}
+            </span>
             <span>{{ formatTime(snippet.createdAt) }}</span>
           </a>
         </div>

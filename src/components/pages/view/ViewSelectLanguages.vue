@@ -1,5 +1,5 @@
 <template>
-  <modal-ui @close="query = ''">
+  <modal-ui @close="query = '', $emit('update:modelValue', false)" :model-value="modelValue">
     <template #header>
       <p>Select language mode</p>
     </template>
@@ -27,6 +27,10 @@ export default {
     snippet: {
       type: Object,
       default: () => ({}),
+    },
+    modelValue: {
+      type: Boolean,
+      default: false,
     },
   },
   emits: ['select', 'update:modelValue'],
