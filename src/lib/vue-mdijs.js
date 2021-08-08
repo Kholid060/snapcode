@@ -28,6 +28,9 @@ import {
   mdiLogin,
   mdiCompassOutline,
   mdiFileOutline,
+  mdiInformationOutline,
+  mdiAlertOutline,
+  mdiCloseCircleOutline,
 } from '@mdi/js';
 
 VMdijs.add({
@@ -59,6 +62,9 @@ VMdijs.add({
   mdiLogin,
   mdiCompassOutline,
   mdiFileOutline,
+  mdiInformationOutline,
+  mdiAlertOutline,
+  mdiCloseCircleOutline,
 });
 
 export default VMdijs;

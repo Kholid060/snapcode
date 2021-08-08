@@ -1,6 +1,6 @@
 {
   "name": "Snapcode",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "private": false,
   "license": "MIT",
   "scripts": {
@@ -12,12 +12,11 @@
   "dependencies": {
     "@mdi/js": "^5.9.55",
     "@vuex-orm/core": "^0.36.4",
-    "codemirror": "^5.62.0",
+    "codemirror": "^5.62.2",
     "dayjs": "1.10.6",
     "deepmerge": "^4.2.2",
     "firebase-auth-lite": "^0.8.9",
     "nanoid": "^3.1.23",
-    "register-service-worker": "^1.6.2",
     "switch-theme": "0.3.0",
     "tiny-emitter": "^2.1.0",
     "tippy.js": "6.3.1",

@@ -16,9 +16,10 @@ class Backup {
     this.init = debounce(this.fetch.bind(this), 1000);
     this.data = {};
     this.listeners = {};
+    this.interval = null;
   }
 
-  fetchData() {
+  _fetchData() {
     this.data = {
       files: {
         updated: dataFlag.getAllUpdated('files'),
@@ -35,9 +36,16 @@ class Backup {
     if (!auth.user) return;
 
     try {
-      this.fetchData();
+      this._fetchData();
 
-      if (isEmptyArray(this.data)) return;
+      if (isEmptyArray(this.data)) {
+        store.commit('updateState', {
+          key: 'isDataChanged',
+          value: false,
+        });
+
+        return;
+      }
 
       this.fireEvent('progress', true);
 
@@ -68,6 +76,7 @@ class Backup {
       this.fireEvent('progress', false);
     } catch (error) {
       /* eslint-disable-next-line */
+      this.fireEvent('progress', false);
       console.error(error);
     }
   }
@@ -86,11 +95,9 @@ class Backup {
   timer(duration = 60000) {
     if (!auth.user) return;
 
-    let interval;
+    clearInterval(this.interval);
 
-    clearInterval(interval);
-
-    interval = setInterval(() => {
+    this.interval = setInterval(() => {
       if (store.state.isDataChanged) this.fetch();
     }, duration);
   }

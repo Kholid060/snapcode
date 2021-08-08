@@ -34,7 +34,18 @@ export default {
           },
         ],
       },
-      workbox: {},
+      workbox: {
+        runtimeCaching: [
+          {
+            urlPattern: new RegExp('https://cdnjs.cloudflare.com/ajax/libs/codemirror'),
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'codemirror-scripts',
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
+        ],
+      },
     }),
     {
       ...eslint({

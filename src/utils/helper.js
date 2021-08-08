@@ -1,3 +1,17 @@
+export function isObject(data) {
+  return typeof data === 'object' && data !== null;
+}
+
+export function transformFile(file, keysParam = []) {
+  const keys = ['$id', 'isEdited', 'isNew'].concat(keysParam);
+
+  keys.forEach((key) => {
+    delete file[key];
+  });
+
+  return file;
+}
+
 export function getTimestamp(date) {
   return new Date(date).getTime();
 }

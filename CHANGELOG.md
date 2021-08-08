@@ -1,3 +1,10 @@
+## 2.3.0 (2021-08-08) 
+
+### Features
+* Now you can protect your shared snippet with a password
+* Support all codemirror modes
+* Add alert when a new version is released
+
 ## 2.2.0 (2021-07-15)
 
 ### Features

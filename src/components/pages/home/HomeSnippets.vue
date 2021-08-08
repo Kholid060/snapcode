@@ -5,6 +5,7 @@
         <button-ui
           v-tooltip="sort.type === 'asc' ? 'ascending' : 'descending'"
           icon
+          aria-label="sort"
           class="rounded-r-none border-r align-bottom"
           @click="sort.type = sort.type === 'asc' ? 'desc' : 'asc'"
         >
@@ -17,7 +18,7 @@
         </select-ui>
       </div>
       <popover-ui>
-        <button-ui icon variant="primary" :disabled="activeFilter === 'starred'">
+        <button-ui icon variant="primary" :disabled="activeFilter === 'starred'" aria-label="add">
           <v-mdi name="mdi-plus"></v-mdi>
         </button-ui>
         <template #popover>
@@ -58,12 +59,14 @@ import { computed, shallowReactive } from 'vue';
 import { useStore } from 'vuex';
 import emitter from 'tiny-emitter/instance';
 import { File } from '~/models';
+import { useStorage } from '~/composable';
 import SnippetList from './snippet/SnippetList.vue';
 
 export default {
   components: { SnippetList },
   setup() {
     const store = useStore();
+    const storage = useStorage();
 
     const sort = shallowReactive({
       by: 'createdAt',
@@ -97,7 +100,7 @@ export default {
     });
 
     function addFile() {
-      File.$update({
+      storage.model('files').update({
         data: {
           name: 'untitled snippet',
           folderId: store.state.filterBy === 'all' ? '' : store.state.filterBy,
@@ -105,10 +108,6 @@ export default {
           isEdited: true,
           createdAt: Date.now(),
         },
-      });
-      store.commit('updateState', {
-        key: 'isDataChanged',
-        value: true,
       });
     }
 

@@ -67,7 +67,7 @@ const defaultOptions = {
 };
 
 export default {
-  components: { ModalUi, ButtonUi, InputUi },
+  components: { ModalUi, InputUi, ButtonUi },
   props: {
     type: {
       type: String,

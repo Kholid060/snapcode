@@ -23,8 +23,9 @@
               v-bind="{ href }"
               :title="snippet.name"
               @click="navigate"
-              >{{ snippet.name }}</a
             >
+              {{ snippet.name }}
+            </a>
             <v-mdi
               :name="snippet.starred ? 'mdi-star' : 'mdi-star-outline'"
               size="22"
@@ -38,7 +39,9 @@
             v-bind="{ href }"
             @click="navigate"
           >
-            <span>{{ snippet.language }}</span>
+            <span class="flex-1 pr-2 text-overflow">{{
+              getLangInfo(snippet.language, 'name')
+            }}</span>
             <span>{{ formatTime(snippet.createdAt) }}</span>
           </a>
         </div>
@@ -48,7 +51,8 @@
 </template>
 <script>
 import dayjs from '~/lib/dayjs';
-import { File } from '~/models';
+import { getLangInfo } from '~/utils/languages';
+import { useStorage } from '~/composable';
 
 export default {
   props: {
@@ -58,11 +62,13 @@ export default {
     },
   },
   setup() {
+    const storage = useStorage();
+
     function formatTime(time) {
       return dayjs(time).fromNow();
     }
     function updateFile(id, data) {
-      File.$update({
+      storage.model('files').update({
         where: id,
         data: {
           ...data,
@@ -74,6 +80,7 @@ export default {
     return {
       updateFile,
       formatTime,
+      getLangInfo,
     };
   },
 };

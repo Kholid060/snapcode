@@ -18,7 +18,7 @@ module.exports = {
     isDefault: true,
     scheme: {
       colors: {
-        primary: colors.blue20,
+        primary: colors.blue10,
         warning: colors.yellow20,
         danger: colors.red20,
       },
@@ -44,7 +44,7 @@ module.exports = {
     selector: '[data-theme="dark"]',
     scheme: {
       colors: {
-        primary: colors.blue10,
+        primary: colors.blue20,
       },
       backgroundColor: {
         dark: colors.gray90,
