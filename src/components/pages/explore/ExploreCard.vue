@@ -25,6 +25,7 @@
       ref="snippetEl"
       :class="theme.currentTheme.value === 'dark' ? 'cm-s-one-dark' : 'cm-s-one-light'"
       class="CodeMirror cm-s-default overflow-x-auto scroll"
+      @click="$emit('modal')"
     ></pre>
     <div class="code-gradient absolute bottom-0 w-full left-0"></div>
   </div>

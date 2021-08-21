@@ -1,5 +1,5 @@
 <template>
-  <modal-ui @close="query = '', $emit('update:modelValue', false)" :model-value="modelValue">
+  <modal-ui :model-value="modelValue" @close="(query = ''), $emit('update:modelValue', false)">
     <template #header>
       <p>Select language mode</p>
     </template>
