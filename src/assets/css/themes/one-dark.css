@@ -18,6 +18,7 @@
 }
 .cm-s-one-dark .CodeMirror-linenumber,
 .cm-s-one-dark .CodeMirror-linenumbers {
+  user-select: none !important;
   color: #5c6370 !important;
   @apply bg-lighter;
 }
