@@ -1,6 +1,5 @@
 import { Model } from '@vuex-orm/core';
 import { nanoid } from 'nanoid';
-import { updateDataChange } from '~/utils/helper';
 
 class File extends Model {
   static entity = 'files';
@@ -12,42 +11,32 @@ class File extends Model {
       id: this.uid(() => nanoid()),
       folderId: this.attr(null),
       name: this.string(''),
-      language: this.string('javascript'),
+      language: this.string('text/javascript'),
       code: this.string(''),
       starred: this.boolean(false),
       createdAt: this.number(Date.now()),
       isShared: this.boolean(false),
       isEdited: this.boolean(false),
+      isProtected: this.boolean(false),
       isNew: this.boolean(false),
     };
   }
 
   static afterWhere(files) {
-    /* eslint-disable no-param-reassign */
-    return files
-      .map((file) => {
+    const validFiles = [];
+
+    files.forEach((file) => {
+      const isValidFile = file.name !== '' && file.folderId !== null;
+
+      if (isValidFile) {
         delete file.$id;
         delete file.isEdited;
 
-        return file;
-      })
-      .filter((file) => file.name !== '' && file.folderId !== null);
-  }
+        validFiles.push(file);
+      }
+    });
 
-  static afterUpdate(model) {
-    updateDataChange(model);
-  }
-
-  static afterDelete(model) {
-    if (model.isNew) return;
-
-    updateDataChange(model);
-
-    const deletedFiles = JSON.parse(localStorage.getItem('deletedFiles')) || [];
-
-    deletedFiles.push(model.id);
-
-    localStorage.setItem('deletedFiles', JSON.stringify(deletedFiles));
+    return validFiles;
   }
 }
 

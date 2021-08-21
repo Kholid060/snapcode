@@ -56,7 +56,7 @@
 import { ref, watch, computed } from 'vue';
 import { useStore } from 'vuex';
 import emitter from 'tiny-emitter/instance';
-import { useTheme, useDialog } from '~/composable';
+import { useTheme, useDialog, useStorage } from '~/composable';
 import { File, Folder } from '~/models';
 import { auth } from '~/utils/firebase';
 
@@ -65,6 +65,7 @@ export default {
     const store = useStore();
     const theme = useTheme();
     const dialog = useDialog();
+    const storage = useStorage();
 
     const isDark = ref(theme.currentTheme.value === 'dark');
 
@@ -85,8 +86,8 @@ export default {
         },
         onConfirm: () => {
           auth.signOut().then(async () => {
-            await Folder.$deleteAll();
-            await File.$deleteAll();
+            await storage.model('folders').deleteAll();
+            await storage.model('files').deleteAll();
 
             ['deletedFiles', 'deletedFolders', 'lastBackup', 'isDataChanged'].forEach((key) => {
               localStorage.removeItem(key);

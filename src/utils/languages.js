@@ -1,4 +1,6 @@
-export default {
+import CodeMirror from '~/lib/codemirror';
+
+const languages = {
   'c++': {
     name: 'C++',
     mode: 'text/x-c++src',
@@ -21,7 +23,7 @@ export default {
   },
   html: {
     name: 'HTML',
-    mode: 'htmlmixed',
+    mode: 'text/html',
     ext: 'html',
   },
   java: {
@@ -66,7 +68,7 @@ export default {
   },
   typescript: {
     name: 'Typescript',
-    mode: 'text/typescript',
+    mode: 'application/typescript',
     ext: 'ts',
   },
   tsx: {
@@ -80,3 +82,17 @@ export default {
     ext: 'vue',
   },
 };
+
+export function getLangInfo(lang, field = 'mode') {
+  let langMime = lang;
+
+  if (languages[lang]) langMime = languages[lang].mode;
+
+  const info = CodeMirror.findModeByMIME(langMime || '');
+
+  if (!info) return '';
+
+  return info[field];
+}
+
+export default languages;

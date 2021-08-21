@@ -3,7 +3,7 @@
     <button-ui
       v-tooltip:top.group="file.starred ? 'Starred' : 'Not starred'"
       icon
-      @click="updateFile('starred', !file.starred)"
+      @click="$emit('change', { starred: !file.starred })"
     >
       <v-mdi
         size="20"
@@ -16,37 +16,48 @@
         <v-mdi size="20" name="mdi-link-variant"></v-mdi>
       </button-ui>
       <template #popover>
-        <div class="flex justify-between w-48">
-          <span>Share snippet</span>
-          <switch-ui
-            v-if="store.state.user"
-            :model-value="file.isShared"
-            @update:model-value="updateFile('isShared', !file.isShared)"
-          ></switch-ui>
+        <div class="w-48">
+          <div class="flex justify-between mb-2">
+            <span>Share snippet</span>
+            <switch-ui v-if="$store.state.user" v-model="shareState.isShared"></switch-ui>
+          </div>
+          <slide-transition direction="top">
+            <input-ui
+              v-if="shareState.isShared"
+              type="text"
+              placeholder="Share URL"
+              :readonly="true"
+              :model-value="`${location}/snippet/${file.id}`"
+              @click="copyUrl"
+            />
+          </slide-transition>
+          <template v-if="shareState.isShared">
+            <div class="flex items-center justify-between mt-4">
+              <span>Password</span>
+              <switch-ui v-model="shareState.isProtected" @change="generatePassword" />
+            </div>
+            <slide-transition direction="top">
+              <input-ui
+                v-if="shareState.isProtected"
+                v-model="shareState.password"
+                placeholder="Password"
+                class="mt-2"
+              />
+            </slide-transition>
+          </template>
+          <button-ui
+            v-if="$store.state.user"
+            variant="primary"
+            class="mt-6 w-full"
+            :loading="shareState.loading"
+            @click="shareSnippet"
+          >
+            Save
+          </button-ui>
+          <p v-if="!$store.state.user" class="text-center my-2 text-light">
+            You need to login first
+          </p>
         </div>
-        <slide-transition direction="top">
-          <input
-            v-if="store.state.user && file.isShared"
-            type="text"
-            aria-label="share url"
-            placeholder="url"
-            class="
-              p-2
-              w-48
-              rounded-lg
-              bg-input
-              hover:bg-input-dark
-              transition-colors
-              duration-200
-              ease-in
-              mt-4
-            "
-            readonly
-            :value="`${location}/snippet/${file.id}`"
-            @click="copyUrl"
-          />
-        </slide-transition>
-        <p v-if="!store.state.user" class="text-center my-2 text-light">You need to login first</p>
       </template>
     </popover-ui>
     <button-ui
@@ -94,13 +105,13 @@
   </button-group-ui>
 </template>
 <script>
-import { onMounted } from 'vue';
+import { shallowReactive, watch } from 'vue';
 import { useRouter } from 'vue-router';
-import { useStore } from 'vuex';
 import { useToast } from 'vue-toastification';
-import { useGroupTooltip } from '~/composable';
-import { File } from '~/models';
-import { copyToClipboard } from '~/utils/helper';
+import { nanoid } from 'nanoid';
+import { useGroupTooltip, useStorage } from '~/composable';
+import { copyToClipboard, transformFile } from '~/utils/helper';
+import { apiFetch } from '../../../utils/firebase';
 
 export default {
   props: {
@@ -110,10 +121,18 @@ export default {
     },
   },
   emits: ['change'],
-  setup(props, { emit }) {
-    const store = useStore();
+  setup(props) {
+    useGroupTooltip();
     const router = useRouter();
     const toast = useToast();
+    const storage = useStorage();
+
+    const shareState = shallowReactive({
+      isShared: props.file.isShared,
+      isProtected: props.file.isProtected,
+      password: '',
+      loading: false,
+    });
 
     function copyUrl(event) {
       event.target.select();
@@ -133,22 +152,59 @@ export default {
       });
     }
     function deleteFile() {
-      File.$delete(props.file.id).then(() => {
-        router.replace('/');
-      });
+      storage
+        .model('files')
+        .delete(props.file.id)
+        .then(() => {
+          router.replace('/');
+        });
+    }
+    async function shareSnippet() {
+      const body = transformFile({ ...props.file, ...shareState }, ['loading']);
+      shareState.loading = true;
+
+      try {
+        if (body.isProtected && body.password === '') {
+          delete body.password;
+        }
+
+        await apiFetch(`/files/share/${props.file.id}`, {
+          method: 'POST',
+          body: JSON.stringify(body),
+        });
+        await storage.model('files', { triggerBackup: false }).update({
+          where: props.file.id,
+          data: { ...shareState, isNew: false, isEdited: false },
+        });
+
+        shareState.loading = false;
+        shareState.password = '';
+      } catch (error) {
+        console.error(error);
+        toast.error('Something went wrong');
+        shareState.loading = false;
+      }
+    }
+    function generatePassword(value) {
+      shareState.password = !props.file.isProtected && value ? nanoid(8) : '';
     }
 
-    onMounted(useGroupTooltip);
+    watch(
+      () => [props.file.isShared, props.file.isProtected],
+      () => {
+        shareState.isShared = props.file.isShared;
+        shareState.isProtected = props.file.isProtected;
+      }
+    );
 
     return {
-      store,
       copyUrl,
       copyCode,
-      location: window.location.origin,
+      shareState,
       deleteFile,
-      updateFile: (key, value) => {
-        emit('change', { [key]: value });
-      },
+      shareSnippet,
+      generatePassword,
+      location: window.location.origin,
     };
   },
 };

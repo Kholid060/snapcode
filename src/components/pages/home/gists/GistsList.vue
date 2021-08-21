@@ -51,8 +51,10 @@
 </template>
 <script>
 import { reactive, onMounted, computed } from 'vue';
-import { useStore } from 'vuex';
-import { Folder, File } from '~/models';
+import CodeMirror from 'codemirror';
+import { useStorage } from '~/composable';
+import { Folder } from '~/models';
+import 'codemirror/mode/meta';
 
 export default {
   props: {
@@ -67,7 +69,7 @@ export default {
   },
   emits: ['close'],
   setup(props, { emit }) {
-    const store = useStore();
+    const storage = useStorage();
 
     const state = reactive({
       query: '',
@@ -109,12 +111,14 @@ export default {
         try {
           const { content, language, raw_url, filename } =
             props.files.find((file) => file.id === id) || {};
+          const fileExtension = filename.split('.').pop();
+          const mode = CodeMirror.findModeByExtension(fileExtension)?.mime || language;
           const file = {
             name: filename,
             isEdited: true,
             isNew: true,
             folderId: state.selectedFolder,
-            language: language.toLowerCase(),
+            language: mode,
             code: content,
             createdAt: Date.now(),
           };
@@ -135,15 +139,10 @@ export default {
 
       snippets.forEach(({ status, value }) => {
         if (status === 'fulfilled') {
-          File.$update({
+          storage.model('files').update({
             data: value,
           });
         }
-      });
-
-      store.commit('updateState', {
-        key: 'isDataChanged',
-        value: true,
       });
 
       state.loadingImport = false;

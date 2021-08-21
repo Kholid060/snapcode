@@ -4,21 +4,9 @@
   </div>
 </template>
 <script>
-import { onMounted, ref, watch, shallowRef } from 'vue';
-import Codemirror from 'codemirror';
+import { onMounted, ref, watch, shallowRef, onUnmounted } from 'vue';
 import { useTheme } from '~/composable';
-import 'codemirror/mode/javascript/javascript';
-import 'codemirror/mode/css/css';
-import 'codemirror/mode/htmlmixed/htmlmixed';
-import 'codemirror/mode/vue/vue';
-import 'codemirror/mode/clike/clike';
-import 'codemirror/mode/python/python';
-import 'codemirror/mode/jsx/jsx';
-import 'codemirror/keymap/sublime';
-import 'codemirror/addon/edit/closebrackets';
-import 'codemirror/lib/codemirror.css';
-import '~/assets/css/themes/one-dark.css';
-import '~/assets/css/themes/one-light.css';
+import CodeMirror, { initCodemirror } from '~/lib/codemirror';
 
 export default {
   props: {
@@ -31,52 +19,24 @@ export default {
       default: () => ({}),
     },
   },
-  emits: ['change', 'update:modelValue', 'cursorActivity', 'focus', 'blur'],
+  emits: ['change', 'update:modelValue', 'cursorActivity', 'focus', 'blur', 'load'],
   setup(props, { emit }) {
     const theme = useTheme();
-    const editor = shallowRef(null);
+
     const container = ref(null);
+    const editor = shallowRef(null);
 
-    onMounted(() => {
-      editor.value = new Codemirror(container.value, {
-        mode: 'text/javascript',
-        theme: 'one-dark',
-        keymap: 'sublime',
-        value: props.modelValue,
-        tabSize: 2,
-        closeBrackets: true,
-        matchBrackets: true,
-        autoCloseBrackets: true,
-        lineNumbers: true,
-        line: true,
-        ...props.options,
-      });
+    function onInputRead(cm) {
+      const value = cm.getValue();
 
-      window.CodeMirror = Codemirror;
+      emit('update:modelValue', value);
+      emit('change', value);
+    }
+    function onCursorActivity(event) {
+      const { line, ch: column } = event.doc.getCursor();
 
-      editor.value.on('change', (cm) => {
-        const value = cm.getValue();
-
-        emit('update:modelValue', value);
-        emit('change', value);
-      });
-
-      editor.value.on('cursorActivity', (event) => {
-        const { line, ch: column } = event.doc.getCursor();
-
-        emit('cursorActivity', { line, column });
-      });
-
-      ['focus', 'blur'].forEach((evtName) => {
-        editor.value.on(evtName, (event) => {
-          emit(evtName, event);
-        });
-      });
-
-      ['.CodeMirror-vscrollbar', '.CodeMirror-hscrollbar'].forEach((selector) => {
-        document.querySelector(selector)?.classList.add('scroll');
-      });
-    });
+      emit('cursorActivity', { line, column });
+    }
 
     watch(theme.currentTheme, (value) => {
       editor.value.setOption('theme', value === 'light' ? 'one-light' : 'one-dark');
@@ -88,7 +48,7 @@ export default {
           editor.value.setOption(key, options[key]);
         });
 
-        // if (options.mode && (options.mode !== oldOptions.mode))
+        if (options.mode && options.mode !== oldOptions.mode) editor.value.loadMode(editor.value);
       },
       { deep: true }
     );
@@ -103,7 +63,39 @@ export default {
       }
     );
 
+    onMounted(() => {
+      window.CodeMirror = CodeMirror;
+
+      editor.value = initCodemirror(container.value, {
+        value: props.modelValue,
+        ...props.options,
+      });
+
+      editor.value.on('inputRead', onInputRead);
+      editor.value.on('cursorActivity', onCursorActivity);
+
+      ['focus', 'blur'].forEach((evtName) => {
+        editor.value.on(evtName, (event) => {
+          emit(evtName, event);
+        });
+      });
+
+      ['.CodeMirror-vscrollbar', '.CodeMirror-hscrollbar'].forEach((selector) => {
+        document.querySelector(selector)?.classList.add('scroll');
+      });
+
+      emit('load', {
+        ...editor.value,
+        showSelectMode: () => (showSelectMode.value = true),
+      });
+    });
+
+    onUnmounted(() => {
+      editor.value.destroy();
+    });
+
     return {
+      editor,
       container,
     };
   },

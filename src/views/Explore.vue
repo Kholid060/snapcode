@@ -40,8 +40,8 @@ import { reactive, watchEffect, onMounted, onUnmounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 import { useToast } from 'vue-toastification';
+import CodeMirror from '~/lib/codemirror';
 import dayjs from '~/lib/dayjs';
-import languages from '~/utils/languages';
 import Snippet from './Snippet.vue';
 import { apiFetch } from '~/utils/firebase';
 import ExploreCard from '~/components/pages/explore/ExploreCard.vue';
@@ -62,12 +62,9 @@ export default {
     });
 
     function formatSnippet(snippet) {
-      const language = languages[snippet.language] || {};
-
       return {
         ...snippet,
         createdAt: dayjs(snippet.createdAt).fromNow(),
-        mode: language.mode || '',
         name: snippet.name,
       };
     }
@@ -152,7 +149,11 @@ export default {
       { flush: 'post' }
     );
 
-    onMounted(fetchData);
+    onMounted(() => {
+      window.CodeMirror = CodeMirror;
+
+      fetchData();
+    });
     onUnmounted(stop);
 
     return {

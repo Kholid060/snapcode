@@ -42,7 +42,7 @@
                 <list-item-ui
                   v-close-popover
                   small
-                  class="cursor-pointer"
+                  class="cursor-pointer text-red-400"
                   @click="deleteFolder(folder)"
                 >
                   <template #prepend>
@@ -61,8 +61,8 @@
 <script>
 import { computed } from 'vue';
 import { useStore } from 'vuex';
-import { useDialog } from '~/composable';
-import { Folder, File } from '~/models';
+import { Folder } from '~/models';
+import { useDialog, useStorage } from '~/composable';
 
 export default {
   props: {
@@ -75,6 +75,7 @@ export default {
   setup() {
     const store = useStore();
     const dialog = useDialog();
+    const storage = useStorage();
 
     const isRetrieved = computed(() => store.state.isRetrieved);
     const folders = computed(() => Folder.query().orderBy('name', 'asc').get());
@@ -88,7 +89,7 @@ export default {
           maxlength: 60,
         },
         onConfirm: (newName) => {
-          Folder.$update({
+          storage.model('folders').update({
             where: id,
             data: {
               name: newName.slice(0, 60),
@@ -109,11 +110,14 @@ export default {
           },
         },
         onConfirm: () => {
-          Folder.$delete(id).then(async () => {
-            await File.$delete((file) => file.folderId === id);
+          storage
+            .model('folders')
+            .delete(id)
+            .then(async () => {
+              await storage.model('files').delete((file) => file.folderId === id);
 
-            store.commit('updateState', { key: 'filterBy', value: 'all' });
-          });
+              store.commit('updateState', { key: 'filterBy', value: 'all' });
+            });
         },
       });
     }

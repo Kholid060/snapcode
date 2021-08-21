@@ -61,7 +61,7 @@
 import { computed } from 'vue';
 import { useStore } from 'vuex';
 import { useRoute } from 'vue-router';
-import { useDialog } from '~/composable';
+import { useDialog, useStorage } from '~/composable';
 import { Folder } from '~/models';
 import SidebarFolders from './sidebar/SidebarFolders.vue';
 
@@ -76,6 +76,7 @@ export default {
     const store = useStore();
     const route = useRoute();
     const dialog = useDialog();
+    const storage = useStorage();
 
     const activeFilter = computed(() => store.state.filterBy);
     const isInHome = computed(() => ['home', 'view'].includes(route.name));
@@ -90,16 +91,12 @@ export default {
           placeholder: 'Folder name',
         },
         onConfirm: (name) => {
-          Folder.$update({
+          storage.model('folders').update({
             data: {
               name,
               isEdited: true,
               isNew: true,
             },
-          });
-          store.commit('updateState', {
-            key: 'isDataChanged',
-            value: true,
           });
         },
       });

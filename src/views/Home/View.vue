@@ -9,7 +9,7 @@
           <input
             type="text"
             :value="file.name"
-            class="bg-transparent text-lg"
+            class="bg-transparent text-lg w-full"
             maxlength="60"
             required
             @change="updateFileName"
@@ -29,50 +29,43 @@
       @cursor-activity="state.cursorPosition = $event"
       @focus="state.isEditorFocused = true"
       @blur="state.isEditorFocused = false"
+      @load="state.codemirror = $event"
     ></app-codemirror>
     <div class="px-5 text-sm text-lighter py-2">
-      <popover-ui content-classes="overflow-hidden">
-        <button>{{ file.language }}</button>
-        <template #popover>
-          <list-ui
-            class="space-y-1 text-default text-base scroll overflow-auto p-4"
-            style="max-height: 250px"
-          >
-            <list-item-ui
-              v-for="(value, language) in languages"
-              :key="language"
-              :active="language === file.language"
-              small
-              class="cursor-pointer"
-              @click="updateFile({ language })"
-            >
-              {{ value.name }}
-            </list-item-ui>
-          </list-ui>
-        </template>
-      </popover-ui>
+      <button @click="state.showSelectLanguages = true">
+        {{ getLangInfo(file.language, 'name') || file.language }}
+      </button>
       <span class="float-right">
         Line {{ state.cursorPosition.line + 1 }}, Column {{ state.cursorPosition.column + 1 }}
       </span>
     </div>
   </div>
+  <view-select-languages
+    v-model="state.showSelectLanguages"
+    :snippet="file"
+    @select="updateFile({ language: $event.mime })"
+  />
 </template>
 <script>
 import { computed, reactive, watch, defineAsyncComponent } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import dayjs from '~/lib/dayjs';
 import { File } from '~/models';
-import languages from '~/utils/languages';
+import { useStorage } from '~/composable';
+import { getLangInfo } from '~/utils/languages';
 import ViewButtonsGroup from '~/components/pages/view/ViewButtonsGroup.vue';
+import ViewSelectLanguages from '~/components/pages/view/ViewSelectLanguages.vue';
 
 export default {
   components: {
     AppCodemirror: defineAsyncComponent(() => import('~/components/app/AppCodemirror.vue')),
     ViewButtonsGroup,
+    ViewSelectLanguages,
   },
   setup() {
     const route = useRoute();
     const router = useRouter();
+    const storage = useStorage();
 
     const fileId = computed(() => route.params.fileId);
     const file = computed(() => {
@@ -87,7 +80,9 @@ export default {
     });
 
     const state = reactive({
+      codemirror: null,
       isEditorFocused: false,
+      showSelectLanguages: false,
       cmOptions: {
         mode: 'text/javascript',
       },
@@ -98,7 +93,7 @@ export default {
     });
 
     function updateFile(data) {
-      File.$update({
+      storage.model('files').update({
         where: file.value.id,
         data: {
           ...data,
@@ -125,7 +120,7 @@ export default {
       () => file.value.language,
       () => {
         state.cmOptions = {
-          mode: languages[file.value.language]?.mode,
+          mode: file.value.language,
         };
       },
       { immediate: true }
@@ -134,9 +129,9 @@ export default {
     return {
       file,
       state,
-      languages,
       updateFile,
       formatDate,
+      getLangInfo,
       updateFileName,
     };
   },
