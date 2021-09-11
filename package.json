@@ -10,7 +10,7 @@
     "commit": "cz"
   },
   "dependencies": {
-    "@mdi/js": "^5.9.55",
+    "@mdi/js": "^6.1.95",
     "@vuex-orm/core": "^0.36.4",
     "codemirror": "^5.62.2",
     "dayjs": "1.10.6",
