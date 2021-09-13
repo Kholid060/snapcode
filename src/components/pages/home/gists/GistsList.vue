@@ -51,10 +51,9 @@
 </template>
 <script>
 import { reactive, onMounted, computed } from 'vue';
-import CodeMirror from 'codemirror';
+import { findModeByExtension } from '~/utils/codemirrorLanguages';
 import { useStorage } from '~/composable';
 import { Folder } from '~/models';
-import 'codemirror/mode/meta';
 
 export default {
   props: {
@@ -112,7 +111,7 @@ export default {
           const { content, language, raw_url, filename } =
             props.files.find((file) => file.id === id) || {};
           const fileExtension = filename.split('.').pop();
-          const mode = CodeMirror.findModeByExtension(fileExtension)?.mime || language;
+          const mode = findModeByExtension(fileExtension)?.mime || language;
           const file = {
             name: filename,
             isEdited: true,

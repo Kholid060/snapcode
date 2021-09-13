@@ -1,6 +1,5 @@
 import Codemirror from 'codemirror';
 import { getLangInfo } from '~/utils/languages';
-import 'codemirror/mode/meta';
 import 'codemirror/addon/runmode/runmode';
 import 'codemirror/addon/mode/loadmode';
 import 'codemirror/addon/edit/closebrackets';
