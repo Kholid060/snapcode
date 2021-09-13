@@ -1,29 +1,23 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import store from '../store';
-import Home from '../views/Home/Index.vue';
-import View from '../views/Home/View.vue';
-import Snippet from '../views/Snippet.vue';
-import Auth from '../views/Auth.vue';
-import PageNotFound from '../views/404.vue';
-import Explore from '../views/Explore.vue';
 
 const routes = [
   {
     path: '/',
     name: 'home',
-    component: Home,
+    component: () => import('../views/Home/Index.vue'),
     children: [
       {
         path: 'view/:fileId',
         name: 'view',
-        component: View,
+        component: () => import('../views/Home/View.vue'),
       },
     ],
   },
   {
     path: '/snippet/:fileId',
     name: 'snippet',
-    component: Snippet,
+    component: () => import('../views/Snippet.vue'),
     meta: {
       hideSidebar: true,
     },
@@ -31,7 +25,7 @@ const routes = [
   {
     path: '/auth',
     name: 'auth',
-    component: Auth,
+    component: () => import('../views/Auth.vue'),
     meta: {
       hideSidebar: true,
     },
@@ -39,12 +33,12 @@ const routes = [
   {
     path: '/explore',
     name: 'explore',
-    component: Explore,
+    component: () => import('../views/Explore.vue'),
   },
   {
     path: '/:pathMatch(.*)*',
     name: 'not-found',
-    component: PageNotFound,
+    component: () => import('../views/404.vue'),
     meta: {
       hideSidebar: true,
     },

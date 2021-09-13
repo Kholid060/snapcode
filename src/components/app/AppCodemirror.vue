@@ -7,6 +7,8 @@
 import { onMounted, ref, watch, shallowRef, onUnmounted } from 'vue';
 import { useTheme } from '~/composable';
 import CodeMirror, { initCodemirror } from '~/lib/codemirror';
+import 'codemirror/addon/edit/closebrackets';
+import 'codemirror/keymap/sublime';
 
 export default {
   props: {

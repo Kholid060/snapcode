@@ -1,4 +1,4 @@
-import CodeMirror from '~/lib/codemirror';
+import { findModeByMIME } from './codemirrorLanguages';
 
 const languages = {
   'c++': {
@@ -88,7 +88,7 @@ export function getLangInfo(lang, field = 'mode') {
 
   if (languages[lang]) langMime = languages[lang].mode;
 
-  const info = CodeMirror.findModeByMIME(langMime || '');
+  const info = findModeByMIME(langMime || '');
 
   if (!info) return '';
 

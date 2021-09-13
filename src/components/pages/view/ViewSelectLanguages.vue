@@ -19,7 +19,7 @@
 </template>
 <script>
 import { computed, ref } from 'vue';
-import CodeMirror from '~/lib/codemirror';
+import { modeInfo } from '~/utils/codemirrorLanguages';
 import { getLangInfo } from '~/utils/languages';
 
 export default {
@@ -38,7 +38,7 @@ export default {
     const query = ref('');
 
     const modes = computed(() =>
-      CodeMirror.modeInfo.filter(({ name }) =>
+      modeInfo.filter(({ name }) =>
         name.toLocaleLowerCase().includes(query.value.toLocaleLowerCase())
       )
     );
