@@ -25,6 +25,7 @@
       class="flex-1 overflow-auto scroll mt-2"
       :model-value="file.code"
       :options="state.cmOptions"
+      :style="{ fontSize: `${state.cmOptions.fontSize || 16}px` }"
       @change="updateFile({ code: $event })"
       @cursor-activity="state.cursorPosition = $event"
       @focus="state.isEditorFocused = true"
@@ -49,9 +50,12 @@
 <script>
 import { computed, reactive, watch, defineAsyncComponent } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
+import { useStore } from 'vuex';
+import { injectCodemirrorScript } from '~/lib/codemirror';
 import dayjs from '~/lib/dayjs';
 import { File } from '~/models';
 import { useStorage } from '~/composable';
+import { debounce } from '~/utils/helper';
 import { getLangInfo } from '~/utils/languages';
 import ViewButtonsGroup from '~/components/pages/view/ViewButtonsGroup.vue';
 import ViewSelectLanguages from '~/components/pages/view/ViewSelectLanguages.vue';
@@ -63,6 +67,7 @@ export default {
     ViewSelectLanguages,
   },
   setup() {
+    const store = useStore();
     const route = useRoute();
     const router = useRouter();
     const storage = useStorage();
@@ -125,6 +130,24 @@ export default {
       },
       { immediate: true }
     );
+    watch(
+      () => store.state.editorSettings,
+      debounce(async (settings, prevSettings) => {
+        try {
+          if (
+            (!prevSettings || settings.keyMap !== prevSettings.keyMap) &&
+            settings.keyMap !== 'default'
+          ) {
+            await injectCodemirrorScript(`/keymap/${settings.keyMap}.js`);
+          }
+        } catch (error) {
+          // Do nothing
+        }
+
+        state.cmOptions = settings;
+      }, 250),
+      { immediate: true }
+    );
 
     return {
       file,
@@ -137,3 +160,8 @@ export default {
   },
 };
 </script>
+<style>
+.CodeMirror {
+  font-size: inherit !important;
+}
+</style>

@@ -3,7 +3,6 @@ import { getLangInfo } from '~/utils/languages';
 import 'codemirror/addon/runmode/runmode';
 import 'codemirror/addon/mode/loadmode';
 import 'codemirror/addon/edit/closebrackets';
-import 'codemirror/keymap/sublime';
 import 'codemirror/lib/codemirror.css';
 import '~/assets/css/themes/one-dark.css';
 import '~/assets/css/themes/one-light.css';
@@ -41,7 +40,7 @@ export function injectCodemirrorScript(path) {
           let modulePath = key.replace(/["()]|require|\.\.\//g, '');
           const folder = key.match(/\.\.\//g);
 
-          if (folder.length === 1) {
+          if (folder.length === 1 && !modulePath.startsWith('addon')) {
             modulePath = `mode/${modulePath}`;
           }
 
