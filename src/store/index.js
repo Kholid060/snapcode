@@ -27,6 +27,13 @@ const store = createStore({
     isRetrieved: false,
     showSidebar: false,
     isDataChanged: false,
+    editorSettings: {
+      fontSize: 16,
+      tabSize: 2,
+      keyMap: 'default',
+      lineNumbers: true,
+      lineWrapping: false,
+    },
     lastBackup: Date.now(),
     historyState: history.state || {},
   }),
@@ -48,7 +55,7 @@ const store = createStore({
         value: !state.showSidebar,
       });
     },
-    async retrieveData({ commit }) {
+    async retrieveData({ commit, state }) {
       const isFirstTime = JSON.parse(localStorage.getItem('firstTime'));
 
       if (isFirstTime === null) {
@@ -83,6 +90,12 @@ const store = createStore({
       commit('updateState', {
         key: 'lastBackup',
         value: JSON.parse(localStorage.getItem('lastBackup')) || Date.now(),
+      });
+
+      const editorSettings = JSON.parse(localStorage.getItem('editor-settings') || '{}');
+      commit('updateState', {
+        key: 'editorSettings',
+        value: { ...state.editorSettings, ...editorSettings },
       });
     },
   },
