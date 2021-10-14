@@ -32,6 +32,7 @@ import {
   mdiAlertOutline,
   mdiCloseCircleOutline,
   mdiCogOutline,
+  mdiFullscreen,
 } from '@mdi/js';
 
 VMdijs.add({
@@ -67,6 +68,7 @@ VMdijs.add({
   mdiAlertOutline,
   mdiCloseCircleOutline,
   mdiCogOutline,
+  mdiFullscreen,
 });
 
 export default VMdijs;

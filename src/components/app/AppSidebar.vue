@@ -1,8 +1,7 @@
 <template>
   <div
-    class="fixed top-0 left-0 w-full lg:w-64 bg-black bg-opacity-25 h-screen"
+    class="fixed z-40 top-0 left-0 w-full lg:w-64 bg-black bg-opacity-25 h-screen"
     :class="[store.state.showSidebar ? 'block' : 'hidden lg:block']"
-    style="z-index: 999"
     @click.self="closeSidebar"
   >
     <div
