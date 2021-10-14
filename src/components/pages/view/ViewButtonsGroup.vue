@@ -67,6 +67,12 @@
         </button-ui>
         <template #popover>
           <list-ui class="space-y-1 w-48">
+            <list-item-ui v-close-popover class="cursor-pointer" small @click="$emit('fullscreen')">
+              <template #prepend>
+                <v-mdi name="mdi-fullscreen"></v-mdi>
+              </template>
+              Toggle fullscreen
+            </list-item-ui>
             <list-item-ui v-close-popover class="cursor-pointer" small @click="copyCode">
               <template #prepend>
                 <v-mdi name="mdi-clipboard-outline"></v-mdi>
@@ -123,7 +129,7 @@ export default {
       default: () => ({}),
     },
   },
-  emits: ['change'],
+  emits: ['change', 'fullscreen'],
   setup(props) {
     useGroupTooltip();
     const router = useRouter();

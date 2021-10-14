@@ -1,5 +1,9 @@
 <template>
-  <div v-if="file" class="h-full snippet relative flex flex-col">
+  <div
+    v-if="file"
+    :class="[state.isFullscreen ? 'bg-lighter top-0 left-0 fixed z-50 w-full' : 'relative']"
+    class="h-full snippet flex flex-col"
+  >
     <expand-transition>
       <button v-if="state.isEditorFocused" class="bg-light absolute top-0 z-50 rounded-br-lg">
         <v-mdi name="mdi-chevron-down" size="18"></v-mdi>
@@ -18,7 +22,11 @@
             Created at: {{ formatDate(file.createdAt) }}
           </p>
         </div>
-        <view-buttons-group v-bind="{ file }" @change="updateFile"></view-buttons-group>
+        <view-buttons-group
+          v-bind="{ file }"
+          @change="updateFile"
+          @fullscreen="state.isFullscreen = !state.isFullscreen"
+        ></view-buttons-group>
       </div>
     </expand-transition>
     <app-codemirror
@@ -51,12 +59,12 @@
 import { computed, reactive, watch, defineAsyncComponent } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useStore } from 'vuex';
-import { injectCodemirrorScript } from '~/lib/codemirror';
 import dayjs from '~/lib/dayjs';
 import { File } from '~/models';
 import { useStorage } from '~/composable';
 import { debounce } from '~/utils/helper';
 import { getLangInfo } from '~/utils/languages';
+import { injectCodemirrorScript } from '~/lib/codemirror';
 import ViewButtonsGroup from '~/components/pages/view/ViewButtonsGroup.vue';
 import ViewSelectLanguages from '~/components/pages/view/ViewSelectLanguages.vue';
 
@@ -86,6 +94,7 @@ export default {
 
     const state = reactive({
       codemirror: null,
+      isFullscreen: false,
       isEditorFocused: false,
       showSelectLanguages: false,
       cmOptions: {
