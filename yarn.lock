@@ -1187,10 +1187,10 @@
     "@vue/compiler-dom" "3.2.19"
     "@vue/shared" "3.2.19"
 
-"@vue/devtools-api@^6.0.0-beta.11", "@vue/devtools-api@^6.0.0-beta.14":
-  version "6.0.0-beta.15"
-  resolved "https://registry.yarnpkg.com/@vue/devtools-api/-/devtools-api-6.0.0-beta.15.tgz#ad7cb384e062f165bcf9c83732125bffbc2ad83d"
-  integrity sha512-quBx4Jjpexo6KDiNUGFr/zF/2A4srKM9S9v2uHgMXSU//hjgq1eGzqkIFql8T9gfX5ZaVOUzYBP3jIdIR3PKIA==
+"@vue/devtools-api@^6.0.0-beta.11", "@vue/devtools-api@^6.1.4":
+  version "6.2.1"
+  resolved "https://registry.yarnpkg.com/@vue/devtools-api/-/devtools-api-6.2.1.tgz#6f2948ff002ec46df01420dfeff91de16c5b4092"
+  integrity sha512-OEgAMeQXvCoJ+1x8WyQuVZzFo0wcyCmUR3baRVLmKBo1LmYZWMlRiXlux5jd0fqVJu6PfDbOrZItVqUEzLobeQ==
 
 "@vue/reactivity@3.2.19":
   version "3.2.19"
@@ -3794,12 +3794,12 @@ vue-mdijs@^0.5.12:
   resolved "https://registry.yarnpkg.com/vue-mdijs/-/vue-mdijs-0.5.12.tgz#1ed495e61515bb5b536357002d378c4cee1c05f7"
   integrity sha512-q8HmpeEN9+EE/GjgKAVfJtw9xNMcdFbnNeIBC/8IcMeS4MB5qJCY0imSGer+2xZMBYL787bCsz7kAoiMgzkHww==
 
-vue-router@^4.0.11:
-  version "4.0.11"
-  resolved "https://registry.yarnpkg.com/vue-router/-/vue-router-4.0.11.tgz#cd649a0941c635281763a20965b599643ddc68ed"
-  integrity sha512-sha6I8fx9HWtvTrFZfxZkiQQBpqSeT+UCwauYjkdOQYRvwsGwimlQQE2ayqUwuuXGzquFpCPoXzYKWlzL4OuXg==
+vue-router@^4.1.5:
+  version "4.1.5"
+  resolved "https://registry.yarnpkg.com/vue-router/-/vue-router-4.1.5.tgz#256f597e3f5a281a23352a6193aa6e342c8d9f9a"
+  integrity sha512-IsvoF5D2GQ/EGTs/Th4NQms9gd2NSqV+yylxIyp/OYp8xOwxmU8Kj/74E9DTSYAyH5LX7idVUngN3JSj1X4xcQ==
   dependencies:
-    "@vue/devtools-api" "^6.0.0-beta.14"
+    "@vue/devtools-api" "^6.1.4"
 
 vue-toastification@^2.0.0-rc.1:
   version "2.0.0-rc.1"
