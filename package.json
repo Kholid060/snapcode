@@ -28,7 +28,7 @@
     "vuex-orm-localforage": "^0.3.2"
   },
   "devDependencies": {
-    "@rollup/plugin-eslint": "^8.0.1",
+    "@rollup/plugin-eslint": "^8.0.2",
     "@vitejs/plugin-vue": "^2.3.4",
     "@vue/compiler-sfc": "^3.2.4",
     "autoprefixer": "^10.4.7",

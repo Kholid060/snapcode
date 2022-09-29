@@ -1070,10 +1070,10 @@
     "@babel/helper-module-imports" "^7.10.4"
     "@rollup/pluginutils" "^3.1.0"
 
-"@rollup/plugin-eslint@^8.0.1":
-  version "8.0.1"
-  resolved "https://registry.yarnpkg.com/@rollup/plugin-eslint/-/plugin-eslint-8.0.1.tgz#bf7462f96027613729b8a805caaa951dc23c333e"
-  integrity sha512-rTMAY4tKGBdbkHHQDaVhXNJg9tRmW7ihRAg7NQHiPUv13NFYBygIr+OYgpVNwSnGOH146BgCITSBAoMxMQGPTQ==
+"@rollup/plugin-eslint@^8.0.2":
+  version "8.0.2"
+  resolved "https://registry.yarnpkg.com/@rollup/plugin-eslint/-/plugin-eslint-8.0.2.tgz#8de988797a199cdce29b2370f6674f4302454935"
+  integrity sha512-XI38cLYfl/jww8KklJT/ji0yJbCyHgFWPbVQlGrgWblWgHlngteOJDhqtc+7iy5ek0q8k6tvBYkbCQwMScEJHA==
   dependencies:
     "@rollup/pluginutils" "^4.0.0"
     eslint "^7.12.0"
