@@ -1150,10 +1150,10 @@
   resolved "https://registry.yarnpkg.com/@types/trusted-types/-/trusted-types-2.0.2.tgz#fc25ad9943bcac11cceb8168db4f275e0e72e756"
   integrity sha512-F5DIZ36YVLE+PN+Zwws4kJogq47hNgX3Nx6WyDJ3kcplxyke3XIzB8uK5n/Lpm1HBsbGzd6nmGehL8cPekP+Tg==
 
-"@vitejs/plugin-vue@^1.7.1":
-  version "1.7.1"
-  resolved "https://registry.yarnpkg.com/@vitejs/plugin-vue/-/plugin-vue-1.7.1.tgz#8b0fc87628425a8ab39798a023c652fcfc0619c9"
-  integrity sha512-ldKF153gyXMXT5ZNkzk05OUXO2rri9fEZE6YOs7WxmTPAGQkwhKtzayke+wXhP5AfRY/Svn71nUVHgJzLMrasg==
+"@vitejs/plugin-vue@^2.3.4":
+  version "2.3.4"
+  resolved "https://registry.yarnpkg.com/@vitejs/plugin-vue/-/plugin-vue-2.3.4.tgz#966a6279060eb2d9d1a02ea1a331af071afdcf9e"
+  integrity sha512-IfFNbtkbIm36O9KB8QodlwwYvTEsJb4Lll4c2IwB3VHc2gie2mSPtSzL0eYay7X2jd/2WX02FjSGTWR6OPr/zg==
 
 "@vue/compiler-core@3.2.39":
   version "3.2.39"
