@@ -1,0 +1,30 @@
+{
+  "name": "nuxt-app",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "nuxt dev",
+    "lint": "eslint .",
+    "build": "nuxt build",
+    "preview": "nuxt preview",
+    "generate": "nuxt generate",
+    "lint:fix": "eslint . --fix",
+    "postinstall": "nuxt prepare"
+  },
+  "dependencies": {
+    "@nuxt/eslint": "^0.7.1",
+    "@nuxtjs/color-mode": "^3.5.2",
+    "@nuxtjs/tailwindcss": "^6.12.2",
+    "@pinia/nuxt": "^0.7.0",
+    "@snippy/ui": "workspace:*",
+    "nuxt": "^3.14.1592",
+    "shadcn-nuxt": "^0.11.3",
+    "vue": "latest",
+    "vue-router": "latest"
+  },
+  "devDependencies": {
+    "@nuxt/kit": "^3.14.1592",
+    "@snippy/eslint-config": "workspace:*",
+    "tailwindcss": "^3.4.15"
+  }
+}

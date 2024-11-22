@@ -1,0 +1,32 @@
+{
+  "name": "desktop",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "tauri": "tauri",
+    "tauri:dev": "tauri dev",
+    "preview": "vite preview",
+    "lint": "eslint . --max-warnings 0",
+    "build": "vue-tsc --noEmit && vite build"
+  },
+  "dependencies": {
+    "@snippy/ui": "workspace:*",
+    "@tauri-apps/api": "^2",
+    "@tauri-apps/plugin-shell": "^2",
+    "vue": "^3.3.4"
+  },
+  "devDependencies": {
+    "@snippy/eslint-config": "workspace:*",
+    "@tauri-apps/cli": "^2",
+    "@vitejs/plugin-vue": "^5.0.5",
+    "autoprefixer": "^10.4.20",
+    "eslint": "^9.15.0",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.15",
+    "typescript": "^5.2.2",
+    "vite": "^5.3.1",
+    "vue-tsc": "^2.0.22"
+  }
+}
