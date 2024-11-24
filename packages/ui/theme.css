@@ -4,6 +4,33 @@
 
 @layer base {
   :root {
+    --lime-1: 79 42% 98%;
+    --lime-2: 77 41% 96%;
+    --lime-3: 75 64% 90%;
+    --lime-4: 76 62% 84%;
+    --lime-5: 78 57% 77%;
+    --lime-6: 79 49% 71%;
+    --lime-7: 82 42% 62%;
+    --lime-8: 85 40% 52%;
+    --lime-9: 81 80% 66%;
+    --lime-10: 81 75% 60%;
+    --lime-11: 84 45% 33%;
+    --lime-12: 75 39% 18%;
+
+    --olive-1: 120 20% 99%;
+    --olive-2: 120 16% 97%;
+    --olive-3: 120 6% 94%;
+    --olive-4: 120 4% 90%;
+    --olive-5: 120 4% 88%;
+    --olive-6: 120 3% 84%;
+    --olive-7: 120 3% 80%;
+    --olive-8: 105 2% 72%;
+    --olive-9: 102 3% 54%;
+    --olive-10: 102 2% 50%;
+    --olive-11: 110 3% 38%;
+    --olive-12: 108 8% 11%;
+  
+
     --background: 0 0% 100%;
     --foreground: 240 10% 3.9%;
 
@@ -37,34 +64,62 @@
   }
 
   .dark {
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
+    --olive-1: 90 5% 6%;
+    --olive-2: 90 4% 9%;
+    --olive-3: 89 3% 12%;
+    --olive-4: 100 3% 15%;
+    --olive-5: 99 3% 18%;
+    --olive-6: 90 3% 21%;
+    --olive-7: 96 3% 27%;
+    --olive-8: 111 3% 37%;
+    --olive-9: 108 4% 41%;
+    --olive-10: 106 3% 47%;
+    --olive-11: 105 5% 69%;
+    --olive-12: 120 5% 92%;  
+    
+    --lime-1: 77 22% 6%;
+    --lime-2: 90 23% 8%;
+    --lime-3: 93 28% 12%;
+    --lime-4: 92 30% 16%;
+    --lime-5: 90 32% 20%;
+    --lime-6: 91 32% 24%;
+    --lime-7: 90 33% 28%;
+    --lime-8: 89 35% 33%;
+    --lime-9: 81 80% 66%;
+    --lime-10: 78 100% 71%;
+    --lime-11: 79 69% 66%;
+    --lime-12: 79 79% 84%;
+  
+
+    --background: var(--olive-1);
+    --foreground: var(--olive-12);
 
     --muted: 240 3.7% 15.9%;
     --muted-foreground: 240 5% 64.9%;
 
     --popover: 240 10% 3.9%;
-    --popover-foreground: 0 0% 98%;
+    --popover-foreground: var(--olive-12);
 
     --card: 240 10% 3.9%;
-    --card-foreground: 0 0% 98%;
+    --card-foreground: var(--olive-12);
 
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
+    --border: var(--olive-6);
+    --input: var(--olive-7);
 
-    --primary: 0 0% 98%;
-    --primary-foreground: 240 5.9% 10%;
+    --primary: var(--lime-9);
+    --primary-foreground: var(--olive-1);
 
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
+    --secondary: var(--olive-3);
+    --secondary-hover: var(--olive-4);
+    --secondary-foreground: var(--olive-12);
 
     --accent: 240 3.7% 15.9%;
-    --accent-foreground: 0 0% 98%;
+    --accent-foreground: var(--olive-12);
 
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
+    --destructive-foreground: var(--olive-12);
 
-    --ring: 240 4.9% 83.9%;
+    --ring: var(--lime-6);
   }
 }
 

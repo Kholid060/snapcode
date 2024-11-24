@@ -5,6 +5,8 @@ export default [
     indent: 2,
     semi: true,
     quotes: 'single',
+    braceStyle: '1tbs',
+    arrowParens: true,
   }),
   
 ];

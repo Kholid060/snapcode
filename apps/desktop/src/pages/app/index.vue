@@ -1,3 +1,3 @@
 <template>
-  <RouterView />
+  <p>app index</p>
 </template>

@@ -5,6 +5,17 @@
   "windows": ["main"],
   "permissions": [
     "core:default",
+    "sql:default",
+    "sql:allow-execute",
+    "fs:default",
+    {
+      "identifier": "fs:allow-read-dir",
+      "allow": [{ "path": "$RESOURCE/db/**/*" }]
+    },
+    {
+      "identifier": "fs:allow-read-text-file",
+      "allow": [{ "path": "$RESOURCE/db/**/*" }]
+    },
     "shell:allow-open"
   ]
 }

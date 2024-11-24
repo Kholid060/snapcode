@@ -2,7 +2,7 @@
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "desktop",
   "version": "0.1.0",
-  "identifier": "com.snapcode.app",
+  "identifier": "com.snippy.app",
   "build": {
     "beforeDevCommand": "pnpm dev",
     "devUrl": "http://localhost:1420",
@@ -22,6 +22,7 @@
     }
   },
   "bundle": {
+    "resources": ["./db"],
     "active": true,
     "targets": "all",
     "icon": [

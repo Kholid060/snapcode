@@ -1,0 +1,6 @@
+@import "@snippy/ui/theme.css";
+@import "./fonts.css";
+
+:root {
+  font-feature-settings: "liga" 1, "calt" 1, "cv02", "cv03", "cv04", "cv11";
+}

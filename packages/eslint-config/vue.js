@@ -18,6 +18,7 @@ export default ts.config(
     rules: {
       'vue/require-default-prop': 'off',
       'vue/no-multiple-template-root': 'off',
+      'vue/multi-word-component-names': 'off',
       'tailwindcss/no-custom-classname': 'off'
     },
   }
