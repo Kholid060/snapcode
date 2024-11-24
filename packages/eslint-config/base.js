@@ -8,5 +8,4 @@ export default [
     braceStyle: '1tbs',
     arrowParens: true,
   }),
-  
 ];

@@ -6,7 +6,10 @@
   "permissions": [
     "core:default",
     "sql:default",
+    "log:default",
+    "log:allow-log",
     "sql:allow-execute",
+    "store:default",
     "fs:default",
     {
       "identifier": "fs:allow-read-dir",

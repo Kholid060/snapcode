@@ -19,6 +19,18 @@ export default ts.config(
       'vue/require-default-prop': 'off',
       'vue/no-multiple-template-root': 'off',
       'vue/multi-word-component-names': 'off',
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          'args': 'all',
+          'argsIgnorePattern': '^_',
+          'caughtErrors': 'all',
+          'caughtErrorsIgnorePattern': '^_',
+          'destructuredArrayIgnorePattern': '^_',
+          'varsIgnorePattern': '^_',
+          'ignoreRestSiblings': true
+        }
+      ],
       'tailwindcss/no-custom-classname': 'off'
     },
   }

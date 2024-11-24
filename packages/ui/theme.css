@@ -76,6 +76,19 @@
     --olive-10: 106 3% 47%;
     --olive-11: 105 5% 69%;
     --olive-12: 120 5% 92%;  
+
+    --ruby-1: 345 19% 8%;
+    --ruby-2: 346 17% 10%;
+    --ruby-3: 344 48% 15%;
+    --ruby-4: 341 60% 19%;
+    --ruby-5: 342 56% 23%;
+    --ruby-6: 343 49% 29%;
+    --ruby-7: 346 26% 36%;
+    --ruby-8: 348 42% 48%;
+    --ruby-9: 347 75% 58%;
+    --ruby-10: 350 79% 63%;
+    --ruby-11: 354 100% 79%;
+    --ruby-12: 339 95% 90%;  
     
     --lime-1: 77 22% 6%;
     --lime-2: 90 23% 8%;
@@ -95,9 +108,9 @@
     --foreground: var(--olive-12);
 
     --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
+    --muted-foreground: var(--olive-11);
 
-    --popover: 240 10% 3.9%;
+    --popover: var(--olive-2);
     --popover-foreground: var(--olive-12);
 
     --card: 240 10% 3.9%;
@@ -116,7 +129,7 @@
     --accent: 240 3.7% 15.9%;
     --accent-foreground: var(--olive-12);
 
-    --destructive: 0 62.8% 30.6%;
+    --destructive: var(--ruby-9);
     --destructive-foreground: var(--olive-12);
 
     --ring: var(--lime-6);

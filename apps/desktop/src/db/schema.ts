@@ -42,8 +42,8 @@ export const snippetsTable = sqliteTable('snippets', {
   folderIdx: index('snippet_folder_idx').on(table.folderId),
   createdAtIdx: index('snippet_created_at_idx').on(table.createdAt),
 }));
-export type NewFile = typeof snippetsTable.$inferInsert;
-export type SelectFile = typeof snippetsTable.$inferSelect;
+export type NewSnippet = typeof snippetsTable.$inferInsert;
+export type SelectSnippet = typeof snippetsTable.$inferSelect;
 
 export const filesRelations = relations(snippetsTable, ({ one }) => ({
   folder: one(foldersTable, {

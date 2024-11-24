@@ -1,3 +1,3 @@
 <template>
-  <p>app index</p>
+  <p>Search...</p>
 </template>

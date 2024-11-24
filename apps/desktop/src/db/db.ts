@@ -6,11 +6,11 @@ import * as schema from './schema';
 
 export const sqlite = await Database.load('sqlite:app.db');
 export const db = drizzle(async (sql, params, method) => {
+  console.log('==db', { sql, params, method });
   if (!isSelectQuery(sql)) {
-    await sqlite.execute(sql, params);
+    await sqlite.select(sql, params);
     return { rows: [] };
-  }  
-  
+  }
 
   let rows: any[] = await sqlite.select(sql, params);
   rows = rows.map((item) => Object.values(item));
@@ -21,5 +21,5 @@ export const db = drizzle(async (sql, params, method) => {
 });
 
 function isSelectQuery(sql: string): boolean {
-  return /^\s*SELECT\b/i.test(sql);
+  return /^\s*SELECT|RETURNING\b/i.test(sql);
 }

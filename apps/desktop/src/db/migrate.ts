@@ -36,7 +36,6 @@ export async function migrate() {
     `SELECT hash FROM "__drizzle_migrations" ORDER BY created_at DESC`,
   );
   const dbMigrationsSet = new Set(dbMigrations.map((item) => item.hash));
-  console.log(dbMigrationsSet);
 
   await sqlite.execute('BEGIN');
   try {
