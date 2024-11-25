@@ -18,6 +18,9 @@ export async function getAllFolders(): Promise<FolderListItem[]> {
       parentId: true,
       createdAt: true,
     },
+    orderBy(fields, operators) {
+      return operators.sql`${fields.name} COLLATE NOCASE ASC`;
+    },
   });
 }
 

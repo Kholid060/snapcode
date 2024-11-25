@@ -97,7 +97,7 @@
       </DialogHeader>
       <form @submit.prevent="renameItem">
         <Input placeholder="unnamed" v-model="renameDialog.newName" />
-        <DialogFooter>
+        <DialogFooter class="mt-6">
           <Button type="submit">Rename</Button>
         </DialogFooter>
       </form>
@@ -192,9 +192,6 @@ async function createFolderFolder() {
 
 async function renameItem() {
   try {
-    const snippetData = editorStore.data.snippets[props.itemId];
-    if (!snippetData) return;
-
     await (props.itemType === 'folder'
       ? editorStore.data.updateFolder(props.itemId, {
           name: renameDialog.newName,

@@ -9,10 +9,13 @@ export type TreeData = Record<
   TreeDataItem[]
 >;
 
-export function buildTreeData(
-  snippets: SnippetListItem[],
-  folders: FolderListItem[],
-) {
+export function buildTreeData({
+  folders,
+  snippets,
+}: {
+  folders: FolderListItem[];
+  snippets: SnippetListItem[];
+}) {
   const groupedChildren: TreeData = {
     [TREE_ROOT_KEY]: [],
   };

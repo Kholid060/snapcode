@@ -2,6 +2,7 @@
   <main class="flex h-screen">
     <div v-if="editorState.status === 'error'">
       <p>Error!</p>
+      <p>{{ editorState.errorMessage }}</p>
     </div>
     <template v-else-if="editorState.status === 'idle'">
       <EditorSidebar />

@@ -14,15 +14,12 @@
       })
     "
   >
-    <template v-if="item.hasChildren">
-      <FolderIcon v-if="!isExpanded" class="size-4" />
-      <FolderOpenIcon v-else class="size-4" />
-    </template>
     <component
-      :is="item.value.isFolder ? FolderIcon : FileIcon"
-      v-else
+      v-if="item.value.isFolder"
       class="size-4"
+      :is="isExpanded ? FolderOpenIcon : FolderIcon"
     />
+    <FileIcon v-else class="size-4" />
     <div class="pl-2">
       {{ itemData?.name ?? '' }}
     </div>
@@ -59,7 +56,7 @@ import { pointerOutsideOfPreview } from '@atlaskit/pragmatic-drag-and-drop/eleme
 import { setCustomNativeDragPreview } from '@atlaskit/pragmatic-drag-and-drop/element/set-custom-native-drag-preview';
 import { combine } from '@atlaskit/pragmatic-drag-and-drop/combine';
 import { unrefElement } from '@vueuse/core';
-import type { TreeDataItem } from '@/utils/tree-data-builder';
+import type { TreeDataItem } from '@/utils/tree-data-utils';
 import { useEditorStore } from '@/stores/editor.store';
 import FolderIcon from '~icons/hugeicons/folder-01';
 import FolderOpenIcon from '~icons/hugeicons/folder-02';

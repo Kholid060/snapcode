@@ -21,6 +21,9 @@ export async function getAllSnippets(): Promise<SnippetListItem[]> {
       folderId: true,
       createdAt: true,
     },
+    orderBy(fields, operators) {
+      return operators.sql`${fields.name} COLLATE NOCASE ASC`;
+    },
   });
 }
 

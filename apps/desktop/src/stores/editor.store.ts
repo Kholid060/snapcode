@@ -16,7 +16,7 @@ import {
   TREE_ROOT_KEY,
   TreeData,
   TreeDataItem,
-} from '@/utils/tree-data-builder';
+} from '@/utils/tree-data-utils';
 import { watchDebounced } from '@vueuse/core/index.cjs';
 import { defineStore } from 'pinia';
 
@@ -87,6 +87,25 @@ const useEditorDataStore = defineStore('editor:snippets', () => {
     }
 
     treeData.value[folderId].push(data);
+    sortTree(folderId);
+  }
+  function sortTree(folderId?: string) {
+    const id = folderId ?? TREE_ROOT_KEY;
+    if (!treeData.value[id]) return;
+
+    treeData.value[id].sort((a, z) => {
+      const aData = a.isFolder ? folders.value[a.id] : snippets.value[a.id];
+      const zData = z.isFolder ? folders.value[z.id] : snippets.value[z.id];
+
+      let value =
+        aData.name
+          ?.toLowerCase()
+          ?.localeCompare(zData.name?.toLowerCase() ?? '') ?? 0;
+      if (z.isFolder && !a.isFolder) value = 2;
+      else if (a.isFolder && !z.isFolder) value = -2;
+
+      return value;
+    });
   }
 
   async function addSnippet(payload: SnippetNewPayload = {}) {
@@ -135,6 +154,10 @@ const useEditorDataStore = defineStore('editor:snippets', () => {
       tags: snippet.tags,
       folderId: snippet.folderId,
     };
+
+    if (payload.name) {
+      sortTree(snippet.folderId ?? undefined);
+    }
   }
 
   async function addFolder(payload: FolderNewPayload = {}) {
@@ -167,6 +190,9 @@ const useEditorDataStore = defineStore('editor:snippets', () => {
       name: folder.name,
       parentId: folder.parentId,
     };
+    if (payload.name) {
+      sortTree(folder.parentId ?? undefined);
+    }
   }
 
   async function init() {
@@ -184,7 +210,10 @@ const useEditorDataStore = defineStore('editor:snippets', () => {
       snippetList.map((item) => [item.id, item]),
     );
 
-    treeData.value = buildTreeData(snippetList, folderList);
+    treeData.value = buildTreeData({
+      folders: folderList,
+      snippets: snippetList,
+    });
     initiated = true;
   }
 

@@ -30,14 +30,12 @@ import { combine } from '@atlaskit/pragmatic-drag-and-drop/combine';
 import { monitorForElements } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
 import { useEditorStore } from '@/stores/editor.store';
 import EditorTreeItem from './EditorTreeItem.vue';
-import type { TreeDataItem } from '@/utils/tree-data-builder';
+import type { TreeDataItem } from '@/utils/tree-data-utils';
 
 const editorStore = useEditorStore();
 
 function getChildren(item: TreeDataItem) {
-  return item.isFolder
-    ? (editorStore.data.treeData[item.id] ?? undefined)
-    : undefined;
+  return item.isFolder ? (editorStore.data.treeData[item.id] ?? []) : undefined;
 }
 
 watchEffect((onCleanup) => {
