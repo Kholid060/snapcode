@@ -3,7 +3,7 @@ import autoImport from './.eslintrc-auto-import.json' with { type: 'json' };
 
 export default [
   {
-    ignores: ['src-tauri/**/*', '**/*.d.ts'],
+    ignores: ['**/*.{svg, d.ts}', 'src-tauri/**/*', '**/*.d.ts', 'dist/**/*'],
   },
   ...config,
   {

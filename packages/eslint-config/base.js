@@ -10,6 +10,6 @@ export default [
           'endOfLine': 'auto'
         }
       ]
-    }
+    },
   }
 ];

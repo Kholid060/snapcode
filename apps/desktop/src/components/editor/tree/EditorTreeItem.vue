@@ -4,7 +4,7 @@
     v-slot="{ isExpanded }"
     :value="item.value"
     :level="item.level"
-    class="relative w-full border-none"
+    class="hover:bg-accent/65 focus-visible:text-foreground hover:text-foreground focus-visible:ring-primary data-[selected]:bg-accent/65 data-[selected]:text-foreground relative flex w-full items-center rounded border-none py-1.5 outline-none focus-visible:ring-2"
     :class="{ 'opacity-50': isDragging }"
     @contextmenu.prevent="
       sidebarProvider.handleContextMenu({
@@ -13,15 +13,24 @@
         type: item.value.isFolder ? 'folder' : 'snippet',
       })
     "
+    :style="{
+        'padding-left': item.level > 1 ? `${item.level - 0.5}rem` : '0.5rem',
+      }"
+    :title="itemName"
+    @select="onSelect"
   >
+    <div v-if="item.level > 1" class="absolute h-full left-0 pl-2">
+      <span v-for="i in item.level - 1" :key="'indent' + item._id + i" class="w-4 inline-block h-full border-l border-border/60 pointer-events-none">
+      </span>
+    </div>
     <component
       v-if="item.value.isFolder"
-      class="size-4"
+      class="size-4 flex-shrink-0"
       :is="isExpanded ? FolderOpenIcon : FolderIcon"
     />
-    <FileIcon v-else class="size-4" />
-    <div class="pl-2">
-      {{ itemData?.name ?? '' }}
+    <FileIcon v-else class="size-4 flex-shrink-0" />
+    <div class="truncate pl-1">
+      {{ itemName }}
     </div>
     <div
       v-if="instruction"
@@ -79,20 +88,35 @@ const instruction = ref<Extract<
   { type: 'reorder-above' | 'reorder-below' | 'make-child' }
 > | null>(null);
 
-const itemData = computed(() => {
+const itemName = computed(() => {
   const item = props.item.value;
-  return (
-    (item.isFolder
-      ? editorStore.data.folders[item.id]
-      : editorStore.data.snippets[item.id]) ?? null
-  );
+  const data = item.isFolder
+    ? editorStore.data.folders[item.id]
+    : editorStore.data.snippets[item.id];
+  if (!data) return '';
+
+  if ('ext' in data) return `${data.name}.${data.ext}`;
+
+  return data.name;
 });
 const mode = computed(() => {
+  console.log('====', props.item.parentItem?.id);
   if (props.item.hasChildren) return 'expanded';
-  // if (props.item.index + 1 === props.item.parentItem?.children?.length)
-  //   return 'last-in-group';
+
+  if (props.item.index + 1 === props.item.parentItem?.id)
+    return 'last-in-group';
+  
   return 'standard';
 });
+
+function onSelect(event: CustomEvent) {
+  if (props.item.value.isFolder) {
+    event.preventDefault();
+    return;
+  }
+
+  editorStore.state.setActiveFile(props.item._id);
+}
 
 watchEffect((onCleanup) => {
   const currentElement = unrefElement(elRef);

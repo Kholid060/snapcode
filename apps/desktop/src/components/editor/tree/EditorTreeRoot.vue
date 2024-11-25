@@ -6,22 +6,21 @@
     :get-key="(item) => item.id"
     :get-children="getChildren"
     multiple
-    propagate-select
+    selection-behavior="replace"
+    v-model:expanded="activeDirs"
   >
     <EditorTreeItem
       v-for="item in flattenItems"
       :key="item._id + item.index"
       :item="item"
       v-bind="item.bind"
-      :style="{ 'padding-left': `${item.level}rem` }"
-      class="focus:ring-grass9 data-[selected]:bg-grass4 flex items-center rounded px-2 py-1.5 outline-none focus:ring-2"
-      @select.prevent
     />
   </TreeRoot>
 </template>
 
 <script setup lang="ts">
 import { TreeRoot } from 'radix-vue';
+import { debouncedWatch } from '@vueuse/core';
 import {
   type Instruction,
   extractInstruction,
@@ -31,8 +30,11 @@ import { monitorForElements } from '@atlaskit/pragmatic-drag-and-drop/element/ad
 import { useEditorStore } from '@/stores/editor.store';
 import EditorTreeItem from './EditorTreeItem.vue';
 import type { TreeDataItem } from '@/utils/tree-data-utils';
+import { store, STORE_KEYS } from '@/services/store.service';
 
 const editorStore = useEditorStore();
+
+const activeDirs = ref<string[]>([]);
 
 function getChildren(item: TreeDataItem) {
   return item.isFolder ? (editorStore.data.treeData[item.id] ?? []) : undefined;
@@ -53,7 +55,7 @@ watchEffect((onCleanup) => {
         const instruction: Instruction | null = extractInstruction(target.data);
 
         if (instruction !== null) {
-          console.log({ itemId, targetId, instruction });
+          console.log('instructions', { itemId, targetId, instruction });
           // items.value = updateTree(items.value, {
           //   type: 'instruction',
           //   instruction,
@@ -67,6 +69,16 @@ watchEffect((onCleanup) => {
 
   onCleanup(() => {
     dndFunction();
+  });
+});
+
+debouncedWatch(activeDirs, () => {
+  store.set(STORE_KEYS.editorActiveDirs, activeDirs.value);
+}, { debounce: 250, deep: true });
+
+onMounted(() => {
+  store.get<string[]>(STORE_KEYS.editorActiveDirs).then((value) => {
+    activeDirs.value = value ?? [];
   });
 });
 </script>

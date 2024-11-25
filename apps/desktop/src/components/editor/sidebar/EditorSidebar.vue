@@ -1,6 +1,6 @@
 <template>
-  <aside class="bg-olive-2 w-64 border-r">
-    <div class="relative h-14 border-b">
+  <aside class="bg-olive-2 flex h-screen w-64 flex-col border-r">
+    <div class="relative h-14 flex-shrink-0 border-b">
       <SearchIcon
         class="text-muted-foreground absolute left-4 top-1/2 size-5 -translate-y-1/2"
       />
@@ -10,11 +10,9 @@
         placeholder="Search..."
         class="h-full w-full bg-transparent pl-12 pr-4 focus:outline-none"
       />
-      <EditorSidebarSearch v-if="debouncedSearch.length > 0" />
-      <div v-show="debouncedSearch.length === 0">
-        <EditorSidebarSnippets />
-      </div>
     </div>
+    <EditorSidebarSearch v-if="debouncedSearch.length > 0" />
+    <EditorSidebarSnippets :hide="debouncedSearch.length > 0" />
   </aside>
 </template>
 <script setup lang="ts">

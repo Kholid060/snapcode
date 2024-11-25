@@ -1,5 +1,5 @@
 <template>
-  <div class="flex items-center p-4">
+  <div v-show="!hide" class="flex items-center p-4 pb-2">
     <p class="text-muted-foreground grow cursor-default text-sm font-semibold">
       Snippets
     </p>
@@ -34,7 +34,10 @@
       </DropdownMenuContent>
     </DropdownMenu>
   </div>
-  <EditorTreeRoot />
+  <EditorTreeRoot
+    v-show="!hide"
+    class="custom-scroll grow overflow-auto px-2 pb-4"
+  />
   <EditorSidebarContextMenu
     :item-id="contextMenuItemData.id"
     :item-type="contextMenuItemData.type"
@@ -67,6 +70,10 @@ import {
   type EditorSidebarProvider,
 } from '@/providers/editor.provider';
 import EditorSidebarContextMenu from './EditorSidebarContextMenu.vue';
+
+defineProps<{
+  hide?: boolean;
+}>();
 
 const { toast } = useToast();
 const editorStore = useEditorStore();
