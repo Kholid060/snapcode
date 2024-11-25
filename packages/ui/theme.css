@@ -113,7 +113,7 @@
     --popover: var(--olive-2);
     --popover-foreground: var(--olive-12);
 
-    --card: 240 10% 3.9%;
+    --card: var(--olive-2);
     --card-foreground: var(--olive-12);
 
     --border: var(--olive-6);
@@ -126,10 +126,11 @@
     --secondary-hover: var(--olive-4);
     --secondary-foreground: var(--olive-12);
 
-    --accent: 240 3.7% 15.9%;
+    --accent: var(--olive-4);
     --accent-foreground: var(--olive-12);
 
     --destructive: var(--ruby-9);
+    --destructive-text: var(--ruby-10);
     --destructive-foreground: var(--olive-12);
 
     --ring: var(--lime-6);

@@ -1,6 +1,11 @@
-import { SnippetListItem, SnippetNewPayload } from '@/interface/snippet.interface';
+import {
+  SnippetListItem,
+  SnippetNewPayload,
+  SnippetUpdatePayload,
+} from '@/interface/snippet.interface';
 import { db } from '../db';
 import { snippetsTable } from '../schema';
+import { eq, inArray } from 'drizzle-orm';
 
 export async function createNewSnippets(snippets: SnippetNewPayload[]) {
   return await db.insert(snippetsTable).values(snippets).returning();
@@ -17,4 +22,27 @@ export async function getAllSnippets(): Promise<SnippetListItem[]> {
       createdAt: true,
     },
   });
+}
+
+export async function deleteSnippets(ids: string | string[]) {
+  await db
+    .delete(snippetsTable)
+    .where(
+      Array.isArray(ids)
+        ? inArray(snippetsTable.id, ids)
+        : eq(snippetsTable.id, ids),
+    );
+}
+
+export async function updateSnippet(
+  snippetId: string,
+  { content, ext, folderId, name, placeholders, tags }: SnippetUpdatePayload,
+) {
+  const [snippet] = await db
+    .update(snippetsTable)
+    .set({ content, ext, folderId, name, placeholders, tags })
+    .where(eq(snippetsTable.id, snippetId))
+    .returning();
+
+  return snippet;
 }

@@ -1,9 +1,13 @@
-import { FolderListItem } from '@/interface/folder.interface';
+import {
+  FolderListItem,
+  FolderUpdatePayload,
+} from '@/interface/folder.interface';
 import { db } from '../db';
 import { foldersTable, NewFolder } from '../schema';
+import { eq, inArray } from 'drizzle-orm';
 
 export async function createNewFolders(folders: Omit<NewFolder, 'id'>[]) {
-  await db.insert(foldersTable).values(folders);
+  return await db.insert(foldersTable).values(folders).returning();
 }
 
 export async function getAllFolders(): Promise<FolderListItem[]> {
@@ -15,4 +19,27 @@ export async function getAllFolders(): Promise<FolderListItem[]> {
       createdAt: true,
     },
   });
+}
+
+export async function deleteFolders(ids: string | string[]) {
+  await db
+    .delete(foldersTable)
+    .where(
+      Array.isArray(ids)
+        ? inArray(foldersTable.id, ids)
+        : eq(foldersTable.id, ids),
+    );
+}
+
+export async function updateFolder(
+  folderId: string,
+  { name, parentId }: FolderUpdatePayload,
+) {
+  const [folder] = await db
+    .update(foldersTable)
+    .set({ name, parentId })
+    .where(eq(foldersTable.id, folderId))
+    .returning();
+
+  return folder;
 }

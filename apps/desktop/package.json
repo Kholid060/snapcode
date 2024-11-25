@@ -13,6 +13,8 @@
     "build": "vue-tsc --noEmit && vite build"
   },
   "dependencies": {
+    "@atlaskit/pragmatic-drag-and-drop": "^1.4.0",
+    "@atlaskit/pragmatic-drag-and-drop-hitbox": "^1.0.3",
     "@snippy/ui": "workspace:*",
     "@tauri-apps/api": "^2",
     "@tauri-apps/plugin-fs": "^2.0.2",
@@ -24,6 +26,7 @@
     "drizzle-orm": "^0.36.4",
     "nanoid": "^5.0.8",
     "pinia": "^2.2.6",
+    "radix-vue": "^1.9.10",
     "unplugin-auto-import": "^0.18.2",
     "vue": "^3.3.4",
     "vue-router": "4"

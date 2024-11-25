@@ -7,9 +7,15 @@ import { path } from '@tauri-apps/api';
 export type ProxyMigrator = (migrationQueries: string[]) => Promise<void>;
 
 export async function migrate() {
-  const migrationPath = await path.join(await resourceDir(), 'db', 'migrations');
+  const migrationPath = await path.join(
+    await resourceDir(),
+    'db',
+    'migrations',
+  );
   const files = await readDir(migrationPath);
-  let migrations = files.filter((file) => file.isFile && file.name.endsWith('.sql'));
+  let migrations = files.filter(
+    (file) => file.isFile && file.name.endsWith('.sql'),
+  );
 
   // sort migrations by the first 4 characters of the file name
   migrations = migrations.sort((a, b) => {
@@ -43,7 +49,9 @@ export async function migrate() {
       const hash = migration.name.replace('.sql', '');
       if (!hash || dbMigrationsSet.has(hash)) continue;
 
-      const sql = await readTextFile(await path.join(migrationPath, migration.name));
+      const sql = await readTextFile(
+        await path.join(migrationPath, migration.name),
+      );
 
       await sqlite.execute(sql, []);
       await sqlite.execute(

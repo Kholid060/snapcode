@@ -6,7 +6,7 @@
     <template v-else-if="editorState.status === 'idle'">
       <EditorSidebar />
       <div class="flex-1">
-        <RouterView />
+        <!-- <RouterView /> -->
       </div>
     </template>
   </main>
@@ -17,12 +17,16 @@ import { useEditorStore } from '@/stores/editor.store';
 
 const editorStore = useEditorStore();
 
-const editorState = shallowReactive<{ status: 'loading' | 'idle' | 'error'; errorMessage: string }>({
+const editorState = shallowReactive<{
+  status: 'loading' | 'idle' | 'error';
+  errorMessage: string;
+}>({
   errorMessage: '',
   status: 'loading',
 });
 
-editorStore.init()
+editorStore
+  .init()
   .then(() => {
     editorState.status = 'idle';
   })

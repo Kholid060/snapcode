@@ -1,6 +1,6 @@
 <template>
-  <div class="p-4 flex items-center">
-    <p class="text-sm font-semibold text-muted-foreground cursor-default grow">
+  <div class="flex items-center p-4">
+    <p class="text-muted-foreground grow cursor-default text-sm font-semibold">
       Snippets
     </p>
     <TooltipSimple label="Add snippet">
@@ -12,7 +12,7 @@
       </EditorSidebarIconButton>
     </TooltipSimple>
     <TooltipSimple label="Add folder">
-      <EditorSidebarIconButton class="ml-0.5">
+      <EditorSidebarIconButton @click="createNewFolder" class="ml-0.5">
         <FolderAddIcon />
       </EditorSidebarIconButton>
     </TooltipSimple>
@@ -34,18 +34,24 @@
       </DropdownMenuContent>
     </DropdownMenu>
   </div>
-  <ul>
-    <li
-      v-for="snippet in editorStore.data.snippets"
-      :key="snippet.id"
-    >
-      {{ snippet.id }}
-    </li>
-  </ul>
+  <EditorTreeRoot />
+  <EditorSidebarContextMenu
+    :item-id="contextMenuItemData.id"
+    :item-type="contextMenuItemData.type"
+  >
+    <button ref="context-menu-trigger" class="hidden"></button>
+  </EditorSidebarContextMenu>
 </template>
 
 <script setup lang="ts">
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, TooltipSimple, DropdownMenuTrigger, useToast } from '@snippy/ui';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  TooltipSimple,
+  DropdownMenuTrigger,
+  useToast,
+} from '@snippy/ui';
 import FolderAddIcon from '~icons/hugeicons/folder-add';
 import FileAddIcon from '~icons/hugeicons/file-add';
 import GitHubIcon from '~icons/hugeicons/github';
@@ -54,14 +60,30 @@ import MoreHorizontalIcon from '~icons/hugeicons/more-horizontal-circle-01';
 import EditorSidebarIconButton from './EditorSidebarIconButton.vue';
 import { useEditorStore } from '@/stores/editor.store';
 import { logger } from '@/services/logger.service';
-import { SnippetNewPayload } from '@/interface/snippet.interface';
+import EditorTreeRoot from '../tree/EditorTreeRoot.vue';
+import {
+  EDITOR_SIDEBAR_PROVIDER_KEY,
+  type EditorSidebarContextMenuData,
+  type EditorSidebarProvider,
+} from '@/providers/editor.provider';
+import EditorSidebarContextMenu from './EditorSidebarContextMenu.vue';
 
 const { toast } = useToast();
 const editorStore = useEditorStore();
 
-async function createNewSnippet({ folderId, name }: Pick<SnippetNewPayload, 'name' | 'folderId'> = {}) {
+const contextMenuTrigger = useTemplateRef('context-menu-trigger');
+
+const contextMenuItemData = shallowReactive<{
+  id: string;
+  type: 'snippet' | 'folder';
+}>({
+  id: '',
+  type: 'folder',
+});
+
+async function createNewSnippet() {
   try {
-    await editorStore.data.addSnippet({ name, folderId });
+    await editorStore.data.addSnippet();
   } catch (error) {
     if (error instanceof Error) {
       await logger.error(`[create-snippet] ${error.message}`);
@@ -72,6 +94,30 @@ async function createNewSnippet({ folderId, name }: Pick<SnippetNewPayload, 'nam
     });
   }
 }
+async function createNewFolder() {
+  try {
+    await editorStore.data.addFolder();
+  } catch (error) {
+    if (error instanceof Error) {
+      await logger.error(`[create-folder] ${error.message}`);
+    }
+    toast({
+      variant: 'destructive',
+      title: 'Error creating a new folder',
+    });
+  }
+}
+function handleContextMenu({ event, id, type }: EditorSidebarContextMenuData) {
+  if (!contextMenuTrigger.value) return;
+
+  contextMenuTrigger.value.dispatchEvent(new PointerEvent(event.type, event));
+  console.log(id);
+  Object.assign(contextMenuItemData, { id, type });
+}
+
+provide<EditorSidebarProvider>(EDITOR_SIDEBAR_PROVIDER_KEY, {
+  handleContextMenu,
+});
 
 console.log(editorStore);
 </script>

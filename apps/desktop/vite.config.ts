@@ -14,7 +14,11 @@ export default defineConfig(async () => ({
     vue(),
     Icons(),
     AutoImport({
-      imports: ['vue', 'vue-router', { 'unplugin-vue-router/runtime': ['definePage'] }],
+      imports: [
+        'vue',
+        'vue-router',
+        { 'unplugin-vue-router/runtime': ['definePage'] },
+      ],
       eslintrc: {
         enabled: true,
       },

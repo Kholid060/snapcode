@@ -1,9 +1,22 @@
-import { getAllFolders } from '@/db/services/folder.db-service';
-import { createNewSnippets, getAllSnippets } from '@/db/services/snippet.db-service';
-import { FolderListItem } from '@/interface/folder.interface';
-import { SnippetListItem, SnippetNewPayload } from '@/interface/snippet.interface';
-import { store } from '@/services/store.service';
-import { APP_STORE_KEYS } from '@/utils/const/app.const';
+import * as folderService from '@/db/services/folder.db-service';
+import * as snippetService from '@/db/services/snippet.db-service';
+import {
+  FolderListItem,
+  FolderNewPayload,
+  FolderUpdatePayload,
+} from '@/interface/folder.interface';
+import {
+  SnippetListItem,
+  SnippetNewPayload,
+  SnippetUpdatePayload,
+} from '@/interface/snippet.interface';
+import { store, STORE_KEYS } from '@/services/store.service';
+import {
+  buildTreeData,
+  TREE_ROOT_KEY,
+  TreeData,
+  TreeDataItem,
+} from '@/utils/tree-data-builder';
 import { watchDebounced } from '@vueuse/core/index.cjs';
 import { defineStore } from 'pinia';
 
@@ -20,8 +33,8 @@ const useEditorState = defineStore('editor:state', () => {
     if (initiated) return;
 
     const storeData = await Promise.all([
-      store.get<string>(APP_STORE_KEYS.editorActiveFile),
-      store.get<string[]>(APP_STORE_KEYS.editorActiveFolders),
+      store.get<string>(STORE_KEYS.editorActiveFile),
+      store.get<string[]>(STORE_KEYS.editorActiveFolders),
     ]);
     activeFileId.value = storeData[0]!;
     Object.assign(activeFolderIds, new Set(storeData[1])!);
@@ -29,9 +42,13 @@ const useEditorState = defineStore('editor:state', () => {
     initiated = true;
   }
 
-  watchDebounced([activeFileId, activeFolderIds], () => {
-    console.log({ activeFileId, activeFolderIds });
-  }, { debounce: 500 });
+  watchDebounced(
+    [activeFileId, activeFolderIds],
+    () => {
+      console.log({ activeFileId, activeFolderIds });
+    },
+    { debounce: 500 },
+  );
 
   return {
     init,
@@ -46,29 +63,144 @@ const useEditorDataStore = defineStore('editor:snippets', () => {
 
   const state = useEditorState();
 
+  const treeData = ref<TreeData>({ __root: [] });
   const folders = ref<Record<string, FolderListItem>>({});
   const snippets = ref<Record<string, SnippetListItem>>({});
 
-  const activeSnippet = computed(() => snippets.value[state.activeFileId] ?? null);
+  const activeSnippet = computed(
+    () => snippets.value[state.activeFileId] ?? null,
+  );
 
-  async function addSnippet(payload: SnippetNewPayload) {
-    const [snippet] = await createNewSnippets([payload]);
-    snippets.value[snippet.id] = snippet;
+  function deleteTreeItem(itemId: string, folderId: string = TREE_ROOT_KEY) {
+    if (!treeData.value[folderId]) return;
+
+    const itemIndex = treeData.value[folderId].findIndex(
+      (item) => item.id === itemId,
+    );
+    if (itemIndex === -1) return;
+
+    treeData.value[folderId].splice(itemIndex, 1);
+  }
+  function addTreeItem(data: TreeDataItem, folderId: string = TREE_ROOT_KEY) {
+    if (!treeData.value[folderId]) {
+      treeData.value[folderId] = [];
+    }
+
+    treeData.value[folderId].push(data);
+  }
+
+  async function addSnippet(payload: SnippetNewPayload = {}) {
+    const [snippet] = await snippetService.createNewSnippets([payload]);
+    snippets.value[snippet.id] = {
+      id: snippet.id,
+      ext: snippet.ext,
+      name: snippet.name,
+      tags: snippet.tags,
+      folderId: snippet.folderId,
+      createdAt: snippet.createdAt,
+    };
+
+    addTreeItem(
+      {
+        id: snippet.id,
+        isFolder: false,
+      },
+      payload.folderId ?? undefined,
+    );
+
     state.setActiveFile(snippet.id);
+  }
+  async function deleteSnippet(snippetId: string) {
+    const snippetData = snippets.value[snippetId];
+    if (!snippetData) return;
+
+    await snippetService.deleteSnippets(snippetId);
+    deleteTreeItem(snippetId, snippetData.folderId ?? undefined);
+
+    delete snippets.value[snippetId];
+  }
+  async function updateSnippet(
+    snippetId: string,
+    payload: SnippetUpdatePayload,
+  ) {
+    if (!snippets.value[snippetId]) return;
+
+    const snippet = await snippetService.updateSnippet(snippetId, payload);
+    if (!snippet) return;
+
+    snippets.value[snippetId] = {
+      ...snippets.value[snippetId],
+      ext: snippet.ext,
+      name: snippet.name,
+      tags: snippet.tags,
+      folderId: snippet.folderId,
+    };
+  }
+
+  async function addFolder(payload: FolderNewPayload = {}) {
+    const [folder] = await folderService.createNewFolders([payload]);
+
+    folders.value[folder.id] = folder;
+    addTreeItem(
+      { id: folder.id, isFolder: true },
+      folder.parentId ?? undefined,
+    );
+  }
+  async function deleteFolder(folderId: string) {
+    const folderData = folders.value[folderId];
+    if (!folderData) return;
+
+    await folderService.deleteFolders(folderId);
+    deleteTreeItem(folderId, folderData.parentId ?? undefined);
+
+    delete treeData.value[folderId];
+    delete folders.value[folderId];
+  }
+  async function updateFolder(folderId: string, payload: FolderUpdatePayload) {
+    if (!folders.value[folderId]) return;
+
+    const folder = await folderService.updateFolder(folderId, payload);
+    if (!folder) return;
+
+    folders.value[folderId] = {
+      ...folders.value[folderId],
+      name: folder.name,
+      parentId: folder.parentId,
+    };
   }
 
   async function init() {
     if (initiated) return;
 
-    const [snippetList, folderList] = await Promise.all([getAllSnippets(), getAllFolders()]);
+    const [snippetList, folderList] = await Promise.all([
+      snippetService.getAllSnippets(),
+      folderService.getAllFolders(),
+    ]);
 
-    folders.value = Object.fromEntries(folderList.map((folder) => [folder.id, folder]));
-    snippets.value = Object.fromEntries(snippetList.map((snippet) => [snippet.id, snippet]));
+    folders.value = Object.fromEntries(
+      folderList.map((item) => [item.id, item]),
+    );
+    snippets.value = Object.fromEntries(
+      snippetList.map((item) => [item.id, item]),
+    );
 
+    treeData.value = buildTreeData(snippetList, folderList);
     initiated = true;
   }
 
-  return { init, snippets, addSnippet, activeSnippet };
+  return {
+    init,
+    folders,
+    treeData,
+    snippets,
+    addFolder,
+    addSnippet,
+    deleteFolder,
+    updateFolder,
+    deleteSnippet,
+    updateSnippet,
+    activeSnippet,
+  };
 });
 
 export const useEditorStore = defineStore('editor', () => {

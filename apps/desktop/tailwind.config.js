@@ -12,10 +12,7 @@ function generateColors(name) {
 /** @type {import('tailwindcss').Config} */
 export default {
   darkMode: 'class',
-  content: [
-    './src/**/*.{js,vue,ts}',
-    '../../packages/ui/src/**/*.{js,vue,ts}',
-  ],
+  content: ['./src/**/*.{js,vue,ts}', '../../packages/ui/src/**/*.{js,vue,ts}'],
   theme: {
     extend: {
       colors: {

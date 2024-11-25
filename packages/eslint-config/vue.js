@@ -7,7 +7,7 @@ export default ts.config(
   ...base,
   js.configs.recommended,
   ...ts.configs.recommended,
-  ...eslintPluginVue.configs['flat/recommended'],
+  ...eslintPluginVue.configs['flat/essential'],
   {
     files: ['*.vue', '**/*.vue'],
     languageOptions: {
@@ -16,6 +16,9 @@ export default ts.config(
       }
     },
     rules: {
+      '@typescript-eslint/consistent-type-imports': 'error',
+      'vue/max-attributes-per-line': 'off',
+      'vue/html-self-closing': 'off',
       'vue/require-default-prop': 'off',
       'vue/no-multiple-template-root': 'off',
       'vue/multi-word-component-names': 'off',

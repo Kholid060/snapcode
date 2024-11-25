@@ -2,6 +2,20 @@ import animate from 'tailwindcss-animate';
 import defaultTheme from 'tailwindcss/defaultTheme';
 import flattenColorPalette from 'tailwindcss/lib/util/flattenColorPalette';
 
+/**
+ *
+ * @param {string} name
+ * @returns {Record<number, string>}
+ */
+function generateColors(name) {
+  return Object.fromEntries(
+    Array.from({ length: 12 }, (_, index) => [
+      index + 1,
+      `hsl(var(--${name}-${index + 1}))`,
+    ]),
+  );
+}
+
 /** @type {import('tailwindcss').Config} */
 export default {
   darkMode: ['class'],
@@ -34,6 +48,9 @@ export default {
         ring: 'hsl(var(--ring))',
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
+        lime: generateColors('lime'),
+        ruby: generateColors('ruby'),
+        olive: generateColors('olive'),
         primary: {
           DEFAULT: 'hsl(var(--primary))',
           foreground: 'hsl(var(--primary-foreground))',
@@ -45,6 +62,7 @@ export default {
         },
         destructive: {
           DEFAULT: 'hsl(var(--destructive))',
+          text: 'hsl(var(--destructive-text))',
           foreground: 'hsl(var(--destructive-foreground))',
         },
         muted: {
@@ -98,7 +116,7 @@ export default {
   },
   plugins: [
     animate,
-    function ({ matchUtilities, theme }) {
+    ({ matchUtilities, theme }) => {
       matchUtilities(
         {
           highlight: (value) => ({ boxShadow: `inset 0 1px 0 0 ${value}` }),
