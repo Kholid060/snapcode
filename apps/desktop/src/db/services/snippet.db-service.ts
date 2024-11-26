@@ -49,3 +49,16 @@ export async function updateSnippet(
 
   return snippet;
 }
+
+export function getSnippetContent(snippetId: string) {
+  return db.query.snippetsTable
+    .findFirst({
+      columns: {
+        content: true,
+      },
+      where(fields, operators) {
+        return operators.eq(fields.id, snippetId);
+      },
+    })
+    .execute();
+}

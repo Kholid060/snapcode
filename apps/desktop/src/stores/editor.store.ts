@@ -18,14 +18,13 @@ import {
   TreeData,
   TreeDataItem,
 } from '@/utils/tree-data-utils';
-import { watchDebounced } from '@vueuse/core/index.cjs';
 import { defineStore } from 'pinia';
 
 const useEditorState = defineStore('editor:state', () => {
   let initiated = false;
 
-  const activeFileId = shallowRef('');
-  const activeFolderIds = reactive(new Set<string>());
+  const activeFileId = ref('');
+  const activeFolderIds = ref<string[]>([]);
 
   function setActiveFile(fileId: string) {
     activeFileId.value = fileId;
@@ -35,21 +34,13 @@ const useEditorState = defineStore('editor:state', () => {
 
     const storeData = await Promise.all([
       store.get<string>(STORE_KEYS.editorActiveFile),
-      store.get<string[]>(STORE_KEYS.editorActiveFolders),
+      store.get<string[]>(STORE_KEYS.editorActiveDirs),
     ]);
     activeFileId.value = storeData[0]!;
-    Object.assign(activeFolderIds, new Set(storeData[1])!);
+    activeFolderIds.value = storeData[1]!;
 
     initiated = true;
   }
-
-  watchDebounced(
-    [activeFileId, activeFolderIds],
-    () => {
-      console.log({ activeFileId, activeFolderIds });
-    },
-    { debounce: 500 },
-  );
 
   return {
     init,
@@ -157,6 +148,8 @@ const useEditorDataStore = defineStore('editor:snippets', () => {
     await snippetService.deleteSnippets(snippetId);
     deleteTreeItem(snippetId, snippetData.folderId ?? undefined);
 
+    if (state.activeFileId === snippetId) state.setActiveFile(snippetId);
+
     delete snippets.value[snippetId];
   }
   async function updateSnippet(
@@ -194,6 +187,25 @@ const useEditorDataStore = defineStore('editor:snippets', () => {
     };
   }
 
+  function deleteFolderRecursive(folderId: string) {
+    const items = treeData.value[folderId];
+    if (!items) return;
+
+    for (const item of items) {
+      if (!item.isFolder) {
+        if (state.activeFileId === item.id) state.setActiveFile(item.id);
+
+        delete snippets.value[item.id];
+
+        continue;
+      }
+
+      deleteFolderRecursive(item.id);
+
+      delete folders.value[item.id];
+      delete treeData.value[item.id];
+    }
+  }
   async function addFolder(payload: FolderNewPayload = {}) {
     const [folder] = await folderService.createNewFolders([payload]);
 
@@ -209,9 +221,7 @@ const useEditorDataStore = defineStore('editor:snippets', () => {
 
     await folderService.deleteFolders(folderId);
     deleteTreeItem(folderId, folderData.parentId ?? undefined);
-
-    delete treeData.value[folderId];
-    delete folders.value[folderId];
+    deleteFolderRecursive(folderId);
   }
   async function updateFolder(folderId: string, payload: FolderUpdatePayload) {
     if (!folders.value[folderId]) return;

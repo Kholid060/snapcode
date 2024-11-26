@@ -7,7 +7,6 @@ import * as schema from './schema';
 export const sqlite = await Database.load('sqlite:app.db');
 export const db = drizzle(
   async (sql, params, method) => {
-    console.log('==db', { sql, params, method });
     if (!isSelectQuery(sql)) {
       await sqlite.select(sql, params);
       return { rows: [] };

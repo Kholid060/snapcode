@@ -1,5 +1,5 @@
 <template>
-  <div v-show="!hide" class="flex items-center p-4 pb-2">
+  <div v-show="!hide" class="flex items-center p-4 pb-1">
     <p class="text-muted-foreground grow cursor-default text-sm font-semibold">
       Snippets
     </p>
@@ -36,7 +36,7 @@
   </div>
   <EditorTreeRoot
     v-show="!hide"
-    class="custom-scroll grow overflow-auto px-2 pb-4"
+    class="custom-scroll grow overflow-auto px-2 pb-4 pt-1"
   />
   <EditorSidebarContextMenu
     :item-id="contextMenuItemData.id"
@@ -71,6 +71,8 @@ import {
   type EditorSidebarProvider,
 } from '@/providers/editor.provider';
 import EditorSidebarContextMenu from './EditorSidebarContextMenu.vue';
+import { watchDebounced } from '@vueuse/core';
+import { store, STORE_KEYS } from '@/services/store.service';
 
 defineProps<{
   hide?: boolean;
@@ -130,4 +132,13 @@ provide<EditorSidebarProvider>(EDITOR_SIDEBAR_PROVIDER_KEY, {
     dragData.value = data;
   },
 });
+
+watchDebounced(
+  () => [editorStore.state.activeFileId, editorStore.state.activeFolderIds],
+  ([activeFileId, activeFolderIds]) => {
+    store.set(STORE_KEYS.editorActiveFile, toRaw(activeFileId ?? ''));
+    store.set(STORE_KEYS.editorActiveDirs, toRaw(activeFolderIds) ?? []);
+  },
+  { debounce: 500, deep: true },
+);
 </script>

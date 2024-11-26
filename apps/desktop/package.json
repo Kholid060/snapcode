@@ -16,7 +16,9 @@
   "dependencies": {
     "@atlaskit/pragmatic-drag-and-drop": "^1.4.0",
     "@atlaskit/pragmatic-drag-and-drop-hitbox": "^1.0.3",
+    "@codemirror/state": "^6.4.1",
     "@iconify-json/vscode-icons": "^1.2.2",
+    "@snippy/codemirror": "workspace:*",
     "@snippy/ui": "workspace:*",
     "@tauri-apps/api": "^2",
     "@tauri-apps/plugin-fs": "^2.0.2",
@@ -24,6 +26,7 @@
     "@tauri-apps/plugin-shell": "^2",
     "@tauri-apps/plugin-sql": "^2.0.1",
     "@tauri-apps/plugin-store": "^2.1.0",
+    "@uiw/codemirror-theme-tokyo-night": "^4.23.6",
     "@vueuse/core": "^11.0.1",
     "drizzle-orm": "^0.36.4",
     "nanoid": "^5.0.8",

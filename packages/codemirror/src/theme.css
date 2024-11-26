@@ -1,0 +1,47 @@
+.codemirror {
+  .cm-scroller {
+    font-size: theme('fontSize.sm');
+    font-family: theme('fontFamily.mono');
+  }
+
+  .cm-lineNumbers,
+  .cm-scroller {
+    color: theme('colors.muted.foreground');
+  }
+
+  .cm-focused {
+    outline: none;
+  }
+
+  .cm-lineNumbers {
+    .cm-activeLineGutter {
+      border-top-left-radius: theme('borderRadius.sm');
+      border-bottom-left-radius: theme('borderRadius.sm');
+    }
+  }
+
+  .cm-activeLine {
+    border-top-right-radius: theme('borderRadius.sm');
+    border-bottom-right-radius: theme('borderRadius.sm');
+  }
+
+  .cm-editor {
+    height: 100%;
+  }
+
+  .cm-tooltip-autocomplete {
+    padding: theme('padding[0.5]');
+    border-radius: theme('borderRadius.sm');
+    background-color: theme('colors.olive.5');
+
+    ul {
+      font-size: theme('fontSize.xs');
+      font-family: theme('fontFamily.mono') !important;
+
+      li[aria-selected] {
+        border-radius: theme('borderRadius.sm');
+        background-color: theme('colors.lime.7');
+      }
+    }
+  }
+}

@@ -7,12 +7,13 @@
     <template v-else-if="editorState.status === 'idle'">
       <EditorSidebar />
       <div class="flex-1">
-        <!-- <RouterView /> -->
+        <EditorContent />
       </div>
     </template>
   </main>
 </template>
 <script setup lang="ts">
+import EditorContent from './content/EditorContent.vue';
 import EditorSidebar from './sidebar/EditorSidebar.vue';
 import { useEditorStore } from '@/stores/editor.store';
 

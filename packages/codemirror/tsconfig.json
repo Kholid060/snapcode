@@ -3,6 +3,7 @@
     "outDir": "dist",
     "baseUrl": ".",
     "strict": true,
+    "lib": ["DOM", "ES2020"],
     "paths": {
       "@/*": ["./src/*"]
     }

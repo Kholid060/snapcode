@@ -5,9 +5,8 @@
     :items="editorStore.data.treeData.__root"
     :get-key="(item) => item.id"
     :get-children="getChildren"
-    multiple
     selection-behavior="replace"
-    v-model:expanded="activeDirs"
+    v-model:expanded="editorStore.state.activeFolderIds"
   >
     <EditorTreeItem
       v-for="item in flattenItems"
@@ -20,13 +19,11 @@
 
 <script setup lang="ts">
 import { TreeRoot } from 'radix-vue';
-import { debouncedWatch } from '@vueuse/core';
 import { combine } from '@atlaskit/pragmatic-drag-and-drop/combine';
 import { monitorForElements } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
 import { useEditorStore } from '@/stores/editor.store';
 import EditorTreeItem from './EditorTreeItem.vue';
 import { type TreeDataItem } from '@/utils/tree-data-utils';
-import { store, STORE_KEYS } from '@/services/store.service';
 import { logger } from '@/services/logger.service';
 import { useToast } from '@snippy/ui';
 import { getLogMessage } from '@/utils/helper';
@@ -34,8 +31,6 @@ import EditorTreeRootItemPlaceholder from './EditorTreeRootItemPlaceholder.vue';
 
 const { toast } = useToast();
 const editorStore = useEditorStore();
-
-const activeDirs = ref<string[]>([]);
 
 function getChildren(item: TreeDataItem) {
   return item.isFolder ? (editorStore.data.treeData[item.id] ?? []) : undefined;
@@ -80,20 +75,6 @@ watchEffect((onCleanup) => {
 
   onCleanup(() => {
     dndFunction();
-  });
-});
-
-debouncedWatch(
-  activeDirs,
-  () => {
-    store.set(STORE_KEYS.editorActiveDirs, activeDirs.value);
-  },
-  { debounce: 250, deep: true },
-);
-
-onMounted(() => {
-  store.get<string[]>(STORE_KEYS.editorActiveDirs).then((value) => {
-    activeDirs.value = value ?? [];
   });
 });
 </script>
