@@ -64,6 +64,7 @@ import EditorSidebarIconButton from './EditorSidebarIconButton.vue';
 import { useEditorStore } from '@/stores/editor.store';
 import { logger } from '@/services/logger.service';
 import EditorTreeRoot from '../tree/EditorTreeRoot.vue';
+import type { EditorSidebarDragData } from '@/providers/editor.provider';
 import {
   EDITOR_SIDEBAR_PROVIDER_KEY,
   type EditorSidebarContextMenuData,
@@ -80,6 +81,7 @@ const editorStore = useEditorStore();
 
 const contextMenuTrigger = useTemplateRef('context-menu-trigger');
 
+const dragData = shallowRef<EditorSidebarDragData | null>(null);
 const contextMenuItemData = shallowReactive<{
   id: string;
   type: 'snippet' | 'folder';
@@ -118,13 +120,14 @@ function handleContextMenu({ event, id, type }: EditorSidebarContextMenuData) {
   if (!contextMenuTrigger.value) return;
 
   contextMenuTrigger.value.dispatchEvent(new PointerEvent(event.type, event));
-  console.log(id);
   Object.assign(contextMenuItemData, { id, type });
 }
 
 provide<EditorSidebarProvider>(EDITOR_SIDEBAR_PROVIDER_KEY, {
+  dragData,
   handleContextMenu,
+  setDragData(data) {
+    dragData.value = data;
+  },
 });
-
-console.log(editorStore);
 </script>

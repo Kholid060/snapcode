@@ -10,6 +10,7 @@
     "log:allow-log",
     "sql:allow-execute",
     "store:default",
+    "core:window:allow-start-dragging",
     "fs:default",
     {
       "identifier": "fs:allow-read-dir",

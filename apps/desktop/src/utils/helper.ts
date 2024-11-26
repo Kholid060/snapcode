@@ -8,3 +8,14 @@ export function getLogMessage<T>(scope: string, value: T): string {
 
   return `[${scope}] ${message}`;
 }
+
+export async function catchAsyncFn<T extends () => Promise<unknown>, K>(
+  fn: T,
+  def: K,
+): Promise<Awaited<ReturnType<T>> | K> {
+  try {
+    return (await fn()) as Awaited<ReturnType<T>>;
+  } catch {
+    return def;
+  }
+}

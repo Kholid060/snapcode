@@ -11,6 +11,7 @@ import {
   SnippetUpdatePayload,
 } from '@/interface/snippet.interface';
 import { store, STORE_KEYS } from '@/services/store.service';
+import { getSnippetExtFromName } from '@/utils/snippet-utils';
 import {
   buildTreeData,
   TREE_ROOT_KEY,
@@ -72,14 +73,17 @@ const useEditorDataStore = defineStore('editor:snippets', () => {
   );
 
   function deleteTreeItem(itemId: string, folderId: string = TREE_ROOT_KEY) {
-    if (!treeData.value[folderId]) return;
+    if (!treeData.value[folderId]) return null;
 
     const itemIndex = treeData.value[folderId].findIndex(
       (item) => item.id === itemId,
     );
-    if (itemIndex === -1) return;
+    if (itemIndex === -1) return null;
 
+    const copyData = { ...treeData.value[folderId][itemIndex] };
     treeData.value[folderId].splice(itemIndex, 1);
+
+    return copyData;
   }
   function addTreeItem(data: TreeDataItem, folderId: string = TREE_ROOT_KEY) {
     if (!treeData.value[folderId]) {
@@ -107,8 +111,25 @@ const useEditorDataStore = defineStore('editor:snippets', () => {
       return value;
     });
   }
+  function moveTreeItem(
+    itemId: string,
+    folder: { from: string | null; to: string | null },
+  ) {
+    if (folder.from === folder.to) return;
+
+    const itemData = deleteTreeItem(itemId, folder.from ?? undefined);
+    if (!itemData) return;
+
+    addTreeItem(itemData, folder.to ?? undefined);
+  }
 
   async function addSnippet(payload: SnippetNewPayload = {}) {
+    if (payload.name) {
+      const { ext, name } = await getSnippetExtFromName(payload.name);
+      payload.ext = ext;
+      payload.name = name;
+    }
+
     const [snippet] = await snippetService.createNewSnippets([payload]);
     snippets.value[snippet.id] = {
       id: snippet.id,
@@ -144,8 +165,25 @@ const useEditorDataStore = defineStore('editor:snippets', () => {
   ) {
     if (!snippets.value[snippetId]) return;
 
+    if (payload.name) {
+      const { ext, name } = await getSnippetExtFromName(payload.name);
+      payload.ext = ext;
+      payload.name = name;
+    }
+
     const snippet = await snippetService.updateSnippet(snippetId, payload);
     if (!snippet) return;
+
+    if (payload.name || 'folderId' in payload) {
+      if ('folderId' in payload) {
+        moveTreeItem(snippet.id, {
+          to: payload.folderId ?? null,
+          from: snippets.value[snippetId].folderId,
+        });
+      } else {
+        sortTree(snippet.folderId ?? undefined);
+      }
+    }
 
     snippets.value[snippetId] = {
       ...snippets.value[snippetId],
@@ -154,10 +192,6 @@ const useEditorDataStore = defineStore('editor:snippets', () => {
       tags: snippet.tags,
       folderId: snippet.folderId,
     };
-
-    if (payload.name) {
-      sortTree(snippet.folderId ?? undefined);
-    }
   }
 
   async function addFolder(payload: FolderNewPayload = {}) {
@@ -185,14 +219,22 @@ const useEditorDataStore = defineStore('editor:snippets', () => {
     const folder = await folderService.updateFolder(folderId, payload);
     if (!folder) return;
 
+    if (payload.name || 'parentId' in payload) {
+      if ('parentId' in payload) {
+        moveTreeItem(folder.id, {
+          to: payload.parentId ?? null,
+          from: folders.value[folderId].parentId,
+        });
+      } else {
+        sortTree(folder.parentId ?? undefined);
+      }
+    }
+
     folders.value[folderId] = {
       ...folders.value[folderId],
       name: folder.name,
       parentId: folder.parentId,
     };
-    if (payload.name) {
-      sortTree(folder.parentId ?? undefined);
-    }
   }
 
   async function init() {

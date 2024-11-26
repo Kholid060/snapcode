@@ -1,5 +1,9 @@
 <template>
-  <aside class="bg-olive-2 flex h-screen w-64 flex-col border-r">
+  <aside
+    class="bg-olive-2 flex h-screen w-64 flex-col border-r"
+    @drag.prevent
+    @dragover.prevent
+  >
     <div class="relative h-14 flex-shrink-0 border-b">
       <SearchIcon
         class="text-muted-foreground absolute left-4 top-1/2 size-5 -translate-y-1/2"

@@ -9,12 +9,7 @@
           <CopyIcon class="mr-2" />
           Make a copy
         </ContextMenuItem>
-        <ContextMenuItem
-          @click="
-            renameDialog.newName = getData().name ?? '';
-            renameDialog.show = true;
-          "
-        >
+        <ContextMenuItem @click="startRenameItem">
           <PencilEditIcon class="mr-2" />
           Rename
         </ContextMenuItem>
@@ -96,7 +91,10 @@
         </DialogTitle>
       </DialogHeader>
       <form @submit.prevent="renameItem">
-        <Input placeholder="unnamed" v-model="renameDialog.newName" />
+        <Input
+          :placeholder="itemType === 'folder' ? 'unnamed' : 'unnamed.txt'"
+          v-model="renameDialog.newName"
+        />
         <DialogFooter class="mt-6">
           <Button type="submit">Rename</Button>
         </DialogFooter>
@@ -165,11 +163,9 @@ function getData() {
 async function createFolderSnippet() {
   try {
     if (props.itemType !== 'folder') return;
-
     await editorStore.data.addSnippet({ folderId: props.itemId });
   } catch (error) {
     logger.error(getLogMessage('sidebar-create-snip-ctx-menu', error));
-    console.error(error);
     toast({
       variant: 'destructive',
       title: `Error adding snippet`,
@@ -200,8 +196,8 @@ async function renameItem() {
           name: renameDialog.newName,
         }));
 
-    renameDialog.show = false;
     renameDialog.newName = '';
+    renameDialog.show = false;
   } catch (error) {
     logger.error(getLogMessage('sidebar-rename-ctx-menu', error));
     toast({
@@ -237,6 +233,16 @@ async function deleteItemPrompt() {
   }
 
   deleteItem();
+}
+function startRenameItem() {
+  const data = getData();
+  if (!data) return;
+
+  let name = data.name ?? '';
+  if ('ext' in data) name += `.${data.ext}`;
+
+  renameDialog.newName = name;
+  renameDialog.show = true;
 }
 
 async function copySnippet() {

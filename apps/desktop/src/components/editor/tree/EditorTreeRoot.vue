@@ -13,25 +13,26 @@
       v-for="item in flattenItems"
       :key="item._id + item.index"
       :item="item"
-      v-bind="item.bind"
     />
+    <EditorTreeRootItemPlaceholder />
   </TreeRoot>
 </template>
 
 <script setup lang="ts">
 import { TreeRoot } from 'radix-vue';
 import { debouncedWatch } from '@vueuse/core';
-import {
-  type Instruction,
-  extractInstruction,
-} from '@atlaskit/pragmatic-drag-and-drop-hitbox/tree-item';
 import { combine } from '@atlaskit/pragmatic-drag-and-drop/combine';
 import { monitorForElements } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
 import { useEditorStore } from '@/stores/editor.store';
 import EditorTreeItem from './EditorTreeItem.vue';
-import type { TreeDataItem } from '@/utils/tree-data-utils';
+import { type TreeDataItem } from '@/utils/tree-data-utils';
 import { store, STORE_KEYS } from '@/services/store.service';
+import { logger } from '@/services/logger.service';
+import { useToast } from '@snippy/ui';
+import { getLogMessage } from '@/utils/helper';
+import EditorTreeRootItemPlaceholder from './EditorTreeRootItemPlaceholder.vue';
 
+const { toast } = useToast();
 const editorStore = useEditorStore();
 
 const activeDirs = ref<string[]>([]);
@@ -43,25 +44,35 @@ function getChildren(item: TreeDataItem) {
 watchEffect((onCleanup) => {
   const dndFunction = combine(
     monitorForElements({
-      onDrop(args) {
-        const { location, source } = args;
-        // didn't drop on anything
-        if (!location.current.dropTargets.length) return;
+      async onDrop(args) {
+        const previous = args.source;
+        const [target] = args.location.current.dropTargets;
+        if (!target || !previous) return;
 
-        const itemId = source.data.id as string;
-        const target = location.current.dropTargets[0];
-        const targetId = target.data.id as string;
+        let parentOrFolderId: string | null = target.data.isFolder
+          ? (target.data.id as string)
+          : (target.data.parentId as string);
+        if (!parentOrFolderId) parentOrFolderId = null;
 
-        const instruction: Instruction | null = extractInstruction(target.data);
+        if (previous.data.parentId === parentOrFolderId) return;
 
-        if (instruction !== null) {
-          console.log('instructions', { itemId, targetId, instruction });
-          // items.value = updateTree(items.value, {
-          //   type: 'instruction',
-          //   instruction,
-          //   itemId,
-          //   targetId,
-          // }) ?? [];
+        try {
+          if (previous.data.isFolder) {
+            await editorStore.data.updateFolder(previous.data.id as string, {
+              parentId: parentOrFolderId,
+            });
+          } else {
+            await editorStore.data.updateSnippet(previous.data.id as string, {
+              folderId: parentOrFolderId,
+            });
+          }
+        } catch (error) {
+          console.error(error);
+          logger.error(getLogMessage('sidebar-create-folder-ctx-menu', error));
+          toast({
+            variant: 'destructive',
+            title: `Error moving ${previous.data.isFolder ? 'folder' : 'snippet'}`,
+          });
         }
       },
     }),
@@ -72,9 +83,13 @@ watchEffect((onCleanup) => {
   });
 });
 
-debouncedWatch(activeDirs, () => {
-  store.set(STORE_KEYS.editorActiveDirs, activeDirs.value);
-}, { debounce: 250, deep: true });
+debouncedWatch(
+  activeDirs,
+  () => {
+    store.set(STORE_KEYS.editorActiveDirs, activeDirs.value);
+  },
+  { debounce: 250, deep: true },
+);
 
 onMounted(() => {
   store.get<string[]>(STORE_KEYS.editorActiveDirs).then((value) => {
