@@ -162,6 +162,9 @@ importers:
       '@snippy/codemirror':
         specifier: workspace:*
         version: link:../../packages/codemirror
+      '@snippy/shared':
+        specifier: workspace:*
+        version: link:../../packages/shared
       '@snippy/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -427,6 +430,15 @@ importers:
         specifier: ^8.15.0
         version: 8.15.0(eslint@9.15.0(jiti@2.4.0))(typescript@5.5.4)
 
+  packages/shared:
+    devDependencies:
+      '@snippy/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
+      typescript:
+        specifier: ^5.7.2
+        version: 5.7.2
+
   packages/ui:
     dependencies:
       '@vueuse/core':
@@ -472,15 +484,6 @@ importers:
       typescript:
         specifier: 5.5.4
         version: 5.5.4
-
-  packages/utils:
-    devDependencies:
-      '@snippy/eslint-config':
-        specifier: workspace:*
-        version: link:../eslint-config
-      typescript:
-        specifier: ^5.7.2
-        version: 5.7.2
 
 packages:
 

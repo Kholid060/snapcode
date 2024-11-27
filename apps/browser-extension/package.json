@@ -27,7 +27,6 @@
     "lint": "eslint --cache .",
     "test": "vitest test",
     "test:e2e": "playwright test",
-    "postinstall": "simple-git-hooks",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {

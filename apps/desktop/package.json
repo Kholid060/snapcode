@@ -20,6 +20,7 @@
     "@codemirror/state": "^6.4.1",
     "@iconify-json/vscode-icons": "^1.2.2",
     "@snippy/codemirror": "workspace:*",
+    "@snippy/shared": "workspace:*",
     "@snippy/ui": "workspace:*",
     "@tauri-apps/api": "^2",
     "@tauri-apps/plugin-fs": "^2.0.2",

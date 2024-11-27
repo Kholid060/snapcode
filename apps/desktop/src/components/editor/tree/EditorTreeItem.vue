@@ -43,6 +43,13 @@
         class="size-4 flex-shrink-0"
         :is="isExpanded ? FolderOpenIcon : FolderIcon"
       />
+      <AppFileExtIcon
+        v-else-if="itemData.ext && itemData.ext !== 'txt'"
+        :ext="itemData.ext"
+        class="size-4 flex-shrink-0"
+      >
+        <FileIcon class="size-4 flex-shrink-0" />
+      </AppFileExtIcon>
       <FileIcon v-else class="size-4 flex-shrink-0" />
       <div class="truncate pl-1">
         {{ itemData.name }}
@@ -72,6 +79,10 @@ const props = defineProps<{
   item: FlattenedItem<TreeDataItem>;
 }>();
 
+const AppFileExtIcon = defineAsyncComponent(
+  () => import('@/components/app/AppFileExtIcon.vue'),
+);
+
 const editorStore = useEditorStore();
 const sidebarProvider = useEditorSidebarProvider();
 
@@ -92,10 +103,12 @@ const itemData = computed(() => {
 
   return 'ext' in data
     ? {
+        ext: data.ext,
         parentId: data.folderId,
         name: `${data.name}.${data.ext}`,
       }
     : {
+        ext: null,
         name: data.name || '',
         parentId: data.parentId,
       };
