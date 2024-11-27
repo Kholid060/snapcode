@@ -1,15 +1,15 @@
 <template>
   <div
-    class="codemirror px-1 pt-1"
+    class="codemirror"
     ref="container-ref"
     style="height: calc(100vh - 5rem)"
   ></div>
-  <div class="flex h-6 items-center border-t px-4">
+  <div class="flex h-6 items-center border-t px-2">
     <Popover v-model:open="langSelectorState.open">
       <PopoverTrigger as-child>
         <button
           role="combobox"
-          class="text-muted-foreground hover:bg-secondary rounded p-0.5 text-xs"
+          class="text-muted-foreground hover:bg-secondary min-w-12 rounded p-0.5 text-left text-xs"
         >
           {{ langSelectorState.label }}
         </button>
@@ -79,13 +79,16 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
+  useToast,
 } from '@snippy/ui';
+import { logger } from '@/services/logger.service';
+import { getLogMessage } from '@/utils/helper';
 
 const props = defineProps<{
   content: string;
 }>();
 const emit = defineEmits<{
-  change: [content: string];
+  change: [content: string, editorView: EditorView];
 }>();
 
 let isReplaceValue = false;
@@ -94,6 +97,7 @@ const filteredLangs = languages
   .filter((lang) => lang.extensions.length > 0)
   .sort((a, z) => a.name.localeCompare(z.name));
 
+const { toast } = useToast();
 const editorStore = useEditorStore();
 
 const containerRef = useTemplateRef('container-ref');
@@ -121,10 +125,18 @@ function updateCursorPos(update: ViewUpdate) {
   });
 }
 async function updateSnippetExt(ext: string) {
-  langSelectorState.open = false;
-  await editorStore.data.updateSnippet(editorStore.data.activeSnippet.id!, {
-    ext,
-  });
+  try {
+    langSelectorState.open = false;
+    await editorStore.data.updateSnippet(editorStore.data.activeSnippet.id!, {
+      ext,
+    });
+  } catch (error) {
+    logger.error(getLogMessage('editor-update-ext', error));
+    toast({
+      variant: 'destructive',
+      title: `Error updating snippet`,
+    });
+  }
 }
 
 watchEffect(async () => {
@@ -163,7 +175,7 @@ onMounted(() => {
     updateCursorPos(update);
 
     if (update.docChanged && !isReplaceValue) {
-      emit('change', update.state.doc.toString());
+      emit('change', update.state.doc.toString(), cmView.value!);
     }
   });
 
@@ -177,6 +189,42 @@ onUnmounted(() => {
   cmView.value?.destroy();
 });
 </script>
-<style>
+<style lang="postcss">
 @import '@snippy/codemirror/src/theme.css';
+
+.codemirror {
+  .cm-scroller {
+    padding: theme('padding.1');
+    padding-bottom: 0;
+  }
+
+  .cm-search.cm-panel {
+    padding-left: theme('padding.2');
+    padding-right: theme('padding.2');
+    border-top: 1px solid theme('colors.border');
+    background-color: theme('backgroundColor.background');
+
+    input,
+    button {
+      border-radius: theme('borderRadius.md');
+    }
+
+    .cm-button {
+      border: none;
+      background-image: none;
+      background-color: theme('colors.secondary.DEFAULT');
+
+      &:hover {
+        background-color: theme('colors.secondary.hover');
+      }
+    }
+  }
+
+  .cm-snippet-placeholders {
+    padding: 1px theme('padding[0.5]');
+    border-radius: theme('borderRadius.sm');
+    color: theme('colors.primary.DEFAULT');
+    background-color: hsl(var(--primary) / 0.15);
+  }
+}
 </style>

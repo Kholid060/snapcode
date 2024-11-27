@@ -150,6 +150,9 @@ importers:
       '@atlaskit/pragmatic-drag-and-drop-hitbox':
         specifier: ^1.0.3
         version: 1.0.3
+      '@codemirror/language':
+        specifier: ^6.10.4
+        version: 6.10.4
       '@codemirror/state':
         specifier: ^6.4.1
         version: 6.4.1

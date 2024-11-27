@@ -6,7 +6,6 @@ import {
   MatchDecorator,
   ViewPlugin,
   ViewUpdate,
-  WidgetType,
 } from '@codemirror/view';
 
 export const themeExtension = tokyoNightInit({
@@ -21,58 +20,36 @@ export const themeExtension = tokyoNightInit({
 export const onUpdateExtension = (cb: (update: ViewUpdate) => void) =>
   EditorView.updateListener.of(cb);
 
-class PlaceholderWidget extends WidgetType {
-  constructor(private value: string) {
-    super();
-  }
-
-  toDOM(): HTMLElement {
-    const span = document.createElement('span');
-
-    span.textContent = this.value;
-    span.className = 'bg-red-400 rounded text-white px-1 py-0.5';
-
-    return span;
-  }
-
-  updateDOM(): boolean {
-    return true;
-  }
-}
-
-export function snippetPlaceholder({
-  matcherRegex,
-}: { matcherRegex?: RegExp } = {}) {
-  const placeholderMatcher = new MatchDecorator({
-    regexp: matcherRegex ?? /\[\[(\w+)\]\]/g,
-    decoration: (match) =>
-      Decoration.replace({
-        widget: new PlaceholderWidget(match[1]),
-      }),
+export function snippetPlaceholder() {
+  const decoration = Decoration.mark({
+    class: 'cm-snippet-placeholders',
   });
-  const placeholders = ViewPlugin.fromClass(
+  const decorator = new MatchDecorator({
+    regexp: /\[\[(\w+)\]\]/g,
+    decoration: () => decoration,
+  });
+  const highlighterExt = ViewPlugin.fromClass(
     class {
-      placeholders: DecorationSet;
+      decorations: DecorationSet;
 
       constructor(view: EditorView) {
-        this.placeholders = placeholderMatcher.createDeco(view);
+        this.decorations = decorator.createDeco(view);
       }
 
       update(update: ViewUpdate) {
-        this.placeholders = placeholderMatcher.updateDeco(
-          update,
-          this.placeholders,
-        );
+        if (
+          update.docChanged ||
+          update.heightChanged ||
+          update.viewportChanged
+        ) {
+          this.decorations = decorator.updateDeco(update, this.decorations);
+        }
       }
     },
     {
-      decorations: (instance) => instance.placeholders,
-      provide: (plugin) =>
-        EditorView.atomicRanges.of((view) => {
-          return view.plugin(plugin)?.placeholders || Decoration.none;
-        }),
+      decorations: (value) => value.decorations,
     },
   );
 
-  return placeholders;
+  return [highlighterExt];
 }

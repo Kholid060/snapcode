@@ -16,6 +16,7 @@
   "dependencies": {
     "@atlaskit/pragmatic-drag-and-drop": "^1.4.0",
     "@atlaskit/pragmatic-drag-and-drop-hitbox": "^1.0.3",
+    "@codemirror/language": "^6.10.4",
     "@codemirror/state": "^6.4.1",
     "@iconify-json/vscode-icons": "^1.2.2",
     "@snippy/codemirror": "workspace:*",

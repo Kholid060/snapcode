@@ -24,11 +24,12 @@ const content = shallowRef('');
 
 const handleContentChange = useDebounceFn(async (value: string) => {
   try {
+    console.log('save', value);
     await updateSnippet(editorStore.state.activeFileId, { content: value });
   } catch (error) {
     logger.error(getLogMessage('save-snippet-content', error));
   }
-}, 500);
+}, 1000);
 
 watchEffect(async () => {
   if (!editorStore.state.activeFileId) return;
