@@ -473,6 +473,15 @@ importers:
         specifier: 5.5.4
         version: 5.5.4
 
+  packages/utils:
+    devDependencies:
+      '@snippy/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
+      typescript:
+        specifier: ^5.7.2
+        version: 5.7.2
+
 packages:
 
   '@alloc/quick-lru@5.2.0':

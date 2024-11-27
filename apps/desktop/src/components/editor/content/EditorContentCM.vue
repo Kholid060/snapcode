@@ -223,8 +223,12 @@ onUnmounted(() => {
   .cm-snippet-placeholders {
     padding: 1px theme('padding[0.5]');
     border-radius: theme('borderRadius.sm');
-    color: theme('colors.primary.DEFAULT');
     background-color: hsl(var(--primary) / 0.15);
+    color: theme('colors.primary.DEFAULT') !important;
+
+    * {
+      color: theme('colors.primary.DEFAULT') !important;
+    }
   }
 }
 </style>
