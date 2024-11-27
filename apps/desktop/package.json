@@ -29,6 +29,7 @@
     "@uiw/codemirror-theme-tokyo-night": "^4.23.6",
     "@vueuse/core": "^11.0.1",
     "drizzle-orm": "^0.36.4",
+    "lucide-vue-next": "^0.460.0",
     "nanoid": "^5.0.8",
     "pinia": "^2.2.6",
     "radix-vue": "^1.9.10",
@@ -38,6 +39,8 @@
   },
   "devDependencies": {
     "@iconify-json/hugeicons": "^1.2.1",
+    "@iconify-json/mynaui": "^1.2.8",
+    "@iconify-json/solar": "^1.2.1",
     "@snippy/eslint-config": "workspace:*",
     "@tauri-apps/cli": "^2",
     "@vitejs/plugin-vue": "^5.0.5",

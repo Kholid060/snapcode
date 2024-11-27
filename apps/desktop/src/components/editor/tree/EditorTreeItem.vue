@@ -13,7 +13,12 @@
           ? 'bg-primary/40 text-foreground'
           : dragState.isDragging
             ? 'bg-primary text-primary-foreground'
-            : 'hover:bg-accent/65 focus-visible:ring-primary data-[selected]:bg-accent/65 data-[selected]:text-foreground',
+            : 'hover:bg-accent/65 focus-visible:ring-primary',
+        {
+          'bg-accent/65 text-foreground':
+            editorStore.state.activeFileId === item._id &&
+            !dragState.isDragging,
+        },
       ]"
       @select="handleSelect"
       @contextmenu.prevent="
@@ -53,10 +58,7 @@ import type { TreeDataItem } from '@/utils/tree-data-utils';
 import { useEditorStore } from '@/stores/editor.store';
 import { pointerOutsideOfPreview } from '@atlaskit/pragmatic-drag-and-drop/element/pointer-outside-of-preview';
 import { setCustomNativeDragPreview } from '@atlaskit/pragmatic-drag-and-drop/element/set-custom-native-drag-preview';
-import FolderIcon from '~icons/hugeicons/folder-01';
-import FolderOpenIcon from '~icons/hugeicons/folder-02';
 import { combine } from '@atlaskit/pragmatic-drag-and-drop/combine';
-import FileIcon from '~icons/hugeicons/file-01';
 import { useEditorSidebarProvider } from '@/providers/editor.provider';
 import {
   draggable,
@@ -64,6 +66,7 @@ import {
   monitorForElements,
 } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
 import { unrefElement } from '@vueuse/core';
+import { FolderIcon, FolderOpenIcon, FileIcon } from 'lucide-vue-next';
 
 const props = defineProps<{
   item: FlattenedItem<TreeDataItem>;

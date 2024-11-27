@@ -20,10 +20,10 @@
   </aside>
 </template>
 <script setup lang="ts">
-import SearchIcon from '~icons/hugeicons/search-01';
 import EditorSidebarSnippets from './EditorSidebarSnippets.vue';
 import { refDebounced } from '@vueuse/core';
 import EditorSidebarSearch from './EditorSidebarSearch.vue';
+import { SearchIcon } from 'lucide-vue-next';
 
 const search = shallowRef('');
 const debouncedSearch = refDebounced(search, 500);

@@ -8,23 +8,23 @@
         aria-label="New snippet"
         @click="createNewSnippet()"
       >
-        <FileAddIcon />
+        <FilePlusIcon class="size-5" />
       </EditorSidebarIconButton>
     </TooltipSimple>
     <TooltipSimple label="Add folder">
       <EditorSidebarIconButton @click="createNewFolder" class="ml-0.5">
-        <FolderAddIcon />
+        <FolderPlusIcon class="size-[21px]" />
       </EditorSidebarIconButton>
     </TooltipSimple>
     <DropdownMenu>
       <DropdownMenuTrigger as-child>
         <EditorSidebarIconButton class="ml-0.5">
-          <MoreHorizontalIcon />
+          <EllipsisIcon />
         </EditorSidebarIconButton>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem>
-          <GitHubIcon />
+          <img src="@/assets/svg/github-mark-white.svg" class="size-4" />
           Import GitHub gists
         </DropdownMenuItem>
         <DropdownMenuItem>
@@ -55,11 +55,6 @@ import {
   DropdownMenuTrigger,
   useToast,
 } from '@snippy/ui';
-import FolderAddIcon from '~icons/hugeicons/folder-add';
-import FileAddIcon from '~icons/hugeicons/file-add';
-import GitHubIcon from '~icons/hugeicons/github';
-import FileIcon from '~icons/hugeicons/file-01';
-import MoreHorizontalIcon from '~icons/hugeicons/more-horizontal-circle-01';
 import EditorSidebarIconButton from './EditorSidebarIconButton.vue';
 import { useEditorStore } from '@/stores/editor.store';
 import { logger } from '@/services/logger.service';
@@ -73,6 +68,12 @@ import {
 import EditorSidebarContextMenu from './EditorSidebarContextMenu.vue';
 import { watchDebounced } from '@vueuse/core';
 import { store, STORE_KEYS } from '@/services/store.service';
+import {
+  FilePlusIcon,
+  FolderPlusIcon,
+  EllipsisIcon,
+  FileIcon,
+} from 'lucide-vue-next';
 
 defineProps<{
   hide?: boolean;
