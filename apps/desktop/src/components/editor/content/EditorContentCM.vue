@@ -41,7 +41,7 @@
                 }"
               >
                 <span class="grow">{{ language.name }}</span>
-                <CheckIcon
+                <Tick02Icon
                   class="ml-2 size-4"
                   v-if="language.extensions.includes(snippetExt)"
                 />

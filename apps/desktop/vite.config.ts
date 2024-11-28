@@ -1,7 +1,6 @@
 import { fileURLToPath, URL } from 'node:url';
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
-import Icons from 'unplugin-icons/vite';
 import VueRouter from 'unplugin-vue-router/vite';
 import AutoImport from 'unplugin-auto-import/vite';
 
@@ -12,7 +11,6 @@ export default defineConfig(async () => ({
   plugins: [
     VueRouter(),
     vue(),
-    Icons(),
     AutoImport({
       imports: [
         'vue',

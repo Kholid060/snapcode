@@ -30,3 +30,19 @@
     background-color: theme('colors.olive.6'); 
   }
 }
+
+[data-tauri-decorum-tb] {
+  height: theme('height.14') !important;
+  align-items: center !important;
+  width: auto !important;
+  right: 0px !important;
+  left: auto !important;
+
+  button {
+    width: theme('width.12');
+  }
+
+  [data-tauri-drag-region] {
+    display: none;
+  }
+}
