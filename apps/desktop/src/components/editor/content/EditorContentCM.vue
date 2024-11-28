@@ -28,7 +28,7 @@
                 }"
               >
                 <span class="grow">Plain Text</span>
-                <CheckIcon class="ml-2 size-4" v-if="snippetExt === 'txt'" />
+                <Tick02Icon class="ml-2 size-4" v-if="snippetExt === 'txt'" />
               </CommandItem>
               <CommandItem
                 v-for="language in filteredLangs"
@@ -59,7 +59,7 @@
 </template>
 <script setup lang="ts">
 import type { EditorView, ViewUpdate } from '@snippy/codemirror';
-import { CheckIcon } from 'lucide-vue-next';
+import { Tick02Icon } from 'hugeicons-vue';
 import { Compartment } from '@codemirror/state';
 import {
   loadCodemirror,

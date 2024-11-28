@@ -8,18 +8,18 @@
         aria-label="New snippet"
         @click="createNewSnippet()"
       >
-        <FilePlusIcon class="size-5" />
+        <FileAddIcon class="size-5" />
       </EditorSidebarIconButton>
     </TooltipSimple>
     <TooltipSimple label="Add folder">
       <EditorSidebarIconButton @click="createNewFolder" class="ml-0.5">
-        <FolderPlusIcon class="size-[21px]" />
+        <FolderAddIcon class="size-5" />
       </EditorSidebarIconButton>
     </TooltipSimple>
     <DropdownMenu>
       <DropdownMenuTrigger as-child>
         <EditorSidebarIconButton class="ml-0.5">
-          <EllipsisIcon />
+          <MoreHorizontalCircle01Icon />
         </EditorSidebarIconButton>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
@@ -28,7 +28,7 @@
           Import GitHub gists
         </DropdownMenuItem>
         <DropdownMenuItem>
-          <FileIcon />
+          <File01Icon />
           Import from file
         </DropdownMenuItem>
       </DropdownMenuContent>
@@ -69,11 +69,11 @@ import EditorSidebarContextMenu from './EditorSidebarContextMenu.vue';
 import { watchDebounced } from '@vueuse/core';
 import { store, STORE_KEYS } from '@/services/store.service';
 import {
-  FilePlusIcon,
-  FolderPlusIcon,
-  EllipsisIcon,
-  FileIcon,
-} from 'lucide-vue-next';
+  FileAddIcon,
+  FolderAddIcon,
+  File01Icon,
+  MoreHorizontalCircle01Icon,
+} from 'hugeicons-vue';
 
 defineProps<{
   hide?: boolean;

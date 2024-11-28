@@ -6,11 +6,11 @@
     <ContextMenuContent class="context-menu-content min-w-40">
       <template v-if="itemType === 'snippet'">
         <ContextMenuItem @click="copySnippet">
-          <CopyIcon class="mr-2" />
+          <CopyIcon class="mr-2 size-4" />
           Make a copy
         </ContextMenuItem>
         <ContextMenuItem @click="startRenameItem">
-          <PencilEditIcon class="mr-2" />
+          <PencilEditIcon class="mr-2 size-4" />
           Rename
         </ContextMenuItem>
         <ContextMenuSeparator />
@@ -18,17 +18,17 @@
           class="text-destructive-text focus:text-destructive-text"
           @click="deleteItemPrompt"
         >
-          <DeleteIcon class="mr-2" />
+          <DeleteIcon class="mr-2 size-4" />
           Delete
         </ContextMenuItem>
       </template>
       <template v-else>
         <ContextMenuItem @click="createFolderSnippet">
-          <FileAddIcon class="mr-2" />
+          <FileAddIcon class="mr-2 size-4" />
           New snippet
         </ContextMenuItem>
         <ContextMenuItem @click="createFolderFolder">
-          <FolderAddIcon class="mr-2" />
+          <FolderAddIcon class="mr-2 size-4" />
           New folder
         </ContextMenuItem>
         <ContextMenuSeparator />
@@ -38,7 +38,7 @@
             renameDialog.show = true;
           "
         >
-          <PencilEditIcon class="mr-2" />
+          <PencilEditIcon class="mr-2 size-4" />
           Rename
         </ContextMenuItem>
         <ContextMenuSeparator />
@@ -46,7 +46,7 @@
           class="text-destructive-text focus:text-destructive-text"
           @click="deleteItemPrompt"
         >
-          <DeleteIcon class="mr-2" />
+          <DeleteIcon class="mr-2 size-4" />
           Delete
         </ContextMenuItem>
       </template>
@@ -131,11 +131,13 @@ import {
   Button,
   AlertDialogHeader,
 } from '@snippy/ui';
-import FileAddIcon from '~icons/hugeicons/file-add';
-import FolderAddIcon from '~icons/hugeicons/folder-add';
-import CopyIcon from '~icons/hugeicons/copy-01';
-import DeleteIcon from '~icons/hugeicons/delete-02';
-import PencilEditIcon from '~icons/hugeicons/pencil-edit-01';
+import {
+  FileAddIcon,
+  FolderAddIcon,
+  Copy01Icon as CopyIcon,
+  Delete02Icon as DeleteIcon,
+  PencilEdit01Icon as PencilEditIcon,
+} from 'hugeicons-vue';
 
 const props = defineProps<{
   itemId: string;

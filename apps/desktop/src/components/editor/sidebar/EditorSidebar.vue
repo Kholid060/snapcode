@@ -5,7 +5,7 @@
     @dragover.prevent
   >
     <div class="relative h-14 flex-shrink-0 border-b">
-      <SearchIcon
+      <Search01Icon
         class="text-muted-foreground absolute left-4 top-1/2 size-5 -translate-y-1/2"
       />
       <input
@@ -23,7 +23,7 @@
 import EditorSidebarSnippets from './EditorSidebarSnippets.vue';
 import { refDebounced } from '@vueuse/core';
 import EditorSidebarSearch from './EditorSidebarSearch.vue';
-import { SearchIcon } from 'lucide-vue-next';
+import { Search01Icon } from 'hugeicons-vue';
 
 const search = shallowRef('');
 const debouncedSearch = refDebounced(search, 500);

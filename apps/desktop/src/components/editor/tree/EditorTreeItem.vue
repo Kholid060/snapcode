@@ -41,16 +41,16 @@
       <component
         v-if="item.value.isFolder"
         class="size-4 flex-shrink-0"
-        :is="isExpanded ? FolderOpenIcon : FolderIcon"
+        :is="isExpanded ? Folder02Icon : Folder01Icon"
       />
       <AppFileExtIcon
         v-else-if="itemData.ext && itemData.ext !== 'txt'"
         :ext="itemData.ext"
         class="size-4 flex-shrink-0"
       >
-        <FileIcon class="size-4 flex-shrink-0" />
+        <File01Icon class="size-4 flex-shrink-0" />
       </AppFileExtIcon>
-      <FileIcon v-else class="size-4 flex-shrink-0" />
+      <File01Icon v-else class="size-4 flex-shrink-0" />
       <div class="truncate pl-1">
         {{ itemData.name }}
       </div>
@@ -73,7 +73,7 @@ import {
   monitorForElements,
 } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
 import { unrefElement } from '@vueuse/core';
-import { FolderIcon, FolderOpenIcon, FileIcon } from 'lucide-vue-next';
+import { Folder01Icon, Folder02Icon, File01Icon } from 'hugeicons-vue';
 
 const props = defineProps<{
   item: FlattenedItem<TreeDataItem>;
