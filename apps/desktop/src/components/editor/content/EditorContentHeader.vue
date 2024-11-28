@@ -9,11 +9,8 @@
           :default-value="`${activeFile.name ?? ''}.${activeFile.ext ?? 'txt'}`"
           placeholder="Snippet name"
           auto-resize
-          @submit="
-            editorStore.data.updateSnippet(activeFile.id, {
-              name: $event ?? 'Unnamed',
-            })
-          "
+          @update:model-value="isNameFormDirty = true"
+          @submit="updateSnippetName($event ?? 'Unnamed')"
         >
           <EditableArea class="text-foreground">
             <EditablePreview />
@@ -38,19 +35,42 @@ import {
   EditableInput,
   EditablePreview,
 } from 'radix-vue';
+import { onWatcherCleanup } from 'vue';
 import dayjs from '@/lib/dayjs';
+
+let interval = -1;
 
 const editorStore = useEditorStore();
 
 const updatedAtKey = shallowRef(-10000);
+const isNameFormDirty = shallowRef(false);
 
 const activeFile = computed(() => editorStore.data.activeSnippet);
 
-watchEffect((onClenup) => {
-  const interval = setInterval(() => {
-    updatedAtKey.value += 1;
-  }, 60_000);
+function updateSnippetName(name: string) {
+  if (!isNameFormDirty.value) return;
 
-  onClenup(() => clearInterval(interval));
+  editorStore.data.updateSnippet(activeFile.value.id, {
+    name,
+  });
+
+  isNameFormDirty.value = false;
+}
+
+watch(
+  () => activeFile.value.updatedAt,
+  (date) => {
+    clearInterval(interval);
+    if (!date) return;
+
+    interval = setInterval(() => {
+      updatedAtKey.value += 1;
+    }, 60_000);
+
+    onWatcherCleanup(() => clearInterval(interval));
+  },
+);
+onUnmounted(() => {
+  clearInterval(interval);
 });
 </script>
