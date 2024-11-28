@@ -1,12 +1,8 @@
 <template>
-  <aside
-    class="bg-olive-2 flex h-screen w-64 flex-col border-r"
-    @drag.prevent
-    @dragover.prevent
-  >
+  <aside class="bg-olive-2 flex h-screen w-64 flex-col border-r">
     <div class="relative h-14 flex-shrink-0 border-b">
       <Search01Icon
-        class="text-muted-foreground absolute left-4 top-1/2 size-5 -translate-y-1/2"
+        class="text-muted-foreground pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2"
       />
       <input
         v-model="search"

@@ -1,6 +1,6 @@
 <template>
   <div
-    class="codemirror"
+    class="codemirror w-full"
     ref="container-ref"
     style="height: calc(100vh - 5rem)"
   ></div>
@@ -67,6 +67,7 @@ import {
   onUpdateExtension,
   snippetPlaceholder,
   languages,
+  indentWithTabExtension,
 } from '@snippy/codemirror';
 import { useEditorStore } from '@/stores/editor.store';
 import {
@@ -182,7 +183,12 @@ onMounted(() => {
   cmView.value = loadCodemirror({
     doc: props.content,
     parent: containerRef.value!,
-    extensions: [updateListenerExt, languageComp.of([]), snippetPlaceholder()],
+    extensions: [
+      updateListenerExt,
+      snippetPlaceholder(),
+      languageComp.of([]),
+      indentWithTabExtension,
+    ],
   });
 });
 onUnmounted(() => {
