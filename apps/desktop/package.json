@@ -31,6 +31,7 @@
     "@vueuse/core": "^11.0.1",
     "dayjs": "^1.11.13",
     "drizzle-orm": "^0.36.4",
+    "hotkeys-js": "^3.13.7",
     "hugeicons-vue": "^0.0.1",
     "nanoid": "^5.0.8",
     "pinia": "^2.2.6",

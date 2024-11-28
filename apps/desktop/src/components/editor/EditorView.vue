@@ -1,16 +1,14 @@
 <template>
-  <main class="flex h-screen">
-    <div v-if="editorState.status === 'error'">
-      <p>Error!</p>
-      <p>{{ editorState.errorMessage }}</p>
+  <div v-if="editorState.status === 'error'">
+    <p>Error!</p>
+    <p>{{ editorState.errorMessage }}</p>
+  </div>
+  <template v-else-if="editorState.status === 'idle'">
+    <EditorSidebar class="flex-shrink-0" />
+    <div class="flex-1">
+      <EditorContent />
     </div>
-    <template v-else-if="editorState.status === 'idle'">
-      <EditorSidebar />
-      <div class="flex-1">
-        <EditorContent />
-      </div>
-    </template>
-  </main>
+  </template>
 </template>
 <script setup lang="ts">
 import EditorContent from './content/EditorContent.vue';
