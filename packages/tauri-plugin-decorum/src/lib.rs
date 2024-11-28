@@ -128,6 +128,7 @@ impl<'a> WebviewWindowExt for WebviewWindow {
                     &controls,
                     1,
                 );
+                let script_controls = script_controls.replacen("window.__windows", "true", 1);
 
                 win2.eval(script_controls.as_str())
                     .expect("couldn't run js");

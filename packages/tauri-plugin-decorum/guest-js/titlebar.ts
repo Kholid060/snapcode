@@ -1,4 +1,6 @@
 import { core as tauriCore, window as tauriWindow } from '@tauri-apps/api';
+import {} from '@tauri-apps/api/'
+import { debounce } from '@snippy/shared';
 
 function createTitleBarContainer() {
 	let tbEl = document.querySelector<HTMLDivElement>("[data-tauri-decorum-tb]");
@@ -36,7 +38,25 @@ function createTitleBarContainer() {
 	return tbEl;
 }
 
-function createTitleBarControls(container: HTMLElement,  win: tauriWindow.Window) {
+const WIN_CONTROL_ICON = {
+  close: '\uE8BB',
+  minimize: '\uE921',
+  maximize: '\uE922',
+  unmaximize: '\uE923',
+} as const;
+const LINUX_CONTROL_ICON = {
+  close: '@win-close',
+  minimize: '@win-minimize',
+  maximize: '@win-maximize',
+  unmaximize: '@win-restore',
+} as const;
+
+async function createTitleBarControls(container: HTMLElement,  win: tauriWindow.Window) {
+  const isMaximized = await win.isMaximized();
+
+  // @ts-expect-error will replace in lib.rs
+  const controlBtn = window.__windows ? WIN_CONTROL_ICON : LINUX_CONTROL_ICON;
+
   const createControlButton = (id: string) => {
     const btn = document.createElement("button");
     btn.id = "decorum-tb-" + id;
@@ -49,7 +69,7 @@ function createTitleBarControls(container: HTMLElement,  win: tauriWindow.Window
   
     switch (id) {
       case "minimize":
-        btn.innerHTML = "\uE921";
+        btn.innerHTML = controlBtn.minimize;
   
         btn.addEventListener("click", () => {
           clearTimeout(timer);
@@ -58,16 +78,12 @@ function createTitleBarControls(container: HTMLElement,  win: tauriWindow.Window
   
         break;
       case "maximize":
-        btn.innerHTML = "\uE922";
-        win.onResized(() => {
+        btn.innerHTML = isMaximized ? controlBtn.unmaximize : controlBtn.maximize;
+        win.onResized(debounce(() => {
           win.isMaximized().then((maximized) => {
-            if (maximized) {
-              btn.innerHTML = "\uE923";
-            } else {
-              btn.innerHTML = "\uE922";
-            }
+            btn.innerHTML = maximized ? controlBtn.unmaximize : controlBtn.maximize;
           });
-        });
+        }, 500));
   
         btn.addEventListener("click", () => {
           clearTimeout(timer);
@@ -79,7 +95,7 @@ function createTitleBarControls(container: HTMLElement,  win: tauriWindow.Window
         });
         break;
       case "close":
-        btn.innerHTML = "\uE8BB";
+        btn.innerHTML = controlBtn.close;
         btn.addEventListener("click", () => win.close());
         break;
     }
