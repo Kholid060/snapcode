@@ -38,11 +38,16 @@
   right: 0px !important;
   left: auto !important;
 
-  button {
+  .decorum-tb-btn {
     width: theme('width.12');
+
+    &:not(.decorum-tb-close):hover {
+      background-color: theme('colors.secondary.hover');
+    }
   }
 
   [data-tauri-drag-region] {
-    display: none;
+    z-index: -2;
+    position: absolute;
   }
 }

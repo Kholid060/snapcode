@@ -4,21 +4,26 @@
     data-tauri-drag-region
   >
     <template v-if="activeFile">
-      <EditableRoot
-        :default-value="`${activeFile.name ?? ''}.${activeFile.ext ?? 'txt'}`"
-        placeholder="Snippet name"
-        auto-resize
-        @submit="
-          editorStore.data.updateSnippet(activeFile.id, {
-            name: $event ?? 'Unnamed',
-          })
-        "
-      >
-        <EditableArea class="w-[250px] text-white">
-          <EditablePreview />
-          <EditableInput class="w-full placeholder:text-white" />
-        </EditableArea>
-      </EditableRoot>
+      <div>
+        <EditableRoot
+          :default-value="`${activeFile.name ?? ''}.${activeFile.ext ?? 'txt'}`"
+          placeholder="Snippet name"
+          auto-resize
+          @submit="
+            editorStore.data.updateSnippet(activeFile.id, {
+              name: $event ?? 'Unnamed',
+            })
+          "
+        >
+          <EditableArea class="text-foreground">
+            <EditablePreview />
+            <EditableInput class="placeholder:text-foreground w-full" />
+          </EditableArea>
+        </EditableRoot>
+        <p class="text-muted-foreground text-sm leading-tight">
+          Last updated {{ dayjs(activeFile.updatedAt).fromNow() }}
+        </p>
+      </div>
     </template>
   </div>
 </template>
@@ -30,6 +35,7 @@ import {
   EditableInput,
   EditablePreview,
 } from 'radix-vue';
+import dayjs from '@/lib/dayjs';
 
 const editorStore = useEditorStore();
 

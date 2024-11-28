@@ -189,6 +189,9 @@ importers:
       '@vueuse/core':
         specifier: ^11.0.1
         version: 11.3.0(vue@3.5.13(typescript@5.7.2))
+      dayjs:
+        specifier: ^1.11.13
+        version: 1.11.13
       drizzle-orm:
         specifier: ^0.36.4
         version: 0.36.4
@@ -425,6 +428,28 @@ importers:
         version: link:../eslint-config
       typescript:
         specifier: ^5.7.2
+        version: 5.7.2
+
+  packages/tauri-plugin-decorum:
+    dependencies:
+      '@tauri-apps/api':
+        specifier: ^2.1.1
+        version: 2.1.1
+    devDependencies:
+      '@rollup/plugin-node-resolve':
+        specifier: ^15.3.0
+        version: 15.3.0(rollup@4.27.4)
+      '@rollup/plugin-typescript':
+        specifier: ^11.1.6
+        version: 11.1.6(rollup@4.27.4)(tslib@2.8.1)(typescript@5.7.2)
+      rollup:
+        specifier: ^4.9.6
+        version: 4.27.4
+      tslib:
+        specifier: ^2.6.2
+        version: 2.8.1
+      typescript:
+        specifier: ^5.3.3
         version: 5.7.2
 
   packages/ui:
@@ -2156,6 +2181,19 @@ packages:
       rollup:
         optional: true
 
+  '@rollup/plugin-typescript@11.1.6':
+    resolution: {integrity: sha512-R92yOmIACgYdJ7dJ97p4K69I8gg6IEHt8M7dUBxN3W6nrO8uUxX5ixl0yU/N3aZTi8WhPuICvOHXQvF6FaykAA==}
+    engines: {node: '>=14.0.0'}
+    peerDependencies:
+      rollup: ^2.14.0||^3.0.0||^4.0.0
+      tslib: '*'
+      typescript: '>=3.7.0'
+    peerDependenciesMeta:
+      rollup:
+        optional: true
+      tslib:
+        optional: true
+
   '@rollup/pluginutils@4.2.1':
     resolution: {integrity: sha512-iKnFXr7NkdZAIHiIWE+BX5ULi/ucVFYWD6TbAV+rZctiRTY2PL6tsIKhoIOaoskiWAkgu+VsbXgUVDNLHf+InQ==}
     engines: {node: '>= 8.0.0'}
@@ -3831,6 +3869,9 @@ packages:
   data-view-byte-offset@1.0.0:
     resolution: {integrity: sha512-t/Ygsytq+R995EJ5PZlD4Cu56sWa8InXySaViRzw9apusqsOO2bQP+SbYzAhR0pFKoB+43lYy8rWban9JSuXnA==}
     engines: {node: '>= 0.4'}
+
+  dayjs@1.11.13:
+    resolution: {integrity: sha512-oaMBel6gjolK862uaPQOVTA7q3TZhuSvuMQAAglQDOWYO9A91IrAOUJEyKVlqJlHE0vq5p5UXxzdPfMH/x6xNg==}
 
   db0@0.2.1:
     resolution: {integrity: sha512-BWSFmLaCkfyqbSEZBQINMVNjCVfrogi7GQ2RSy1tmtfK9OXlsup6lUMwLsqSD7FbAjD04eWFdXowSHHUp6SE/Q==}
@@ -8728,7 +8769,7 @@ snapshots:
       '@babel/traverse': 7.25.9
       '@babel/types': 7.26.0
       convert-source-map: 2.0.0
-      debug: 4.3.7
+      debug: 4.3.7(supports-color@9.4.0)
       gensync: 1.0.0-beta.2
       json5: 2.2.3
       semver: 6.3.1
@@ -8905,7 +8946,7 @@ snapshots:
       '@babel/parser': 7.26.2
       '@babel/template': 7.25.9
       '@babel/types': 7.26.0
-      debug: 4.3.7
+      debug: 4.3.7(supports-color@9.4.0)
       globals: 11.12.0
     transitivePeerDependencies:
       - supports-color
@@ -9655,7 +9696,7 @@ snapshots:
   '@eslint/config-array@0.19.0':
     dependencies:
       '@eslint/object-schema': 2.1.4
-      debug: 4.3.7
+      debug: 4.3.7(supports-color@9.4.0)
       minimatch: 3.1.2
     transitivePeerDependencies:
       - supports-color
@@ -9703,7 +9744,7 @@ snapshots:
   '@eslint/eslintrc@3.2.0':
     dependencies:
       ajv: 6.12.6
-      debug: 4.3.7
+      debug: 4.3.7(supports-color@9.4.0)
       espree: 10.3.0
       globals: 14.0.0
       ignore: 5.3.2
@@ -10203,34 +10244,6 @@ snapshots:
       - rollup
       - supports-color
 
-  '@nuxt/kit@3.14.1592(rollup@4.27.4)':
-    dependencies:
-      '@nuxt/schema': 3.14.1592(rollup@4.27.4)
-      c12: 2.0.1
-      consola: 3.2.3
-      defu: 6.1.4
-      destr: 2.0.3
-      globby: 14.0.2
-      hash-sum: 2.0.0
-      ignore: 6.0.2
-      jiti: 2.4.0
-      klona: 2.0.6
-      knitwork: 1.1.0
-      mlly: 1.7.3
-      pathe: 1.1.2
-      pkg-types: 1.2.1
-      scule: 1.3.0
-      semver: 7.6.3
-      ufo: 1.5.4
-      unctx: 2.3.1
-      unimport: 3.13.3(rollup@4.27.4)
-      untyped: 1.5.1
-    transitivePeerDependencies:
-      - magicast
-      - rollup
-      - supports-color
-    optional: true
-
   '@nuxt/schema@3.14.1592(magicast@0.3.5)(rollup@4.27.4)':
     dependencies:
       c12: 2.0.1(magicast@0.3.5)
@@ -10250,27 +10263,6 @@ snapshots:
       - magicast
       - rollup
       - supports-color
-
-  '@nuxt/schema@3.14.1592(rollup@4.27.4)':
-    dependencies:
-      c12: 2.0.1
-      compatx: 0.1.8
-      consola: 3.2.3
-      defu: 6.1.4
-      hookable: 5.5.3
-      pathe: 1.1.2
-      pkg-types: 1.2.1
-      scule: 1.3.0
-      std-env: 3.8.0
-      ufo: 1.5.4
-      uncrypto: 0.1.3
-      unimport: 3.13.3(rollup@4.27.4)
-      untyped: 1.5.1
-    transitivePeerDependencies:
-      - magicast
-      - rollup
-      - supports-color
-    optional: true
 
   '@nuxt/telemetry@2.6.0(magicast@0.3.5)(rollup@4.27.4)':
     dependencies:
@@ -10572,6 +10564,15 @@ snapshots:
       terser: 5.36.0
     optionalDependencies:
       rollup: 4.27.4
+
+  '@rollup/plugin-typescript@11.1.6(rollup@4.27.4)(tslib@2.8.1)(typescript@5.7.2)':
+    dependencies:
+      '@rollup/pluginutils': 5.1.3(rollup@4.27.4)
+      resolve: 1.22.8
+      typescript: 5.7.2
+    optionalDependencies:
+      rollup: 4.27.4
+      tslib: 2.8.1
 
   '@rollup/pluginutils@4.2.1':
     dependencies:
@@ -12225,22 +12226,6 @@ snapshots:
       esbuild: 0.24.0
       load-tsconfig: 0.2.5
 
-  c12@2.0.1:
-    dependencies:
-      chokidar: 4.0.1
-      confbox: 0.1.8
-      defu: 6.1.4
-      dotenv: 16.4.5
-      giget: 1.2.3
-      jiti: 2.4.0
-      mlly: 1.7.3
-      ohash: 1.1.4
-      pathe: 1.1.2
-      perfect-debounce: 1.0.0
-      pkg-types: 1.2.1
-      rc9: 2.1.2
-    optional: true
-
   c12@2.0.1(magicast@0.3.5):
     dependencies:
       chokidar: 4.0.1
@@ -12771,6 +12756,8 @@ snapshots:
       es-errors: 1.3.0
       is-data-view: 1.0.1
 
+  dayjs@1.11.13: {}
+
   db0@0.2.1(drizzle-orm@0.36.4):
     optionalDependencies:
       drizzle-orm: 0.36.4
@@ -12784,10 +12771,6 @@ snapshots:
       ms: 2.0.0
 
   debug@3.2.7:
-    dependencies:
-      ms: 2.1.3
-
-  debug@4.3.7:
     dependencies:
       ms: 2.1.3
 
@@ -13101,7 +13084,7 @@ snapshots:
 
   esbuild-register@3.6.0(esbuild@0.19.12):
     dependencies:
-      debug: 4.3.7
+      debug: 4.3.7(supports-color@9.4.0)
       esbuild: 0.19.12
     transitivePeerDependencies:
       - supports-color
@@ -13812,7 +13795,7 @@ snapshots:
       ajv: 6.12.6
       chalk: 4.1.2
       cross-spawn: 7.0.6
-      debug: 4.3.7
+      debug: 4.3.7(supports-color@9.4.0)
       escape-string-regexp: 4.0.0
       eslint-scope: 8.2.0
       eslint-visitor-keys: 4.2.0
@@ -17690,7 +17673,7 @@ snapshots:
       unimport: 3.13.3(rollup@4.27.4)
       unplugin: 1.16.0
     optionalDependencies:
-      '@nuxt/kit': 3.14.1592(rollup@4.27.4)
+      '@nuxt/kit': 3.14.1592(magicast@0.3.5)(rollup@4.27.4)
       '@vueuse/core': 11.3.0(vue@3.5.13(typescript@5.7.2))
     transitivePeerDependencies:
       - rollup

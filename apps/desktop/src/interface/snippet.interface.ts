@@ -5,10 +5,7 @@ export interface SnippetPlaceholder {
   defValue: string;
 }
 
-export type SnippetListItem = Omit<
-  SelectSnippet,
-  'content' | 'placeholders' | 'updatedAt'
->;
+export type SnippetListItem = Omit<SelectSnippet, 'content' | 'placeholders'>;
 
 export type SnippetNewPayload = Omit<NewSnippet, 'id'>;
 
