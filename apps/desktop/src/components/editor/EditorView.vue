@@ -6,12 +6,14 @@
   <template v-else-if="editorState.status === 'idle'">
     <EditorSidebar class="flex-shrink-0" />
     <div class="flex-1">
-      <EditorContent />
+      <EditorContentHeader />
+      <EditorContentCM v-if="editorStore.data.activeSnippet" />
     </div>
   </template>
 </template>
 <script setup lang="ts">
-import EditorContent from './content/EditorContent.vue';
+import EditorContentCM from './content/EditorContentCM.vue';
+import EditorContentHeader from './content/EditorContentHeader.vue';
 import EditorSidebar from './sidebar/EditorSidebar.vue';
 import { useEditorStore } from '@/stores/editor.store';
 

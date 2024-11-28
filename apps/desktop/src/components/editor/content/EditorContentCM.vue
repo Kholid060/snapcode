@@ -58,9 +58,9 @@
   </div>
 </template>
 <script setup lang="ts">
-import type { EditorView, ViewUpdate } from '@snippy/codemirror';
+import type { CMEditorView, ViewUpdate } from '@snippy/codemirror';
 import { Tick02Icon } from 'hugeicons-vue';
-import { Compartment } from '@codemirror/state';
+import { Compartment, EditorState } from '@codemirror/state';
 import {
   loadCodemirror,
   getLanguageByExt,
@@ -84,13 +84,8 @@ import {
 } from '@snippy/ui';
 import { logger } from '@/services/logger.service';
 import { getLogMessage } from '@/utils/helper';
-
-const props = defineProps<{
-  content: string;
-}>();
-const emit = defineEmits<{
-  change: [content: string, editorView: EditorView];
-}>();
+import { getSnippetContent } from '@/db/services/snippet.db-service';
+import { useDebounceFn } from '@vueuse/core';
 
 let isReplaceValue = false;
 const languageComp = new Compartment();
@@ -103,7 +98,7 @@ const editorStore = useEditorStore();
 
 const containerRef = useTemplateRef('container-ref');
 
-const cmView = shallowRef<EditorView>();
+const cmView = shallowRef<CMEditorView>();
 
 const langSelectorState = shallowReactive({
   label: '',
@@ -114,7 +109,7 @@ const cursorPos = shallowReactive({
   line: 0,
 });
 
-const snippetExt = computed(() => editorStore.data.activeSnippet?.ext ?? '');
+const snippetExt = computed(() => editorStore.data.activeSnippet.ext ?? '');
 
 function updateCursorPos(update: ViewUpdate) {
   const head = update.state.selection.main.head;
@@ -140,48 +135,49 @@ async function updateSnippetExt(ext: string) {
   }
 }
 
+const handleContentChange = useDebounceFn(async (value: string) => {
+  try {
+    await editorStore.data.updateSnippet(editorStore.state.activeFileId, {
+      content: value,
+    });
+  } catch (error) {
+    logger.error(getLogMessage('save-snippet-content', error));
+  }
+}, 1000);
+
 watchEffect(async () => {
-  if (!cmView.value || !snippetExt.value) return;
+  const snippet = editorStore.data.activeSnippet;
+  if (!snippet || !cmView.value) return;
 
-  const language = getLanguageByExt(snippetExt.value);
-  const langExt = (await language?.load()) ?? [];
-  cmView.value?.dispatch({
-    effects: languageComp.reconfigure(langExt),
-  });
+  try {
+    const language = getLanguageByExt(snippet.ext ?? '');
+    const langExt = (await language?.load()) ?? [];
+    cmView.value.dispatch({
+      effects: languageComp.reconfigure(langExt),
+    });
+    langSelectorState.label = language ? language.name : 'Plain Text';
 
-  langSelectorState.label = language ? language.name : 'Plain Text';
+    const result = await getSnippetContent(editorStore.state.activeFileId);
+    if (result) {
+      const newState = EditorState.create({ doc: result.content ?? '' });
+      cmView.value.replaceContent(newState);
+    }
+  } catch (error) {
+    logger.error(getLogMessage('get-snippet-content', error));
+  }
 });
-watch(
-  () => props.content,
-  () => {
-    const view = cmView.value;
-    if (!view) return;
-
-    isReplaceValue = true;
-    view.dispatch({
-      changes: {
-        from: 0,
-        insert: props.content,
-        to: view.state.doc.length,
-      },
-    });
-    setTimeout(() => {
-      isReplaceValue = false;
-    });
-  },
-);
 
 onMounted(() => {
   const updateListenerExt = onUpdateExtension((update) => {
     updateCursorPos(update);
 
     if (update.docChanged && !isReplaceValue) {
-      emit('change', update.state.doc.toString(), cmView.value!);
+      handleContentChange(update.state.doc.toString());
     }
   });
 
   cmView.value = loadCodemirror({
-    doc: props.content,
+    doc: '',
     parent: containerRef.value!,
     extensions: [
       updateListenerExt,
