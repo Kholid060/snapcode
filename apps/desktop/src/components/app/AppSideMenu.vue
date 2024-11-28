@@ -27,11 +27,18 @@
         </Button>
       </TooltipSimple>
       <div class="grow"></div>
-      <TooltipSimple label="Settings" side="right">
-        <Button size="icon" variant="ghost">
-          <Settings01Icon class="size-5" />
-        </Button>
-      </TooltipSimple>
+      <Dialog v-model:open="showSettings">
+        <TooltipSimple label="Settings" side="right">
+          <DialogTrigger>
+            <Button size="icon" variant="ghost">
+              <Settings01Icon class="size-5" />
+            </Button>
+          </DialogTrigger>
+        </TooltipSimple>
+        <DialogContent>
+          <p>Settings</p>
+        </DialogContent>
+      </Dialog>
     </div>
   </div>
 </template>
@@ -41,10 +48,18 @@ import {
   AllBookmarkIcon,
   FolderFileStorageIcon,
 } from 'hugeicons-vue';
-import { Button, TooltipSimple } from '@snippy/ui';
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogTrigger,
+  TooltipSimple,
+} from '@snippy/ui';
 import type { Component } from 'vue';
 import type { AppSidebarItems } from '@/interface/app.interface';
 import { useAppStore } from '@/stores/app.store';
+import { useHotkey } from '@/composables/hotkey.composable';
+import { APP_DEFAULT_HOTKEY } from '@/utils/const/app.const';
 
 const items: { icon: Component; id: AppSidebarItems; label: string }[] = [
   { icon: FolderFileStorageIcon, id: 'snippets', label: 'Snippets' },
@@ -52,4 +67,27 @@ const items: { icon: Component; id: AppSidebarItems; label: string }[] = [
 ];
 
 const appStore = useAppStore();
+
+const showSettings = shallowRef(false);
+
+useHotkey(
+  [
+    APP_DEFAULT_HOTKEY.snippetsMenu,
+    APP_DEFAULT_HOTKEY.openSettings,
+    APP_DEFAULT_HOTKEY.bookmarksMenu,
+  ],
+  (_, handler) => {
+    switch (handler.key) {
+      case APP_DEFAULT_HOTKEY.bookmarksMenu:
+        appStore.setActiveSidebar('bookmarks');
+        break;
+      case APP_DEFAULT_HOTKEY.snippetsMenu:
+        appStore.setActiveSidebar('snippets');
+        break;
+      case APP_DEFAULT_HOTKEY.openSettings:
+        showSettings.value = true;
+        break;
+    }
+  },
+);
 </script>

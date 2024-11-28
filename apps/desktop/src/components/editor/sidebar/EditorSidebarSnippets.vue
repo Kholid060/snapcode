@@ -74,6 +74,8 @@ import {
   File01Icon,
   MoreHorizontalCircle01Icon,
 } from 'hugeicons-vue';
+import { useHotkey } from '@/composables/hotkey.composable';
+import { APP_DEFAULT_HOTKEY } from '@/utils/const/app.const';
 
 defineProps<{
   hide?: boolean;
@@ -133,6 +135,20 @@ provide<EditorSidebarProvider>(EDITOR_SIDEBAR_PROVIDER_KEY, {
     dragData.value = data;
   },
 });
+
+useHotkey(
+  [APP_DEFAULT_HOTKEY.newSnippet, APP_DEFAULT_HOTKEY.newFolder],
+  (_, handler) => {
+    switch (handler.key) {
+      case APP_DEFAULT_HOTKEY.newSnippet:
+        createNewSnippet();
+        break;
+      case APP_DEFAULT_HOTKEY.newFolder:
+        createNewFolder();
+        break;
+    }
+  },
+);
 
 watchDebounced(
   () => [editorStore.state.activeFileId, editorStore.state.activeFolderIds],
