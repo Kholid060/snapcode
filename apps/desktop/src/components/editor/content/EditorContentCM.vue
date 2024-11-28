@@ -52,7 +52,7 @@
       </PopoverContent>
     </Popover>
     <div class="grow"></div>
-    <p class="text-muted-foreground cursor-default text-right text-xs">
+    <p class="text-muted-foreground min-w-20 cursor-default text-right text-xs">
       Ln {{ cursorPos.line }}, Col {{ cursorPos.col }}
     </p>
   </div>

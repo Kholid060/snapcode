@@ -184,6 +184,7 @@ const useEditorDataStore = defineStore('editor:snippets', () => {
       name: snippet.name,
       tags: snippet.tags,
       folderId: snippet.folderId,
+      updatedAt: snippet.updatedAt,
     };
   }
 

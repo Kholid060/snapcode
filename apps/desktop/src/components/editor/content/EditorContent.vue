@@ -10,10 +10,7 @@
 import { useEditorStore } from '@/stores/editor.store';
 import EditorContentHeader from './EditorContentHeader.vue';
 import EditorContentCM from './EditorContentCM.vue';
-import {
-  getSnippetContent,
-  updateSnippet,
-} from '@/db/services/snippet.db-service';
+import { getSnippetContent } from '@/db/services/snippet.db-service';
 import { useDebounceFn } from '@vueuse/core';
 import { logger } from '@/services/logger.service';
 import { getLogMessage } from '@/utils/helper';
@@ -24,8 +21,9 @@ const content = shallowRef('');
 
 const handleContentChange = useDebounceFn(async (value: string) => {
   try {
-    console.log('save', value);
-    await updateSnippet(editorStore.state.activeFileId, { content: value });
+    await editorStore.data.updateSnippet(editorStore.state.activeFileId, {
+      content: value,
+    });
   } catch (error) {
     logger.error(getLogMessage('save-snippet-content', error));
   }

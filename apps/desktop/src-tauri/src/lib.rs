@@ -33,12 +33,6 @@ pub fn run() {
             let main_window = app.get_webview_window("main").unwrap();
             main_window.create_overlay_titlebar().unwrap();
 
-            // #[cfg(target_os="windows")]
-            // {
-            //     main_window.title
-            //     main_window.set_title_bar_style(tauri::utils::TitleBarStyle::Overlay)?;
-            // }
-
             Ok(())
         })
         .run(tauri::generate_context!())

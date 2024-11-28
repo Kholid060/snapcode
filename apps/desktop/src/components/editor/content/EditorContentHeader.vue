@@ -20,7 +20,10 @@
             <EditableInput class="placeholder:text-foreground w-full" />
           </EditableArea>
         </EditableRoot>
-        <p class="text-muted-foreground text-sm leading-tight">
+        <p
+          class="text-muted-foreground text-sm leading-tight"
+          :key="updatedAtKey"
+        >
           Last updated {{ dayjs(activeFile.updatedAt).fromNow() }}
         </p>
       </div>
@@ -39,5 +42,15 @@ import dayjs from '@/lib/dayjs';
 
 const editorStore = useEditorStore();
 
+const updatedAtKey = shallowRef(-10000);
+
 const activeFile = computed(() => editorStore.data.activeSnippet);
+
+watchEffect((onClenup) => {
+  const interval = setInterval(() => {
+    updatedAtKey.value += 1;
+  }, 60_000);
+
+  onClenup(() => clearInterval(interval));
+});
 </script>
