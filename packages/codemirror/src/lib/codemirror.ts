@@ -1,5 +1,6 @@
-import { EditorView, EditorViewConfig } from '@codemirror/view';
+import { EditorView, EditorViewConfig, keymap } from '@codemirror/view';
 import { basicSetup } from 'codemirror';
+import { vscodeKeymap } from '@replit/codemirror-vscode-keymap';
 import { languages } from '@codemirror/language-data';
 import { themeExtension } from './extensions';
 
@@ -13,7 +14,12 @@ export function getLanguageByExt(ext: string) {
 export function loadCodemirror(config: EditorViewConfig = {}) {
   return new EditorView({
     ...config,
-    extensions: [basicSetup, themeExtension, config.extensions ?? []],
+    extensions: [
+      basicSetup,
+      themeExtension,
+      keymap.of(vscodeKeymap),
+      config.extensions ?? [],
+    ],
   });
 }
 

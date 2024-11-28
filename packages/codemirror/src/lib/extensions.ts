@@ -1,8 +1,10 @@
 import { EditorView } from 'codemirror';
+import { indentWithTab } from '@codemirror/commands';
 import { tokyoNightInit } from '@uiw/codemirror-theme-tokyo-night';
 import {
   Decoration,
   DecorationSet,
+  keymap,
   MatchDecorator,
   ViewPlugin,
   ViewUpdate,
@@ -53,3 +55,5 @@ export function snippetPlaceholder() {
 
   return [highlighterExt];
 }
+
+export const indentWithTabExtension = keymap.of([indentWithTab]);

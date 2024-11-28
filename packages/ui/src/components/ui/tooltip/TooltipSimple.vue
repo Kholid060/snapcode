@@ -3,12 +3,18 @@
     <TooltipTrigger as-child>
       <slot />
     </TooltipTrigger>
-    <TooltipContent class="px-3 text-xs">
+    <TooltipContent
+      :align="align"
+      :side="side"
+      :align-offset="alignOffset"
+      :side-offset="sideOffset"
+    >
       {{ label }}
     </TooltipContent>
   </Tooltip>
 </template>
 <script setup lang="ts">
+import type { TooltipContentProps } from 'radix-vue';
 import {
   type TooltipRootEmits,
   type TooltipRootProps,
@@ -19,7 +25,13 @@ import TooltipTrigger from './TooltipTrigger.vue';
 import TooltipContent from './TooltipContent.vue';
 
 const emits = defineEmits<TooltipRootEmits>();
-const props = defineProps<TooltipRootProps & { label: string }>();
+const props = defineProps<
+  TooltipRootProps &
+    Pick<
+      TooltipContentProps,
+      'align' | 'side' | 'sideOffset' | 'alignOffset'
+    > & { label: string }
+>();
 
 const forwarded = useForwardPropsEmits(props, emits);
 </script>

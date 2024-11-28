@@ -195,6 +195,9 @@ importers:
       drizzle-orm:
         specifier: ^0.36.4
         version: 0.36.4
+      hotkeys-js:
+        specifier: ^3.13.7
+        version: 3.13.7
       hugeicons-vue:
         specifier: ^0.0.1
         version: 0.0.1(vue@3.5.13(typescript@5.7.2))
@@ -368,6 +371,9 @@ importers:
       '@codemirror/view':
         specifier: ^6.35.0
         version: 6.35.0
+      '@replit/codemirror-vscode-keymap':
+        specifier: ^6.0.2
+        version: 6.0.2(@codemirror/autocomplete@6.18.3(@codemirror/language@6.10.4)(@codemirror/state@6.4.1)(@codemirror/view@6.35.0)(@lezer/common@1.2.3))(@codemirror/commands@6.7.1)(@codemirror/language@6.10.4)(@codemirror/lint@6.8.3)(@codemirror/search@6.5.8)(@codemirror/state@6.4.1)(@codemirror/view@6.35.0)
       '@uiw/codemirror-theme-tokyo-night':
         specifier: ^4.23.6
         version: 4.23.6(@codemirror/language@6.10.4)(@codemirror/state@6.4.1)(@codemirror/view@6.35.0)
@@ -2117,6 +2123,17 @@ packages:
   '@redocly/openapi-core@1.25.13':
     resolution: {integrity: sha512-8O2IdHCHU1EaGc74/Z5nTItfPrakvPEwZ6sf16c/u5ZJJBo3SKbqM2vOLk4spY4Tn0eaAwUxw2b0kXueemp+iw==}
     engines: {node: '>=14.19.0', npm: '>=7.0.0'}
+
+  '@replit/codemirror-vscode-keymap@6.0.2':
+    resolution: {integrity: sha512-j45qTwGxzpsv82lMD/NreGDORFKSctMDVkGRopaP+OrzSzv+pXDQuU3LnFvKpasyjVT0lf+PKG1v2DSCn/vxxg==}
+    peerDependencies:
+      '@codemirror/autocomplete': ^6.0.0
+      '@codemirror/commands': ^6.0.0
+      '@codemirror/language': ^6.0.0
+      '@codemirror/lint': ^6.0.0
+      '@codemirror/search': ^6.0.0
+      '@codemirror/state': ^6.0.0
+      '@codemirror/view': ^6.0.0
 
   '@rollup/plugin-alias@5.1.1':
     resolution: {integrity: sha512-PR9zDb+rOzkRb2VD+EuKB7UC41vU5DIwZ5qqCpk0KJudcWAyi8rvYOhS7+L5aZCspw1stTViLgN5v6FF1p5cgQ==}
@@ -5168,6 +5185,9 @@ packages:
 
   hosted-git-info@2.8.9:
     resolution: {integrity: sha512-mxIDAb9Lsm6DoOJ7xH+5+X4y1LU/4Hi50L9C5sIswK3JzULS4bwk1FvjdBgvYR4bzT4tuUQiC15FE2f5HbLvYw==}
+
+  hotkeys-js@3.13.7:
+    resolution: {integrity: sha512-ygFIdTqqwG4fFP7kkiYlvayZppeIQX2aPpirsngkv1xM1lP0piDY5QEh68nQnIKvz64hfocxhBaD/uK3sSK1yQ==}
 
   html-encoding-sniffer@4.0.0:
     resolution: {integrity: sha512-Y22oTqIU4uuPgEemfz7NDJz6OeKf12Lsu+QC+s3BVpda64lTiMYCyGwg5ki4vFxkMwQdeZDl2adZoqUgdFuTgQ==}
@@ -10564,6 +10584,16 @@ snapshots:
       - encoding
       - supports-color
 
+  '@replit/codemirror-vscode-keymap@6.0.2(@codemirror/autocomplete@6.18.3(@codemirror/language@6.10.4)(@codemirror/state@6.4.1)(@codemirror/view@6.35.0)(@lezer/common@1.2.3))(@codemirror/commands@6.7.1)(@codemirror/language@6.10.4)(@codemirror/lint@6.8.3)(@codemirror/search@6.5.8)(@codemirror/state@6.4.1)(@codemirror/view@6.35.0)':
+    dependencies:
+      '@codemirror/autocomplete': 6.18.3(@codemirror/language@6.10.4)(@codemirror/state@6.4.1)(@codemirror/view@6.35.0)(@lezer/common@1.2.3)
+      '@codemirror/commands': 6.7.1
+      '@codemirror/language': 6.10.4
+      '@codemirror/lint': 6.8.3
+      '@codemirror/search': 6.5.8
+      '@codemirror/state': 6.4.1
+      '@codemirror/view': 6.35.0
+
   '@rollup/plugin-alias@5.1.1(rollup@4.27.4)':
     optionalDependencies:
       rollup: 4.27.4
@@ -12828,10 +12858,6 @@ snapshots:
     dependencies:
       ms: 2.1.3
 
-  debug@4.3.7:
-    dependencies:
-      ms: 2.1.3
-
   debug@4.3.7(supports-color@9.4.0):
     dependencies:
       ms: 2.1.3
@@ -14412,6 +14438,8 @@ snapshots:
   hookable@5.5.3: {}
 
   hosted-git-info@2.8.9: {}
+
+  hotkeys-js@3.13.7: {}
 
   html-encoding-sniffer@4.0.0:
     dependencies:
@@ -17535,7 +17563,7 @@ snapshots:
       cac: 6.7.14
       chokidar: 4.0.1
       consola: 3.2.3
-      debug: 4.3.7
+      debug: 4.3.7(supports-color@9.4.0)
       esbuild: 0.24.0
       joycon: 3.1.1
       picocolors: 1.1.1

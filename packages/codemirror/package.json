@@ -31,6 +31,7 @@
     "@codemirror/legacy-modes": "^6.4.2",
     "@codemirror/state": "^6.4.1",
     "@codemirror/view": "^6.35.0",
+    "@replit/codemirror-vscode-keymap": "^6.0.2",
     "@uiw/codemirror-theme-tokyo-night": "^4.23.6",
     "codemirror": "^6.0.1",
     "vue": "^3.5.13"
