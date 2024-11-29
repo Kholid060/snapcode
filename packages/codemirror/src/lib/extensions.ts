@@ -13,8 +13,8 @@ import {
 export const themeExtension = tokyoNightInit({
   settings: {
     background: 'transparent',
-    gutterBackground: 'transparent',
     selection: 'hsl(var(--lime-4))',
+    gutterBackground: 'hsl(var(--background))',
     lineHighlight: 'hsl(var(--accent) / 0.45)',
   },
 });

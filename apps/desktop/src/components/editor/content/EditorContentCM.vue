@@ -197,7 +197,13 @@ onUnmounted(() => {
 .codemirror {
   .cm-scroller {
     padding: theme('padding.1');
+    padding-left: 0;
     padding-bottom: 0;
+  }
+
+  .cm-gutters {
+    user-select: none;
+    padding-left: theme('padding.1');
   }
 
   .cm-search.cm-panel {

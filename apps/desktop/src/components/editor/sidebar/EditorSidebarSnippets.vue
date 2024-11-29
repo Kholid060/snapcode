@@ -27,7 +27,7 @@
           <img src="@/assets/svg/github-mark-white.svg" class="size-4" />
           Import GitHub gists
         </DropdownMenuItem>
-        <DropdownMenuItem>
+        <DropdownMenuItem @click="importSnippetFromFiles">
           <File01Icon />
           Import from file
         </DropdownMenuItem>
@@ -76,6 +76,9 @@ import {
 } from 'hugeicons-vue';
 import { useHotkey } from '@/composables/hotkey.composable';
 import { APP_DEFAULT_HOTKEY } from '@/utils/const/app.const';
+import SnippetCommands from '@/services/commands/SnippetCommands';
+import { getLogMessage } from '@/utils/helper';
+import { useSelectFolder } from '@/providers/app-select-folder.provider';
 
 defineProps<{
   hide?: boolean;
@@ -83,6 +86,7 @@ defineProps<{
 
 const { toast } = useToast();
 const editorStore = useEditorStore();
+const selectFolder = useSelectFolder();
 
 const contextMenuTrigger = useTemplateRef('context-menu-trigger');
 
@@ -97,7 +101,7 @@ const contextMenuItemData = shallowReactive<{
 
 async function createNewSnippet() {
   try {
-    await editorStore.data.addSnippet();
+    await editorStore.data.addSnippets();
   } catch (error) {
     if (error instanceof Error) {
       await logger.error(`[create-snippet] ${error.message}`);
@@ -126,6 +130,28 @@ function handleContextMenu({ event, id, type }: EditorSidebarContextMenuData) {
 
   contextMenuTrigger.value.dispatchEvent(new PointerEvent(event.type, event));
   Object.assign(contextMenuItemData, { id, type });
+}
+async function importSnippetFromFiles() {
+  try {
+    const files = await SnippetCommands.importSnippetFromFiles();
+    if (files.length === 0) return;
+
+    const selectedFolder = await selectFolder.open({
+      title: 'Select folder to put the snippets',
+    });
+    if (selectedFolder.canceled) return;
+
+    await editorStore.data.addSnippets(
+      files.map((file) => ({
+        ext: file.ext,
+        name: file.name,
+        content: file.content,
+        folderId: selectedFolder.folderId,
+      })),
+    );
+  } catch (error) {
+    logger.error(getLogMessage('import-snippet-from-file', error));
+  }
 }
 
 provide<EditorSidebarProvider>(EDITOR_SIDEBAR_PROVIDER_KEY, {

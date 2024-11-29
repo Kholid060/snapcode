@@ -28,4 +28,8 @@ tauri-plugin-log = "2.0.2"
 tauri-plugin-store = "2.1.0"
 tauri-plugin-decorum = { "path" = "../../../packages/tauri-plugin-decorum" }
 tauri-plugin-os = "2.0.1"
+grep-matcher = "0.1.7"
+grep-searcher = "0.1.14"
+grep-regex = "0.1.13"
+tauri-plugin-dialog = "2.0.3"
 

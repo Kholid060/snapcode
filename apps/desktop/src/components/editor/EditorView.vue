@@ -5,7 +5,7 @@
   </div>
   <template v-else-if="editorState.status === 'idle'">
     <EditorSidebar class="flex-shrink-0" />
-    <div class="flex-1">
+    <div class="min-w-0 grow">
       <EditorContentHeader />
       <EditorContentCM v-if="editorStore.data.activeSnippet" />
     </div>

@@ -5,10 +5,6 @@
     </ContextMenuTrigger>
     <ContextMenuContent class="context-menu-content min-w-40">
       <template v-if="itemType === 'snippet'">
-        <ContextMenuItem @click="copySnippet">
-          <CopyIcon class="mr-2 size-4" />
-          Make a copy
-        </ContextMenuItem>
         <ContextMenuItem @click="startRenameItem">
           <PencilEditIcon class="mr-2 size-4" />
           Rename
@@ -134,7 +130,6 @@ import {
 import {
   FileAddIcon,
   FolderAddIcon,
-  Copy01Icon as CopyIcon,
   Delete02Icon as DeleteIcon,
   PencilEdit01Icon as PencilEditIcon,
 } from 'hugeicons-vue';
@@ -165,7 +160,7 @@ function getData() {
 async function createFolderSnippet() {
   try {
     if (props.itemType !== 'folder') return;
-    await editorStore.data.addSnippet({ folderId: props.itemId });
+    await editorStore.data.addSnippets({ folderId: props.itemId });
   } catch (error) {
     logger.error(getLogMessage('sidebar-create-snip-ctx-menu', error));
     toast({
@@ -245,27 +240,6 @@ function startRenameItem() {
 
   renameDialog.newName = name;
   renameDialog.show = true;
-}
-
-async function copySnippet() {
-  try {
-    const snippetData = editorStore.data.snippets[props.itemId];
-    if (!snippetData) return;
-
-    await editorStore.data.addSnippet({
-      ...structuredClone(toRaw(snippetData)),
-      name: `${snippetData.name} (copy)`,
-      // @ts-expect-error remove snippet id
-      id: undefined,
-    });
-  } catch (error) {
-    logger.error(getLogMessage('sidebar-copy-ctx-menu', error));
-    console.error(error);
-    toast({
-      variant: 'destructive',
-      title: `Error copying snippet`,
-    });
-  }
 }
 </script>
 <style>

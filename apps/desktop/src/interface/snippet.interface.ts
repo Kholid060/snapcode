@@ -12,3 +12,9 @@ export type SnippetNewPayload = Omit<NewSnippet, 'id'>;
 export type SnippetUpdatePayload = Partial<
   Omit<NewSnippet, 'id' | 'createdAt' | 'updatedAt'>
 >;
+
+export interface SnippetImportFileItem {
+  ext: string;
+  name: string;
+  content: string;
+}

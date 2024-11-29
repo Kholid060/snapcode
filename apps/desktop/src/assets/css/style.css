@@ -31,6 +31,10 @@
   }
 }
 
+html {
+  overflow: hidden;
+}
+
 [data-tauri-decorum-tb] {
   background-color: theme('colors.background');
   height: theme('height.14') !important;

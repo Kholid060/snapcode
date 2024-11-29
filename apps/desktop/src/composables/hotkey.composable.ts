@@ -1,6 +1,7 @@
 import hotkeys, { KeyHandler } from 'hotkeys-js';
 import { platform } from '@tauri-apps/plugin-os';
 
+console.log(platform);
 interface KeyOption {
   scope: string;
   key: string | string[];

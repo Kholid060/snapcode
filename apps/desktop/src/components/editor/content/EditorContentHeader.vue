@@ -6,7 +6,7 @@
     <template v-if="activeFile">
       <div>
         <EditableRoot
-          :default-value="`${activeFile.name ?? ''}.${activeFile.ext ?? 'txt'}`"
+          :model-value="`${activeFile.name ?? ''}.${activeFile.ext ?? 'txt'}`"
           placeholder="Snippet name"
           auto-resize
           @update:model-value="isNameFormDirty = true"
@@ -18,7 +18,7 @@
           </EditableArea>
         </EditableRoot>
         <p
-          class="text-muted-foreground text-sm leading-tight"
+          class="text-muted-foreground select-none text-sm leading-tight"
           :key="updatedAtKey"
         >
           Last updated {{ dayjs(activeFile.updatedAt).fromNow() }}
@@ -58,7 +58,7 @@ function updateSnippetName(name: string) {
 }
 
 watch(
-  () => activeFile.value.updatedAt,
+  () => activeFile.value?.updatedAt,
   (date) => {
     clearInterval(interval);
     if (!date) return;
