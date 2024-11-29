@@ -12,7 +12,7 @@
       />
       <UiEditable
         value=""
-        class="bg-secondary highlight-white/10 text-muted-foreground ml-4 h-7 min-w-24 rounded-md px-1 py-1 text-sm before:pl-1"
+        class="bg-secondary hover:bg-secondary-hover text-muted-foreground ml-4 h-7 min-w-24 rounded-md border px-1 py-1 text-sm transition before:pl-1"
         placeholder="keyword"
       />
       <div class="pointer-events-none grow"></div>

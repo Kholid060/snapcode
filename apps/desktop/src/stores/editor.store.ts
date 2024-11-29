@@ -114,7 +114,7 @@ const useEditorDataStore = defineStore('editor:snippets', () => {
     addTreeItem([itemData], folder.to ?? undefined);
   }
 
-  async function addSnippets(payload: SnippetNewPayload[] = []) {
+  async function addSnippets(payload: SnippetNewPayload[]) {
     if (payload.length === 0) return;
 
     const addedSnippets = await snippetService.createNewSnippets(payload);

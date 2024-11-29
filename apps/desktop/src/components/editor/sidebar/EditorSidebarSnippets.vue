@@ -101,7 +101,7 @@ const contextMenuItemData = shallowReactive<{
 
 async function createNewSnippet() {
   try {
-    await editorStore.data.addSnippets();
+    await editorStore.data.addSnippets([{}]);
   } catch (error) {
     if (error instanceof Error) {
       await logger.error(`[create-snippet] ${error.message}`);
