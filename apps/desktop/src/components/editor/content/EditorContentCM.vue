@@ -134,6 +134,16 @@ async function updateSnippetExt(ext: string) {
     });
   }
 }
+async function loadLanguageExt() {
+  if (!cmView.value) return;
+
+  const language = getLanguageByExt(snippetExt.value ?? '');
+  const langExt = (await language?.load()) ?? [];
+  cmView.value.dispatch({
+    effects: languageComp.reconfigure(langExt),
+  });
+  langSelectorState.label = language ? language.name : 'Plain Text';
+}
 
 const handleContentChange = useDebounceFn(async (value: string) => {
   try {
@@ -146,26 +156,24 @@ const handleContentChange = useDebounceFn(async (value: string) => {
 }, 1000);
 
 watchEffect(async () => {
-  const snippet = editorStore.data.activeSnippet;
-  if (!snippet || !cmView.value) return;
+  const snippetId = editorStore.state.activeFileId;
+  if (!snippetId || !cmView.value) return;
 
   try {
-    const language = getLanguageByExt(snippet.ext ?? '');
-    const langExt = (await language?.load()) ?? [];
-    cmView.value.dispatch({
-      effects: languageComp.reconfigure(langExt),
-    });
-    langSelectorState.label = language ? language.name : 'Plain Text';
-
-    const result = await getSnippetContent(editorStore.state.activeFileId);
+    const result = await getSnippetContent(snippetId);
     if (result) {
-      const newState = EditorState.create({ doc: result.content ?? '' });
+      const newState = EditorState.create({
+        doc: result.content ?? '',
+      });
       cmView.value.replaceContent(newState);
+
+      await loadLanguageExt();
     }
   } catch (error) {
     logger.error(getLogMessage('get-snippet-content', error));
   }
 });
+watch(snippetExt, loadLanguageExt);
 
 onMounted(() => {
   const updateListenerExt = onUpdateExtension((update) => {
@@ -186,6 +194,7 @@ onMounted(() => {
       indentWithTabExtension,
     ],
   });
+  loadLanguageExt();
 });
 onUnmounted(() => {
   cmView.value?.destroy();
