@@ -7,7 +7,7 @@
       draggable="true"
       :value="item.value"
       :level="item.level"
-      class="relative z-10 flex h-7 w-full items-center rounded border-none pl-2 outline-none focus-visible:ring-2"
+      class="data-[selected]:bg-accent/65 relative z-10 flex h-7 w-full items-center rounded border-none pl-2 outline-none focus-visible:ring-2"
       :class="[
         dragState.isDragOver
           ? 'bg-primary/40 text-foreground'

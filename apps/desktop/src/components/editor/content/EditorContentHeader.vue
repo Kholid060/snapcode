@@ -4,73 +4,35 @@
     data-tauri-drag-region
   >
     <template v-if="activeFile">
-      <div>
-        <EditableRoot
-          :model-value="`${activeFile.name ?? ''}.${activeFile.ext ?? 'txt'}`"
-          placeholder="Snippet name"
-          auto-resize
-          @update:model-value="isNameFormDirty = true"
-          @submit="updateSnippetName($event ?? 'Unnamed')"
-        >
-          <EditableArea class="text-foreground">
-            <EditablePreview />
-            <EditableInput class="placeholder:text-foreground w-full" />
-          </EditableArea>
-        </EditableRoot>
-        <p
-          class="text-muted-foreground select-none text-sm leading-tight"
-          :key="updatedAtKey"
-        >
-          Last updated {{ dayjs(activeFile.updatedAt).fromNow() }}
-        </p>
-      </div>
+      <UiEditable
+        :value="`${activeFile.name ?? ''}.${activeFile.ext ?? 'txt'}`"
+        placeholder="Snippet name"
+        class="hover:bg-secondary focus:bg-secondary -ml-1 inline-block flex-shrink-0 truncate rounded px-1 py-0.5 transition before:pl-1 focus:outline-none"
+        @submit="$event.isDirty && updateSnippetName($event.value ?? 'Unnamed')"
+      />
+      <UiEditable
+        value=""
+        class="bg-secondary highlight-white/10 text-muted-foreground ml-4 h-7 min-w-24 rounded-md px-1 py-1 text-sm before:pl-1"
+        placeholder="keyword"
+      />
+      <div class="pointer-events-none grow"></div>
+      <span class="bg-border h-3/5 w-px" />
     </template>
   </div>
 </template>
 <script setup lang="ts">
+import UiEditable from '@/components/ui/UiEditable.vue';
 import { useEditorStore } from '@/stores/editor.store';
-import {
-  EditableRoot,
-  EditableArea,
-  EditableInput,
-  EditablePreview,
-} from 'radix-vue';
-import { onWatcherCleanup } from 'vue';
-import dayjs from '@/lib/dayjs';
-
-let interval = -1;
 
 const editorStore = useEditorStore();
-
-const updatedAtKey = shallowRef(-10000);
-const isNameFormDirty = shallowRef(false);
 
 const activeFile = computed(() => editorStore.data.activeSnippet);
 
 function updateSnippetName(name: string) {
-  if (!isNameFormDirty.value) return;
-
   editorStore.data.updateSnippet(activeFile.value.id, {
     name,
   });
-
-  isNameFormDirty.value = false;
 }
 
-watch(
-  () => activeFile.value?.updatedAt,
-  (date) => {
-    clearInterval(interval);
-    if (!date) return;
-
-    interval = setInterval(() => {
-      updatedAtKey.value += 1;
-    }, 60_000);
-
-    onWatcherCleanup(() => clearInterval(interval));
-  },
-);
-onUnmounted(() => {
-  clearInterval(interval);
-});
+onUnmounted(() => {});
 </script>

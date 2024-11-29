@@ -36,7 +36,8 @@ html {
 }
 
 [data-tauri-decorum-tb] {
-  background-color: theme('colors.background');
+  border-bottom: 1px solid theme('colors.border');
+  background-color: theme('colors.background') !important;
   height: theme('height.14') !important;
   align-items: center !important;
   width: auto !important;
