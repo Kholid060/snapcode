@@ -15,6 +15,13 @@
       "when": 1732957227814,
       "tag": "0001_nostalgic_ironclad",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1732958081874,
+      "tag": "0002_eager_quasar",
+      "breakpoints": true
     }
   ]
 }

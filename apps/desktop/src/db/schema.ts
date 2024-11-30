@@ -19,6 +19,7 @@ export const foldersTable = sqliteTable(
     createdAt: integer('created_at', { mode: 'timestamp' }).$default(
       () => new Date(),
     ),
+    isBookmark: integer('is_bookmark', { mode: 'boolean' }),
     parentId: text('parent_id').references(
       (): AnySQLiteColumn => foldersTable.id,
       { onDelete: 'cascade' },
@@ -30,6 +31,7 @@ export const foldersTable = sqliteTable(
   (table) => ({
     nameIdx: index('folder_name_idx').on(table.name),
     parentIdx: index('folder_parent_idx').on(table.parentId),
+    bookmarkIdx: index('folder_bookmark_idx').on(table.isBookmark),
     createdAtIdx: index('folder_created_at_idx').on(table.createdAt),
   }),
 );
@@ -61,6 +63,7 @@ export const snippetsTable = sqliteTable(
     createdAt: integer('created_at', { mode: 'timestamp' }).$default(
       () => new Date(),
     ),
+    isBookmark: integer('is_bookmark', { mode: 'boolean' }),
     folderId: text('folder_id').references(() => foldersTable.id, {
       onDelete: 'cascade',
     }),
@@ -73,6 +76,7 @@ export const snippetsTable = sqliteTable(
     nameIdx: index('snippet_name_idx').on(table.name),
     tagsIdx: index('snippet_tags_idx').on(table.tags),
     folderIdx: index('snippet_folder_idx').on(table.folderId),
+    bookmarkIdx: index('snippet_bookmark_idx').on(table.isBookmark),
     createdAtIdx: index('snippet_created_at_idx').on(table.createdAt),
   }),
 );
