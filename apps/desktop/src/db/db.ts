@@ -22,6 +22,9 @@ export const db = drizzle(
   },
 );
 
+export type DB = typeof db;
+export type DBTransaction = Parameters<typeof db.transaction>[0];
+
 function isSelectQuery(sql: string): boolean {
   return /^\s*SELECT|RETURNING\b/i.test(sql);
 }

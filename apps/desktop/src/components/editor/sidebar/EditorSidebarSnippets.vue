@@ -36,6 +36,7 @@
   </div>
   <EditorTreeRoot
     v-show="!hide"
+    :is-hidden="hide"
     class="custom-scroll grow overflow-auto px-2 pb-4 pt-1"
   />
   <EditorSidebarContextMenu
@@ -78,15 +79,15 @@ import { useHotkey } from '@/composables/hotkey.composable';
 import { APP_DEFAULT_HOTKEY } from '@/utils/const/app.const';
 import SnippetCommands from '@/services/commands/SnippetCommands';
 import { getLogMessage } from '@/utils/helper';
-import { useSelectFolder } from '@/providers/app-select-folder.provider';
+import { useAppDialog } from '@/providers/app-dialog.provider';
 
 defineProps<{
   hide?: boolean;
 }>();
 
 const { toast } = useToast();
+const appDialog = useAppDialog();
 const editorStore = useEditorStore();
-const selectFolder = useSelectFolder();
 
 const contextMenuTrigger = useTemplateRef('context-menu-trigger');
 
@@ -136,8 +137,8 @@ async function importSnippetFromFiles() {
     const files = await SnippetCommands.importSnippetFromFiles();
     if (files.length === 0) return;
 
-    const selectedFolder = await selectFolder.open({
-      title: 'Select folder to put the snippets',
+    const selectedFolder = await appDialog.selectFolder({
+      title: 'Select a folder where to put the snippets',
     });
     if (selectedFolder.canceled) return;
 

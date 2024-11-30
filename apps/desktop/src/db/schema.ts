@@ -51,6 +51,7 @@ export const snippetsTable = sqliteTable(
       .primaryKey()
       .$default(() => nanoid()),
     ext: text('ext').default('txt'),
+    keyword: text('keyword').default('txt'),
     content: text('content').default(''),
     name: text('name').default('Unnamed'),
     tags: text({ mode: 'json' })

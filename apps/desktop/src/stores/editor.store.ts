@@ -130,6 +130,7 @@ const useEditorDataStore = defineStore('editor:snippets', () => {
         ext: snippet.ext,
         name: snippet.name,
         tags: snippet.tags,
+        keyword: snippet.keyword,
         folderId: snippet.folderId,
         updatedAt: snippet.updatedAt,
         createdAt: snippet.createdAt,
@@ -195,7 +196,7 @@ const useEditorDataStore = defineStore('editor:snippets', () => {
 
     for (const item of items) {
       if (!item.isFolder) {
-        if (state.activeFileId === item.id) state.setActiveFile(item.id);
+        if (state.activeFileId === item.id) state.setActiveFile('');
 
         delete snippets.value[item.id];
 
@@ -249,6 +250,35 @@ const useEditorDataStore = defineStore('editor:snippets', () => {
     };
   }
 
+  async function deleteItems(items: TreeDataItem[]) {
+    const folderIds: string[] = [];
+    const snippetIds: string[] = [];
+
+    for (const item of items) {
+      (item.isFolder ? folderIds : snippetIds).push(item.id);
+    }
+
+    await folderService.deleteFolders(folderIds);
+    await snippetService.deleteSnippets(snippetIds);
+
+    folderIds.forEach((folderId) => {
+      const folder = folders.value[folderId];
+      if (!folder) return;
+
+      deleteTreeItem(folderId, folder.parentId ?? undefined);
+      deleteFolderRecursive(folderId);
+
+      delete folders.value[folderId];
+    });
+    snippetIds.forEach((snippetId) => {
+      const snippet = snippets.value[snippetId];
+      if (!snippet) return;
+
+      deleteTreeItem(snippetId, snippet.folderId ?? undefined);
+      delete snippets.value[snippetId];
+    });
+  }
+
   async function init() {
     if (initiated) return;
 
@@ -277,6 +307,7 @@ const useEditorDataStore = defineStore('editor:snippets', () => {
     treeData,
     snippets,
     addFolder,
+    deleteItems,
     addSnippets,
     deleteFolder,
     updateFolder,

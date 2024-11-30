@@ -1,10 +1,10 @@
 import hotkeys, { KeyHandler } from 'hotkeys-js';
 import { platform } from '@tauri-apps/plugin-os';
-
-console.log(platform);
+import { unrefElement } from '@vueuse/core';
 interface KeyOption {
-  scope: string;
+  scope?: string;
   key: string | string[];
+  element?: MaybeRef<HTMLElement | null>;
 }
 interface ParsedHotkey {
   key: string;
@@ -42,29 +42,38 @@ export function useHotkey(
   option: string | string[] | KeyOption,
   handlerFn: KeyHandler,
 ) {
-  let parsedHotkey: ParsedHotkey;
+  watchEffect((onCleanUp) => {
+    let parsedHotkey: ParsedHotkey;
 
-  const handler: KeyHandler = (event, hkEvent) => {
-    if (parsedHotkey.parsedKeys.has(hkEvent.key)) {
-      handlerFn(event, {
-        ...hkEvent,
-        key: parsedHotkey.parsedKeys.get(hkEvent.key)!,
-      });
-      return;
+    const handler: KeyHandler = (event, hkEvent) => {
+      if (parsedHotkey.parsedKeys.has(hkEvent.key)) {
+        handlerFn(event, {
+          ...hkEvent,
+          key: parsedHotkey.parsedKeys.get(hkEvent.key)!,
+        });
+        return;
+      }
+
+      handlerFn(event, hkEvent);
+    };
+
+    if (typeof option === 'string' || Array.isArray(option)) {
+      parsedHotkey = parseKey(option);
+      hotkeys(parsedHotkey.key, handler);
+    } else {
+      parsedHotkey = parseKey(option.key);
+      hotkeys(
+        parsedHotkey.key,
+        {
+          scope: option.scope,
+          element: unrefElement(option.element),
+        },
+        handler,
+      );
     }
 
-    handlerFn(event, hkEvent);
-  };
-
-  if (typeof option === 'string' || Array.isArray(option)) {
-    parsedHotkey = parseKey(option);
-    hotkeys(parsedHotkey.key, handler);
-  } else {
-    parsedHotkey = parseKey(option.key);
-    hotkeys(parsedHotkey.key, option.scope, handler);
-  }
-
-  onUnmounted(() => {
-    hotkeys.unbind(parsedHotkey.key, handler);
+    onCleanUp(() => {
+      hotkeys.unbind(parsedHotkey.key, handler);
+    });
   });
 }

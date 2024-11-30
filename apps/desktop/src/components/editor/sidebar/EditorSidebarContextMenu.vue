@@ -5,14 +5,14 @@
     </ContextMenuTrigger>
     <ContextMenuContent class="context-menu-content min-w-40">
       <template v-if="itemType === 'snippet'">
-        <ContextMenuItem @click="startRenameItem">
+        <ContextMenuItem @click="renameItem">
           <PencilEditIcon class="mr-2 size-4" />
           Rename
         </ContextMenuItem>
         <ContextMenuSeparator />
         <ContextMenuItem
           class="text-destructive-text focus:text-destructive-text"
-          @click="deleteItemPrompt"
+          @click="deleteItem"
         >
           <DeleteIcon class="mr-2 size-4" />
           Delete
@@ -28,19 +28,14 @@
           New folder
         </ContextMenuItem>
         <ContextMenuSeparator />
-        <ContextMenuItem
-          @click="
-            renameDialog.newName = getData().name ?? '';
-            renameDialog.show = true;
-          "
-        >
+        <ContextMenuItem @click="renameItem">
           <PencilEditIcon class="mr-2 size-4" />
           Rename
         </ContextMenuItem>
         <ContextMenuSeparator />
         <ContextMenuItem
           class="text-destructive-text focus:text-destructive-text"
-          @click="deleteItemPrompt"
+          @click="deleteItem"
         >
           <DeleteIcon class="mr-2 size-4" />
           Delete
@@ -48,57 +43,9 @@
       </template>
     </ContextMenuContent>
   </ContextMenu>
-  <AlertDialog v-model:open="deleteDialog.show">
-    <AlertDialogContent>
-      <AlertDialogHeader>
-        <AlertDialogTitle>
-          {{ itemType === 'folder' ? 'Delete folder?' : 'Delete snippet?' }}
-        </AlertDialogTitle>
-        <AlertDialogDescription>
-          Are you sure you want to delete
-          <span class="font-semibold">"{{ getData()?.name ?? '' }}"</span>? This
-          will be permanently deleted and it cannot be undone.
-        </AlertDialogDescription>
-      </AlertDialogHeader>
-      <AlertDialogFooter class="mt-4 items-center">
-        <Checkbox
-          id="dont-ask-prompt"
-          v-model:checked="deleteDialog.dontAskPrompt"
-        />
-        <label
-          for="dont-ask-prompt"
-          class="text-muted-foreground select-none text-sm"
-        >
-          Don't ask again
-        </label>
-        <div class="grow"></div>
-        <AlertDialogCancel>Cancel</AlertDialogCancel>
-        <AlertDialogAction variant="destructive" @click="deleteItem">
-          Delete
-        </AlertDialogAction>
-      </AlertDialogFooter>
-    </AlertDialogContent>
-  </AlertDialog>
-  <Dialog v-model:open="renameDialog.show">
-    <DialogContent class="max-w-md">
-      <DialogHeader>
-        <DialogTitle>
-          {{ itemType === 'folder' ? 'Rename folder' : 'Rename snippet' }}
-        </DialogTitle>
-      </DialogHeader>
-      <form @submit.prevent="renameItem">
-        <Input
-          :placeholder="itemType === 'folder' ? 'unnamed' : 'unnamed.txt'"
-          v-model="renameDialog.newName"
-        />
-        <DialogFooter class="mt-6">
-          <Button type="submit">Rename</Button>
-        </DialogFooter>
-      </form>
-    </DialogContent>
-  </Dialog>
 </template>
 <script setup lang="ts">
+import { useAppDialog } from '@/providers/app-dialog.provider';
 import { logger } from '@/services/logger.service';
 import { store, STORE_KEYS } from '@/services/store.service';
 import { useEditorStore } from '@/stores/editor.store';
@@ -106,26 +53,10 @@ import { getLogMessage } from '@/utils/helper';
 import {
   ContextMenuItem,
   ContextMenuSeparator,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  DialogHeader,
-  AlertDialogTitle,
-  AlertDialog,
   ContextMenu,
   ContextMenuContent,
   ContextMenuTrigger,
-  Checkbox,
-  AlertDialogCancel,
-  AlertDialogAction,
   useToast,
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  Input,
-  DialogFooter,
-  Button,
-  AlertDialogHeader,
 } from '@snippy/ui';
 import {
   FileAddIcon,
@@ -140,16 +71,8 @@ const props = defineProps<{
 }>();
 
 const { toast } = useToast();
+const appDialog = useAppDialog();
 const editorStore = useEditorStore();
-
-const deleteDialog = shallowReactive({
-  show: false,
-  dontAskPrompt: false,
-});
-const renameDialog = shallowReactive({
-  show: false,
-  newName: '',
-});
 
 function getData() {
   return props.itemType === 'snippet'
@@ -160,7 +83,7 @@ function getData() {
 async function createFolderSnippet() {
   try {
     if (props.itemType !== 'folder') return;
-    await editorStore.data.addSnippets({ folderId: props.itemId });
+    await editorStore.data.addSnippets([{ folderId: props.itemId }]);
   } catch (error) {
     logger.error(getLogMessage('sidebar-create-snip-ctx-menu', error));
     toast({
@@ -185,16 +108,27 @@ async function createFolderFolder() {
 
 async function renameItem() {
   try {
+    const data = getData();
+    if (!data) return;
+
+    let name = data.name ?? '';
+    if ('ext' in data) name += `.${data.ext}`;
+
+    const result = await appDialog.prompt({
+      defaultValue: name,
+      okBtnLabel: 'Rename',
+      placeholder: props.itemType === 'folder' ? 'unnamed' : 'unnamed.txt',
+      title: props.itemType === 'folder' ? 'Rename folder' : 'Rename snippet',
+    });
+    if (result.canceled) return;
+
     await (props.itemType === 'folder'
       ? editorStore.data.updateFolder(props.itemId, {
-          name: renameDialog.newName,
+          name: result.value,
         })
       : editorStore.data.updateSnippet(props.itemId, {
-          name: renameDialog.newName,
+          name: result.value,
         }));
-
-    renameDialog.newName = '';
-    renameDialog.show = false;
   } catch (error) {
     logger.error(getLogMessage('sidebar-rename-ctx-menu', error));
     toast({
@@ -205,14 +139,29 @@ async function renameItem() {
 }
 async function deleteItem() {
   try {
+    const dontShowDialog = await store.get<boolean>(STORE_KEYS.noDeletePrompt);
+    let dontAskPrompt = false;
+
+    if (!dontShowDialog) {
+      const { isConfirmed, dontAskValue } = await appDialog.confirm({
+        title:
+          props.itemType === 'folder' ? 'Delete folder?' : 'Delete snippet?',
+        body: `Are you sure you want to delete "${getData()?.name ?? ''}"? This will be permanently deleted and it cannot be undone.`,
+        okBtnLabel: 'Delete',
+        okBtnVariant: 'destructive',
+        showDontAsk: true,
+      });
+      if (!isConfirmed) return;
+
+      dontAskPrompt = dontAskValue;
+    }
+
     await (props.itemType === 'folder'
       ? editorStore.data.deleteFolder(props.itemId)
       : editorStore.data.deleteSnippet(props.itemId));
 
-    deleteDialog.show = false;
-
-    if (deleteDialog.dontAskPrompt) {
-      await store.set(STORE_KEYS.noDeletePrompt, deleteDialog.dontAskPrompt);
+    if (dontAskPrompt) {
+      await store.set(STORE_KEYS.noDeletePrompt, true);
     }
   } catch (error) {
     logger.error(getLogMessage('sidebar-delete-ctx-menu', error));
@@ -221,25 +170,6 @@ async function deleteItem() {
       title: `Error deleting ${props.itemType}`,
     });
   }
-}
-async function deleteItemPrompt() {
-  const dontShowDialog = await store.get<boolean>(STORE_KEYS.noDeletePrompt);
-  if (!dontShowDialog) {
-    deleteDialog.show = true;
-    return;
-  }
-
-  deleteItem();
-}
-function startRenameItem() {
-  const data = getData();
-  if (!data) return;
-
-  let name = data.name ?? '';
-  if ('ext' in data) name += `.${data.ext}`;
-
-  renameDialog.newName = name;
-  renameDialog.show = true;
 }
 </script>
 <style>

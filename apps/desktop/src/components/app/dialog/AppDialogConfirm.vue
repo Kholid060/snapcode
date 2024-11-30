@@ -12,7 +12,7 @@
           {{ options.body }}
         </AlertDialogDescription>
       </AlertDialogHeader>
-      <AlertDialogFooter class="mt-4">
+      <AlertDialogFooter class="mt-4 items-center justify-start">
         <template v-if="options.showDontAsk">
           <Checkbox
             id="dont-ask-prompt"
@@ -25,6 +25,7 @@
             Don't ask again
           </label>
         </template>
+        <div class="grow"></div>
         <AlertDialogCancel>
           {{ options.cancelBtnLabel ?? 'Cancel' }}
         </AlertDialogCancel>

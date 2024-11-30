@@ -1,67 +1,65 @@
 <template>
-  <div class="relative">
-    <TreeItem
-      ref="tree-item"
-      v-bind="item.bind"
-      v-slot="{ isExpanded }"
-      draggable="true"
-      :value="item.value"
-      :level="item.level"
-      class="data-[selected]:bg-accent/65 relative z-10 flex h-7 w-full items-center rounded border-none pl-2 outline-none focus-visible:ring-2"
-      :class="[
-        dragState.isDragOver
-          ? 'bg-primary/40 text-foreground'
-          : dragState.isDragging
-            ? 'bg-primary text-primary-foreground'
-            : 'hover:bg-accent/65 focus-visible:ring-primary',
-        {
-          'bg-accent/65 text-foreground':
-            editorStore.state.activeFileId === item._id &&
-            !dragState.isDragging,
-        },
-      ]"
-      @select="handleSelect"
-      @contextmenu.prevent="
-        sidebarProvider.handleContextMenu({
-          id: item._id,
-          event: $event,
-          type: item.value.isFolder ? 'folder' : 'snippet',
-        })
-      "
-      :title="itemData.name"
-    >
-      <template v-if="item.level > 1">
-        <span
-          v-for="i in item.level - 1"
-          :key="'indent' + item._id + i"
-          class="border-border/60 pointer-events-none inline-block h-full w-4 flex-shrink-0 border-l"
-        >
-        </span>
-      </template>
-      <component
-        v-if="item.value.isFolder"
-        class="size-4 flex-shrink-0"
-        :is="isExpanded ? Folder02Icon : Folder01Icon"
-      />
-      <AppFileExtIcon
-        v-else-if="itemData.ext && itemData.ext !== 'txt'"
-        :ext="itemData.ext"
-        class="size-4 flex-shrink-0"
+  <TreeItem
+    ref="tree-item"
+    v-bind="item.bind"
+    v-slot="{ isExpanded }"
+    draggable="true"
+    :value="item.value"
+    :level="item.level"
+    class="data-[selected]:bg-primary/10 relative z-10 flex h-7 w-full items-center rounded border-none pl-2 outline-none focus-visible:ring-2"
+    :class="[
+      dragState.isDragOver
+        ? 'bg-primary/40 text-foreground'
+        : dragState.isDragging
+          ? 'bg-primary text-primary-foreground'
+          : 'hover:bg-accent/65 focus-visible:ring-primary',
+      {
+        'bg-accent/65 text-foreground':
+          editorStore.state.activeFileId === item._id && !dragState.isDragging,
+      },
+    ]"
+    @toggle="handleToggle"
+    @contextmenu.prevent="
+      sidebarProvider.handleContextMenu({
+        id: item._id,
+        event: $event,
+        type: item.value.isFolder ? 'folder' : 'snippet',
+      })
+    "
+    :title="itemData.name"
+  >
+    <template v-if="item.level > 1">
+      <span
+        v-for="i in item.level - 1"
+        :key="'indent' + item._id + i"
+        class="border-border/60 pointer-events-none inline-block h-full w-4 flex-shrink-0 border-l"
       >
-        <File01Icon class="size-4 flex-shrink-0" />
-      </AppFileExtIcon>
-      <File01Icon v-else class="size-4 flex-shrink-0" />
-      <div class="truncate pl-1">
-        {{ itemData.name }}
-      </div>
-    </TreeItem>
-  </div>
+      </span>
+    </template>
+    <component
+      v-if="item.value.isFolder"
+      class="size-4 flex-shrink-0"
+      :is="isExpanded ? Folder02Icon : Folder01Icon"
+    />
+    <AppFileExtIcon
+      v-else-if="itemData.ext && itemData.ext !== 'txt'"
+      :ext="itemData.ext"
+      class="size-4 flex-shrink-0"
+    >
+      <File01Icon class="size-4 flex-shrink-0" />
+    </AppFileExtIcon>
+    <File01Icon v-else class="size-4 flex-shrink-0" />
+    <div class="truncate pl-1">
+      {{ itemData.name }}
+    </div>
+  </TreeItem>
 </template>
 
 <script setup lang="ts">
 import { computed, render } from 'vue';
+import type { TreeItemToggleEvent } from 'radix-vue';
 import { type FlattenedItem, TreeItem } from 'radix-vue';
-import type { TreeDataItem } from '@/utils/tree-data-utils';
+import { type TreeDataItem } from '@/utils/tree-data-utils';
 import { useEditorStore } from '@/stores/editor.store';
 import { pointerOutsideOfPreview } from '@atlaskit/pragmatic-drag-and-drop/element/pointer-outside-of-preview';
 import { setCustomNativeDragPreview } from '@atlaskit/pragmatic-drag-and-drop/element/set-custom-native-drag-preview';
@@ -114,13 +112,15 @@ const itemData = computed(() => {
       };
 });
 
-function handleSelect(event: CustomEvent) {
-  if (props.item.value.isFolder) {
+function handleToggle(event: TreeItemToggleEvent<TreeDataItem>) {
+  const { originalEvent } = event.detail;
+  if (
+    originalEvent instanceof PointerEvent &&
+    (originalEvent.ctrlKey || originalEvent.metaKey || originalEvent.shiftKey)
+  ) {
     event.preventDefault();
     return;
   }
-
-  editorStore.state.setActiveFile(props.item._id);
 }
 function expandItem() {
   if (!treeItemEl.value?.isExpanded) {

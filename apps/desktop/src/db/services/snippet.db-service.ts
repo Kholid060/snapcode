@@ -18,6 +18,7 @@ export async function getAllSnippets(): Promise<SnippetListItem[]> {
       ext: true,
       tags: true,
       name: true,
+      keyword: true,
       folderId: true,
       updatedAt: true,
       createdAt: true,

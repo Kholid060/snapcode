@@ -11,7 +11,7 @@
         @submit="$event.isDirty && updateSnippetName($event.value ?? 'Unnamed')"
       />
       <UiEditable
-        value=""
+        :value="activeFile.keyword ?? ''"
         class="bg-secondary hover:bg-secondary-hover text-muted-foreground ml-4 h-7 min-w-24 rounded-md border px-1 py-1 text-sm transition before:pl-1"
         placeholder="keyword"
       />
