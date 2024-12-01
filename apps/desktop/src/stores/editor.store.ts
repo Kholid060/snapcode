@@ -1,5 +1,6 @@
 import * as folderService from '@/db/services/folder.db-service';
 import * as snippetService from '@/db/services/snippet.db-service';
+import { EditorSidebarState } from '@/interface/editor.interface';
 import {
   FolderListItem,
   FolderNewPayload,
@@ -10,7 +11,7 @@ import {
   SnippetNewPayload,
   SnippetUpdatePayload,
 } from '@/interface/snippet.interface';
-import { store, STORE_KEYS } from '@/services/store.service';
+import { store } from '@/services/store.service';
 import { getSnippetExtFromName } from '@/utils/snippet-utils';
 import {
   buildTreeData,
@@ -18,35 +19,54 @@ import {
   TreeData,
   TreeDataItem,
 } from '@/utils/tree-data-utils';
+import { watchDebounced } from '@vueuse/core';
 import { defineStore } from 'pinia';
+
+const DEFAULT_SIDEBAR_STATE: EditorSidebarState = {
+  show: true,
+  activeFileId: '',
+  activeFolderIds: [],
+  activeMenu: 'snippets',
+};
 
 const useEditorState = defineStore('editor:state', () => {
   let initiated = false;
 
-  const activeFileId = ref('');
-  const activeFolderIds = ref<string[]>([]);
+  const sidebarState = reactive<EditorSidebarState>({
+    ...DEFAULT_SIDEBAR_STATE,
+  });
 
-  function setActiveFile(fileId: string) {
-    activeFileId.value = fileId;
+  function setSidebarState<T extends keyof EditorSidebarState>(
+    key: T,
+    value: EditorSidebarState[T],
+  ) {
+    sidebarState[key] = value;
   }
   async function init() {
     if (initiated) return;
 
-    const storeData = await Promise.all([
-      store.get<string>(STORE_KEYS.editorActiveFile),
-      store.get<string[]>(STORE_KEYS.editorActiveDirs),
-    ]);
-    activeFileId.value = storeData[0]!;
-    activeFolderIds.value = storeData[1]!;
+    const storeData = await store.xGet(store.xKeys.editorSidebarState, {
+      ...DEFAULT_SIDEBAR_STATE,
+    });
+    Object.assign(sidebarState, storeData);
 
     initiated = true;
   }
 
+  watchDebounced(
+    sidebarState,
+    () => {
+      if (!initiated) return;
+
+      store.xSet(store.xKeys.editorSidebarState, toRaw(sidebarState));
+    },
+    { debounce: 500 },
+  );
+
   return {
     init,
-    activeFileId,
-    setActiveFile,
-    activeFolderIds,
+    sidebarState,
+    setSidebarState,
   };
 });
 
@@ -60,7 +80,7 @@ const useEditorDataStore = defineStore('editor:snippets', () => {
   const snippets = ref<Record<string, SnippetListItem>>({});
 
   const activeSnippet = computed(
-    () => snippets.value[state.activeFileId] ?? null,
+    () => snippets.value[state.sidebarState.activeFileId] ?? null,
   );
 
   function deleteTreeItem(itemId: string, folderId: string = TREE_ROOT_KEY) {
@@ -134,6 +154,7 @@ const useEditorDataStore = defineStore('editor:snippets', () => {
         folderId: snippet.folderId,
         updatedAt: snippet.updatedAt,
         createdAt: snippet.createdAt,
+        isBookmark: snippet.isBookmark,
       };
     });
 
@@ -141,7 +162,10 @@ const useEditorDataStore = defineStore('editor:snippets', () => {
       addTreeItem(groupedSnippets[folderId], folderId);
     }
 
-    state.setActiveFile(addedSnippets[addedSnippets.length - 1]?.id ?? '');
+    state.setSidebarState(
+      'activeFileId',
+      addedSnippets[addedSnippets.length - 1]?.id ?? '',
+    );
   }
   async function deleteSnippet(snippetId: string) {
     const snippetData = snippets.value[snippetId];
@@ -150,7 +174,9 @@ const useEditorDataStore = defineStore('editor:snippets', () => {
     await snippetService.deleteSnippets(snippetId);
     deleteTreeItem(snippetId, snippetData.folderId ?? undefined);
 
-    if (state.activeFileId === snippetId) state.setActiveFile(snippetId);
+    if (state.sidebarState.activeFileId === snippetId) {
+      state.setSidebarState('activeFileId', snippetId);
+    }
 
     delete snippets.value[snippetId];
   }
@@ -196,7 +222,9 @@ const useEditorDataStore = defineStore('editor:snippets', () => {
 
     for (const item of items) {
       if (!item.isFolder) {
-        if (state.activeFileId === item.id) state.setActiveFile('');
+        if (state.sidebarState.activeFileId === item.id) {
+          state.setSidebarState('activeFileId', '');
+        }
 
         delete snippets.value[item.id];
 

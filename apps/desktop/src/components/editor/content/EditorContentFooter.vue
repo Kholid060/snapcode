@@ -1,5 +1,12 @@
 <template>
   <div class="text-muted-foreground flex h-6 items-center border-t px-2">
+    <p class="min-w-20 cursor-default text-xs">
+      Ln {{ cursorPos.line }}, Col {{ cursorPos.col }}
+    </p>
+    <p class="select-none text-xs leading-tight" :key="updatedAtKey">
+      Last updated {{ dayjs(activeSnippet.updatedAt).fromNow() }}
+    </p>
+    <div class="grow"></div>
     <Popover v-model:open="openLangSelector">
       <PopoverTrigger as-child>
         <button
@@ -51,14 +58,6 @@
         </Command>
       </PopoverContent>
     </Popover>
-    <div class="bg-border mx-2 h-4 w-px"></div>
-    <p class="select-none text-xs leading-tight" :key="updatedAtKey">
-      Last updated {{ dayjs(activeSnippet.updatedAt).fromNow() }}
-    </p>
-    <div class="grow"></div>
-    <p class="min-w-20 cursor-default text-right text-xs">
-      Ln {{ cursorPos.line }}, Col {{ cursorPos.col }}
-    </p>
   </div>
 </template>
 <script setup lang="ts">

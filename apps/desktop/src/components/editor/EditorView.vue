@@ -4,7 +4,10 @@
     <p>{{ editorState.errorMessage }}</p>
   </div>
   <template v-else-if="editorState.status === 'idle'">
-    <EditorSidebar class="flex-shrink-0" />
+    <EditorSidebar
+      v-if="editorStore.state.sidebarState.show"
+      class="flex-shrink-0"
+    />
     <div class="min-w-0 grow">
       <EditorContentHeader />
       <EditorContentCM v-if="editorStore.data.activeSnippet" />

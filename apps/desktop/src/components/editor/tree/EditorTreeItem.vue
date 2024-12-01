@@ -6,17 +6,17 @@
     draggable="true"
     :value="item.value"
     :level="item.level"
-    class="data-[selected]:bg-primary/10 relative z-10 flex h-7 w-full items-center rounded border-none pl-2 outline-none focus-visible:ring-2"
+    class="data-[selected]:bg-primary/20 data-[selected]:text-foreground relative z-10 flex h-7 w-full items-center rounded border-none pl-2 outline-none focus-visible:ring-2"
     :class="[
       dragState.isDragOver
-        ? 'bg-primary/40 text-foreground'
+        ? 'bg-primary/20 text-foreground'
         : dragState.isDragging
           ? 'bg-primary text-primary-foreground'
-          : 'hover:bg-accent/65 focus-visible:ring-primary',
-      {
-        'bg-accent/65 text-foreground':
-          editorStore.state.activeFileId === item._id && !dragState.isDragging,
-      },
+          : 'focus-visible:ring-primary',
+      editorStore.state.sidebarState.activeFileId === item._id &&
+      !dragState.isDragging
+        ? 'bg-accent/70 text-foreground'
+        : 'hover:bg-accent/70',
     ]"
     @toggle="handleToggle"
     @contextmenu.prevent="

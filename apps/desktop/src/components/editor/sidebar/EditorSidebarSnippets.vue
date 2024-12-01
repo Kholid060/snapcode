@@ -1,5 +1,5 @@
 <template>
-  <div v-show="!hide" class="flex items-center p-4 pb-1">
+  <div class="flex items-center p-4 pb-1">
     <p class="text-muted-foreground grow cursor-default text-sm font-semibold">
       Snippets
     </p>
@@ -8,18 +8,18 @@
         aria-label="New snippet"
         @click="createNewSnippet()"
       >
-        <FileAddIcon class="size-5" />
+        <FileAddIcon class="size-[18px]" />
       </EditorSidebarIconButton>
     </TooltipSimple>
     <TooltipSimple label="Add folder">
       <EditorSidebarIconButton @click="createNewFolder" class="ml-0.5">
-        <FolderAddIcon class="size-5" />
+        <FolderAddIcon class="size-[18px]" />
       </EditorSidebarIconButton>
     </TooltipSimple>
     <DropdownMenu>
       <DropdownMenuTrigger as-child>
         <EditorSidebarIconButton class="ml-0.5">
-          <MoreHorizontalCircle01Icon />
+          <MoreHorizontalCircle01Icon class="size-[18px]" />
         </EditorSidebarIconButton>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
@@ -34,11 +34,7 @@
       </DropdownMenuContent>
     </DropdownMenu>
   </div>
-  <EditorTreeRoot
-    v-show="!hide"
-    :is-hidden="hide"
-    class="custom-scroll grow overflow-auto px-2 pb-4 pt-1"
-  />
+  <EditorTreeRoot class="custom-scroll grow overflow-auto px-2 pb-4 pt-2" />
   <EditorSidebarContextMenu
     :item-id="contextMenuItemData.id"
     :item-type="contextMenuItemData.type"
@@ -67,8 +63,6 @@ import {
   type EditorSidebarProvider,
 } from '@/providers/editor.provider';
 import EditorSidebarContextMenu from './EditorSidebarContextMenu.vue';
-import { watchDebounced } from '@vueuse/core';
-import { store, STORE_KEYS } from '@/services/store.service';
 import {
   FileAddIcon,
   FolderAddIcon,
@@ -175,14 +169,5 @@ useHotkey(
         break;
     }
   },
-);
-
-watchDebounced(
-  () => [editorStore.state.activeFileId, editorStore.state.activeFolderIds],
-  ([activeFileId, activeFolderIds]) => {
-    store.set(STORE_KEYS.editorActiveFile, toRaw(activeFileId ?? ''));
-    store.set(STORE_KEYS.editorActiveDirs, toRaw(activeFolderIds) ?? []);
-  },
-  { debounce: 500, deep: true },
 );
 </script>

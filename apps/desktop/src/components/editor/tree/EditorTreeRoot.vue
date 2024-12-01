@@ -8,10 +8,10 @@
     :get-children="getChildren"
     multiple
     selection-behavior="replace"
-    v-model:expanded="editorStore.state.activeFolderIds"
+    v-model:expanded="editorStore.state.sidebarState.activeFolderIds"
     v-model="selectedItems"
   >
-    <div ref="items-container">
+    <div ref="items-container" class="space-y-px">
       <EditorTreeItem
         v-for="item in flattenItems"
         :key="item._id + item.index"
@@ -39,10 +39,6 @@ import { onClickOutside } from '@vueuse/core';
 import { useHotkey } from '@/composables/hotkey.composable';
 import { store, STORE_KEYS } from '@/services/store.service';
 import { useAppDialog } from '@/providers/app-dialog.provider';
-
-const props = defineProps<{
-  isHidden?: boolean;
-}>();
 
 const { toast } = useToast();
 const appDialog = useAppDialog();
@@ -101,7 +97,7 @@ function handleSelect(
   }
 
   if (!item.value.isFolder && !event.defaultPrevented) {
-    editorStore.state.setActiveFile(item._id);
+    editorStore.state.setSidebarState('activeFileId', item._id);
   }
 }
 async function deleteSelectedItems() {
@@ -148,7 +144,6 @@ useHotkey(
     element: treeRootRef,
   },
   () => {
-    if (props.isHidden) return;
     deleteSelectedItems();
   },
 );

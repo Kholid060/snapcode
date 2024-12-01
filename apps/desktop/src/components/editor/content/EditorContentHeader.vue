@@ -3,11 +3,35 @@
     class="relative flex h-14 items-center border-b px-4 pr-36"
     data-tauri-drag-region
   >
+    <TooltipSimple
+      :label="editorStore.state.sidebarState.show ? 'Collapse' : 'Expand'"
+    >
+      <Button
+        size="icon"
+        @click="
+          editorStore.state.setSidebarState(
+            'show',
+            !editorStore.state.sidebarState.show,
+          )
+        "
+        class="text-muted-foreground"
+        variant="ghost"
+      >
+        <component
+          :is="
+            editorStore.state.sidebarState.show
+              ? SidebarLeft01Icon
+              : SidebarRight01Icon
+          "
+          class="size-5"
+        />
+      </Button>
+    </TooltipSimple>
     <template v-if="activeFile">
       <UiEditable
         :value="`${activeFile.name ?? ''}.${activeFile.ext ?? 'txt'}`"
         placeholder="Snippet name"
-        class="hover:bg-secondary focus:bg-secondary -ml-1 inline-block flex-shrink-0 truncate rounded px-1 py-0.5 transition before:pl-1 focus:outline-none"
+        class="hover:bg-secondary focus:bg-secondary ml-2 inline-block flex-shrink-0 truncate rounded px-1 py-0.5 transition before:pl-1 focus:outline-none"
         @submit="$event.isDirty && updateSnippetName($event.value ?? 'Unnamed')"
       />
       <div class="pointer-events-none grow"></div>
@@ -23,6 +47,8 @@
 <script setup lang="ts">
 import UiEditable from '@/components/ui/UiEditable.vue';
 import { useEditorStore } from '@/stores/editor.store';
+import { Button, TooltipSimple } from '@snippy/ui';
+import { SidebarLeft01Icon, SidebarRight01Icon } from 'hugeicons-vue';
 
 const editorStore = useEditorStore();
 
