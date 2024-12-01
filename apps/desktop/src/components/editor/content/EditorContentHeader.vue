@@ -40,7 +40,30 @@
         class="bg-secondary hover:bg-secondary-hover text-muted-foreground ml-4 h-7 min-w-24 rounded-md border px-1 py-1 text-sm transition before:pl-1"
         placeholder="keyword"
       />
-      <span class="bg-border h-3/5 w-px" />
+      <TooltipSimple
+        :label="
+          activeFile.isBookmark ? 'Remove from bookmark' : 'Add to bookmark'
+        "
+      >
+        <Button
+          variant="secondary"
+          size="icon"
+          class="ml-4"
+          :class="{ 'text-primary bg-primary/10': activeFile.isBookmark }"
+          @click="
+            editorStore.data.updateSnippet(activeFile.id, {
+              isBookmark: !activeFile.isBookmark,
+            })
+          "
+        >
+          <component
+            :is="activeFile.isBookmark ? Bookmark02Icon : BookmarkAdd02Icon"
+            :fill="activeFile.isBookmark ? 'currentColor' : 'none'"
+            class="size-5"
+          />
+        </Button>
+      </TooltipSimple>
+      <span class="bg-border ml-4 h-3/5 w-px" />
     </template>
   </div>
 </template>
@@ -48,7 +71,12 @@
 import UiEditable from '@/components/ui/UiEditable.vue';
 import { useEditorStore } from '@/stores/editor.store';
 import { Button, TooltipSimple } from '@snippy/ui';
-import { SidebarLeft01Icon, SidebarRight01Icon } from 'hugeicons-vue';
+import {
+  Bookmark02Icon,
+  BookmarkAdd02Icon,
+  SidebarLeft01Icon,
+  SidebarRight01Icon,
+} from 'hugeicons-vue';
 
 const editorStore = useEditorStore();
 

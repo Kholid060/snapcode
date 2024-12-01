@@ -211,8 +211,10 @@ const useEditorDataStore = defineStore('editor:snippets', () => {
       ext: snippet.ext,
       name: snippet.name,
       tags: snippet.tags,
+      keyword: snippet.keyword,
       folderId: snippet.folderId,
       updatedAt: snippet.updatedAt,
+      isBookmark: snippet.isBookmark,
     };
   }
 
@@ -275,6 +277,7 @@ const useEditorDataStore = defineStore('editor:snippets', () => {
       ...folders.value[folderId],
       name: folder.name,
       parentId: folder.parentId,
+      isBookmark: folder.isBookmark,
     };
   }
 

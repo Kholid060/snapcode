@@ -17,6 +17,7 @@ export async function getAllFolders(): Promise<FolderListItem[]> {
       name: true,
       parentId: true,
       createdAt: true,
+      isBookmark: true,
     },
     orderBy(fields, operators) {
       return operators.sql`${fields.name} COLLATE NOCASE ASC`;
@@ -36,11 +37,11 @@ export async function deleteFolders(ids: string | string[]) {
 
 export async function updateFolder(
   folderId: string,
-  { name, parentId }: FolderUpdatePayload,
+  { name, parentId, isBookmark }: FolderUpdatePayload,
 ) {
   const [folder] = await db
     .update(foldersTable)
-    .set({ name, parentId })
+    .set({ name, parentId, isBookmark })
     .where(eq(foldersTable.id, folderId))
     .returning();
 

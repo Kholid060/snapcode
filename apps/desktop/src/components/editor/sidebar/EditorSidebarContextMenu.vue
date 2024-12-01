@@ -9,6 +9,15 @@
           <PencilEditIcon class="mr-2 size-4" />
           Rename
         </ContextMenuItem>
+        <ContextMenuItem @click="toggleBookmark">
+          <component
+            :is="itemData?.isBookmark ? Bookmark02Icon : BookmarkAdd02Icon"
+            class="mr-2 size-4"
+          />
+          {{
+            itemData?.isBookmark ? 'Remove from bookmark' : 'Add to bookmark'
+          }}
+        </ContextMenuItem>
         <ContextMenuSeparator />
         <ContextMenuItem
           class="text-destructive-text focus:text-destructive-text"
@@ -31,6 +40,15 @@
         <ContextMenuItem @click="renameItem">
           <PencilEditIcon class="mr-2 size-4" />
           Rename
+        </ContextMenuItem>
+        <ContextMenuItem @click="toggleBookmark">
+          <component
+            :is="itemData?.isBookmark ? Bookmark02Icon : BookmarkAdd02Icon"
+            class="mr-2 size-4"
+          />
+          {{
+            itemData?.isBookmark ? 'Remove from bookmark' : 'Add to bookmark'
+          }}
         </ContextMenuItem>
         <ContextMenuSeparator />
         <ContextMenuItem
@@ -61,6 +79,8 @@ import {
 import {
   FileAddIcon,
   FolderAddIcon,
+  Bookmark02Icon,
+  BookmarkAdd02Icon,
   Delete02Icon as DeleteIcon,
   PencilEdit01Icon as PencilEditIcon,
 } from 'hugeicons-vue';
@@ -74,11 +94,11 @@ const { toast } = useToast();
 const appDialog = useAppDialog();
 const editorStore = useEditorStore();
 
-function getData() {
-  return props.itemType === 'snippet'
+const itemData = computed(() =>
+  props.itemType === 'snippet'
     ? editorStore.data.snippets[props.itemId]
-    : editorStore.data.folders[props.itemId];
-}
+    : editorStore.data.folders[props.itemId],
+);
 
 async function createFolderSnippet() {
   try {
@@ -108,11 +128,10 @@ async function createFolderFolder() {
 
 async function renameItem() {
   try {
-    const data = getData();
-    if (!data) return;
+    if (!itemData.value) return;
 
-    let name = data.name ?? '';
-    if ('ext' in data) name += `.${data.ext}`;
+    let name = itemData.value.name ?? '';
+    if ('ext' in itemData.value) name += `.${itemData.value.ext}`;
 
     const result = await appDialog.prompt({
       defaultValue: name,
@@ -137,6 +156,26 @@ async function renameItem() {
     });
   }
 }
+async function toggleBookmark() {
+  if (!itemData.value) return;
+
+  try {
+    await (props.itemType === 'folder'
+      ? editorStore.data.updateFolder(props.itemId, {
+          isBookmark: !itemData.value.isBookmark,
+        })
+      : editorStore.data.updateSnippet(props.itemId, {
+          isBookmark: !itemData.value.isBookmark,
+        }));
+  } catch (error) {
+    console.error(error);
+    logger.error(getLogMessage('sidebar-bookmark-ctx-menu', error));
+    toast({
+      variant: 'destructive',
+      title: `Error updating bookmark`,
+    });
+  }
+}
 async function deleteItem() {
   try {
     const dontShowDialog = await store.get<boolean>(STORE_KEYS.noDeletePrompt);
@@ -146,7 +185,7 @@ async function deleteItem() {
       const { isConfirmed, dontAskValue } = await appDialog.confirm({
         title:
           props.itemType === 'folder' ? 'Delete folder?' : 'Delete snippet?',
-        body: `Are you sure you want to delete "${getData()?.name ?? ''}"? This will be permanently deleted and it cannot be undone.`,
+        body: `Are you sure you want to delete "${itemData.value?.name ?? ''}"? This will be permanently deleted and it cannot be undone.`,
         okBtnLabel: 'Delete',
         okBtnVariant: 'destructive',
         showDontAsk: true,

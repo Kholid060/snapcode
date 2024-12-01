@@ -41,6 +41,7 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits);
           props.class,
         )
       "
+      style="z-index: 400"
     >
       <slot />
     </TooltipContent>

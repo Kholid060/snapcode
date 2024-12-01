@@ -22,6 +22,7 @@ export async function getAllSnippets(): Promise<SnippetListItem[]> {
       folderId: true,
       updatedAt: true,
       createdAt: true,
+      isBookmark: true,
     },
     orderBy(fields, operators) {
       return operators.sql`${fields.name} COLLATE NOCASE ASC`;
@@ -41,11 +42,29 @@ export async function deleteSnippets(ids: string | string[]) {
 
 export async function updateSnippet(
   snippetId: string,
-  { content, ext, folderId, name, placeholders, tags }: SnippetUpdatePayload,
+  {
+    ext,
+    name,
+    tags,
+    content,
+    keyword,
+    folderId,
+    isBookmark,
+    placeholders,
+  }: SnippetUpdatePayload,
 ) {
   const [snippet] = await db
     .update(snippetsTable)
-    .set({ content, ext, folderId, name, placeholders, tags })
+    .set({
+      ext,
+      name,
+      tags,
+      content,
+      keyword,
+      folderId,
+      isBookmark,
+      placeholders,
+    })
     .where(eq(snippetsTable.id, snippetId))
     .returning();
 
