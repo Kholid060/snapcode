@@ -120,6 +120,7 @@
     --input: var(--olive-7);
 
     --primary: var(--lime-9);
+    --primary-hover: var(--lime-10);
     --primary-foreground: var(--olive-1);
 
     --secondary: var(--olive-3);
