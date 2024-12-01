@@ -1,22 +1,17 @@
-import { ShallowRef } from 'vue';
+import { TreeDataItem } from '@/utils/tree-data-utils';
 
 export const EDITOR_SIDEBAR_PROVIDER_KEY = Symbol('editor-sidebar');
 
 export interface EditorSidebarContextMenuData {
   id: string;
   event: PointerEvent;
+  isTopOfSelected: boolean;
   type: 'folder' | 'snippet';
 }
 
-export interface EditorSidebarDragData {
-  id: string;
-  isFolder: boolean;
-  parentId: string | null;
-}
-
 export interface EditorSidebarProvider {
-  dragData: ShallowRef<EditorSidebarDragData | null>;
-  setDragData: (data: EditorSidebarDragData | null) => void;
+  selectedItems: Ref<TreeDataItem[]>;
+  deleteSelectedItems: () => Promise<void>;
   handleContextMenu: (data: EditorSidebarContextMenuData) => void;
 }
 

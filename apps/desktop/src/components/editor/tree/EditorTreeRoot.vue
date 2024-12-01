@@ -17,6 +17,15 @@
         :key="item._id + item.index"
         :item="item"
         @select="handleSelect($event, item, flattenItems)"
+        @contextmenu.prevent="
+          sidebarProvider.handleContextMenu({
+            id: item._id,
+            event: $event,
+            type: item.value.isFolder ? 'folder' : 'snippet',
+            isTopOfSelected:
+              selectedItems.length > 1 && selectedItems.includes(item.value),
+          })
+        "
       />
       <EditorTreeRootItemPlaceholder />
     </div>
@@ -37,17 +46,24 @@ import { getLogMessage } from '@/utils/helper';
 import EditorTreeRootItemPlaceholder from './EditorTreeRootItemPlaceholder.vue';
 import { onClickOutside } from '@vueuse/core';
 import { useHotkey } from '@/composables/hotkey.composable';
-import { store, STORE_KEYS } from '@/services/store.service';
-import { useAppDialog } from '@/providers/app-dialog.provider';
+import { useEditorSidebarProvider } from '@/providers/editor.provider';
+import { debounce } from '@snippy/shared';
 
 const { toast } = useToast();
-const appDialog = useAppDialog();
 const editorStore = useEditorStore();
+const sidebarProvider = useEditorSidebarProvider();
 
 const itemsContainerRef = useTemplateRef('items-container');
 const treeRootRef = useTemplateRef<HTMLElement>('tree-root');
 
-const selectedItems = ref<TreeDataItem[]>([]);
+const selectedItems = computed({
+  get() {
+    return sidebarProvider.selectedItems.value;
+  },
+  set(value) {
+    sidebarProvider.selectedItems.value = value;
+  },
+});
 
 function getChildren(item: TreeDataItem) {
   return item.isFolder ? (editorStore.data.treeData[item.id] ?? []) : undefined;
@@ -59,13 +75,13 @@ function selectItemsByMouse(
 ) {
   const { originalEvent } = event.detail;
   if (originalEvent.ctrlKey || originalEvent.metaKey) {
-    const itemIndex = selectedItems.value.indexOf(item.value);
-    if (itemIndex === -1) selectedItems.value.push(item.value);
-    else selectedItems.value.splice(itemIndex, 1);
+    const itemIndex = sidebarProvider.selectedItems.value.indexOf(item.value);
+    if (itemIndex === -1) sidebarProvider.selectedItems.value.push(item.value);
+    else sidebarProvider.selectedItems.value.splice(itemIndex, 1);
     event.preventDefault();
   }
 
-  const [firstValue] = selectedItems.value;
+  const [firstValue] = sidebarProvider.selectedItems.value;
   if (!originalEvent.shiftKey || !firstValue) return;
 
   const firstIndex = items.findIndex(
@@ -84,7 +100,7 @@ function selectItemsByMouse(
     .map((treeItem) => treeItem.value);
   if (isAfter) newSelectedItems.unshift(items[firstIndex].value);
 
-  selectedItems.value = newSelectedItems;
+  sidebarProvider.selectedItems.value = newSelectedItems;
   event.preventDefault();
 }
 function handleSelect(
@@ -100,43 +116,13 @@ function handleSelect(
     editorStore.state.setSidebarState('activeFileId', item._id);
   }
 }
-async function deleteSelectedItems() {
-  try {
-    const dontShowDialog = await store.get(STORE_KEYS.noDeletePrompt);
-    let dontAskPrompt = false;
 
-    if (!dontShowDialog) {
-      const { isConfirmed, dontAskValue } = await appDialog.confirm({
-        title: 'Delete snippets/folders?',
-        body: `Are you sure you want to delete "${selectedItems.value.length} items"? This will be permanently deleted and it cannot be undone.`,
-        okBtnLabel: 'Delete',
-        okBtnVariant: 'destructive',
-        showDontAsk: true,
-      });
-      if (!isConfirmed) return;
-
-      dontAskPrompt = dontAskValue;
-    }
-
-    await editorStore.data.deleteItems(selectedItems.value);
-    selectedItems.value = [];
-
-    if (dontAskPrompt) {
-      await store.set(STORE_KEYS.noDeletePrompt, true);
-    }
-  } catch (error) {
-    console.error(error);
-    logger.error(getLogMessage('sidebar-delete-ctx-menu', error));
-    toast({
-      variant: 'destructive',
-      title: `Error deleting items`,
-    });
-  }
-}
-
-onClickOutside(itemsContainerRef, () => {
-  selectedItems.value = [];
-});
+onClickOutside(itemsContainerRef, () =>
+  // race when click delete in context menu
+  debounce(() => {
+    sidebarProvider.selectedItems.value = [];
+  }, 200),
+);
 
 useHotkey(
   {
@@ -144,7 +130,7 @@ useHotkey(
     element: treeRootRef,
   },
   () => {
-    deleteSelectedItems();
+    sidebarProvider.deleteSelectedItems();
   },
 );
 

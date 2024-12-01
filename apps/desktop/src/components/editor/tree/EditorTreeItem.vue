@@ -19,13 +19,6 @@
         : 'hover:bg-accent/70',
     ]"
     @toggle="handleToggle"
-    @contextmenu.prevent="
-      sidebarProvider.handleContextMenu({
-        id: item._id,
-        event: $event,
-        type: item.value.isFolder ? 'folder' : 'snippet',
-      })
-    "
     :title="itemData.name"
   >
     <template v-if="item.level > 1">
@@ -64,7 +57,6 @@ import { useEditorStore } from '@/stores/editor.store';
 import { pointerOutsideOfPreview } from '@atlaskit/pragmatic-drag-and-drop/element/pointer-outside-of-preview';
 import { setCustomNativeDragPreview } from '@atlaskit/pragmatic-drag-and-drop/element/set-custom-native-drag-preview';
 import { combine } from '@atlaskit/pragmatic-drag-and-drop/combine';
-import { useEditorSidebarProvider } from '@/providers/editor.provider';
 import {
   draggable,
   dropTargetForElements,
@@ -82,7 +74,6 @@ const AppFileExtIcon = defineAsyncComponent(
 );
 
 const editorStore = useEditorStore();
-const sidebarProvider = useEditorSidebarProvider();
 
 const treeItemEl = useTemplateRef('tree-item');
 

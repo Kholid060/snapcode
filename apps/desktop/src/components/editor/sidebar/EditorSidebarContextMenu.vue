@@ -3,8 +3,20 @@
     <ContextMenuTrigger as-child>
       <slot />
     </ContextMenuTrigger>
-    <ContextMenuContent class="context-menu-content min-w-40">
-      <template v-if="itemType === 'snippet'">
+    <ContextMenuContent
+      v-if="ctxData.isTopOfSelected"
+      class="context-menu-content min-w-40"
+    >
+      <ContextMenuItem
+        class="text-destructive-text focus:text-destructive-text"
+        @click="sidebarProvider.deleteSelectedItems"
+      >
+        <DeleteIcon class="mr-2 size-4" />
+        Delete
+      </ContextMenuItem>
+    </ContextMenuContent>
+    <ContextMenuContent v-else class="context-menu-content min-w-40">
+      <template v-if="ctxData.type === 'snippet'">
         <ContextMenuItem @click="renameItem">
           <PencilEditIcon class="mr-2 size-4" />
           Rename
@@ -64,6 +76,10 @@
 </template>
 <script setup lang="ts">
 import { useAppDialog } from '@/providers/app-dialog.provider';
+import {
+  useEditorSidebarProvider,
+  type EditorSidebarContextMenuData,
+} from '@/providers/editor.provider';
 import { logger } from '@/services/logger.service';
 import { store, STORE_KEYS } from '@/services/store.service';
 import { useEditorStore } from '@/stores/editor.store';
@@ -86,24 +102,24 @@ import {
 } from 'hugeicons-vue';
 
 const props = defineProps<{
-  itemId: string;
-  itemType: 'snippet' | 'folder';
+  ctxData: Omit<EditorSidebarContextMenuData, 'event'>;
 }>();
 
 const { toast } = useToast();
 const appDialog = useAppDialog();
 const editorStore = useEditorStore();
+const sidebarProvider = useEditorSidebarProvider();
 
 const itemData = computed(() =>
-  props.itemType === 'snippet'
-    ? editorStore.data.snippets[props.itemId]
-    : editorStore.data.folders[props.itemId],
+  props.ctxData.type === 'snippet'
+    ? editorStore.data.snippets[props.ctxData.id]
+    : editorStore.data.folders[props.ctxData.id],
 );
 
 async function createFolderSnippet() {
   try {
-    if (props.itemType !== 'folder') return;
-    await editorStore.data.addSnippets([{ folderId: props.itemId }]);
+    if (props.ctxData.type !== 'folder') return;
+    await editorStore.data.addSnippets([{ folderId: props.ctxData.id }]);
   } catch (error) {
     logger.error(getLogMessage('sidebar-create-snip-ctx-menu', error));
     toast({
@@ -114,9 +130,9 @@ async function createFolderSnippet() {
 }
 async function createFolderFolder() {
   try {
-    if (props.itemType !== 'folder') return;
+    if (props.ctxData.type !== 'folder') return;
 
-    await editorStore.data.addFolder({ parentId: props.itemId });
+    await editorStore.data.addFolder({ parentId: props.ctxData.id });
   } catch (error) {
     logger.error(getLogMessage('sidebar-create-folder-ctx-menu', error));
     toast({
@@ -136,23 +152,24 @@ async function renameItem() {
     const result = await appDialog.prompt({
       defaultValue: name,
       okBtnLabel: 'Rename',
-      placeholder: props.itemType === 'folder' ? 'unnamed' : 'unnamed.txt',
-      title: props.itemType === 'folder' ? 'Rename folder' : 'Rename snippet',
+      placeholder: props.ctxData.type === 'folder' ? 'unnamed' : 'unnamed.txt',
+      title:
+        props.ctxData.type === 'folder' ? 'Rename folder' : 'Rename snippet',
     });
     if (result.canceled) return;
 
-    await (props.itemType === 'folder'
-      ? editorStore.data.updateFolder(props.itemId, {
+    await (props.ctxData.type === 'folder'
+      ? editorStore.data.updateFolder(props.ctxData.id, {
           name: result.value,
         })
-      : editorStore.data.updateSnippet(props.itemId, {
+      : editorStore.data.updateSnippet(props.ctxData.id, {
           name: result.value,
         }));
   } catch (error) {
     logger.error(getLogMessage('sidebar-rename-ctx-menu', error));
     toast({
       variant: 'destructive',
-      title: `Error rename ${props.itemType}`,
+      title: `Error rename ${props.ctxData.type}`,
     });
   }
 }
@@ -160,11 +177,11 @@ async function toggleBookmark() {
   if (!itemData.value) return;
 
   try {
-    await (props.itemType === 'folder'
-      ? editorStore.data.updateFolder(props.itemId, {
+    await (props.ctxData.type === 'folder'
+      ? editorStore.data.updateFolder(props.ctxData.id, {
           isBookmark: !itemData.value.isBookmark,
         })
-      : editorStore.data.updateSnippet(props.itemId, {
+      : editorStore.data.updateSnippet(props.ctxData.id, {
           isBookmark: !itemData.value.isBookmark,
         }));
   } catch (error) {
@@ -184,7 +201,9 @@ async function deleteItem() {
     if (!dontShowDialog) {
       const { isConfirmed, dontAskValue } = await appDialog.confirm({
         title:
-          props.itemType === 'folder' ? 'Delete folder?' : 'Delete snippet?',
+          props.ctxData.type === 'folder'
+            ? 'Delete folder?'
+            : 'Delete snippet?',
         body: `Are you sure you want to delete "${itemData.value?.name ?? ''}"? This will be permanently deleted and it cannot be undone.`,
         okBtnLabel: 'Delete',
         okBtnVariant: 'destructive',
@@ -195,9 +214,9 @@ async function deleteItem() {
       dontAskPrompt = dontAskValue;
     }
 
-    await (props.itemType === 'folder'
-      ? editorStore.data.deleteFolder(props.itemId)
-      : editorStore.data.deleteSnippet(props.itemId));
+    await (props.ctxData.type === 'folder'
+      ? editorStore.data.deleteFolder(props.ctxData.id)
+      : editorStore.data.deleteSnippet(props.ctxData.id));
 
     if (dontAskPrompt) {
       await store.set(STORE_KEYS.noDeletePrompt, true);
@@ -206,7 +225,7 @@ async function deleteItem() {
     logger.error(getLogMessage('sidebar-delete-ctx-menu', error));
     toast({
       variant: 'destructive',
-      title: `Error deleting ${props.itemType}`,
+      title: `Error deleting ${props.ctxData.type}`,
     });
   }
 }

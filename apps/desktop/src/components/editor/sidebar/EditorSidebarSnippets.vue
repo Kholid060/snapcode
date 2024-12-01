@@ -35,12 +35,6 @@
     </DropdownMenu>
   </div>
   <EditorTreeRoot class="custom-scroll grow overflow-auto px-2 pb-4 pt-2" />
-  <EditorSidebarContextMenu
-    :item-id="contextMenuItemData.id"
-    :item-type="contextMenuItemData.type"
-  >
-    <button ref="context-menu-trigger" class="hidden"></button>
-  </EditorSidebarContextMenu>
 </template>
 
 <script setup lang="ts">
@@ -56,13 +50,6 @@ import EditorSidebarIconButton from './EditorSidebarIconButton.vue';
 import { useEditorStore } from '@/stores/editor.store';
 import { logger } from '@/services/logger.service';
 import EditorTreeRoot from '../tree/EditorTreeRoot.vue';
-import type { EditorSidebarDragData } from '@/providers/editor.provider';
-import {
-  EDITOR_SIDEBAR_PROVIDER_KEY,
-  type EditorSidebarContextMenuData,
-  type EditorSidebarProvider,
-} from '@/providers/editor.provider';
-import EditorSidebarContextMenu from './EditorSidebarContextMenu.vue';
 import {
   FileAddIcon,
   FolderAddIcon,
@@ -82,17 +69,6 @@ defineProps<{
 const { toast } = useToast();
 const appDialog = useAppDialog();
 const editorStore = useEditorStore();
-
-const contextMenuTrigger = useTemplateRef('context-menu-trigger');
-
-const dragData = shallowRef<EditorSidebarDragData | null>(null);
-const contextMenuItemData = shallowReactive<{
-  id: string;
-  type: 'snippet' | 'folder';
-}>({
-  id: '',
-  type: 'folder',
-});
 
 async function createNewSnippet() {
   try {
@@ -120,12 +96,6 @@ async function createNewFolder() {
     });
   }
 }
-function handleContextMenu({ event, id, type }: EditorSidebarContextMenuData) {
-  if (!contextMenuTrigger.value) return;
-
-  contextMenuTrigger.value.dispatchEvent(new PointerEvent(event.type, event));
-  Object.assign(contextMenuItemData, { id, type });
-}
 async function importSnippetFromFiles() {
   try {
     const files = await SnippetCommands.importSnippetFromFiles();
@@ -148,14 +118,6 @@ async function importSnippetFromFiles() {
     logger.error(getLogMessage('import-snippet-from-file', error));
   }
 }
-
-provide<EditorSidebarProvider>(EDITOR_SIDEBAR_PROVIDER_KEY, {
-  dragData,
-  handleContextMenu,
-  setDragData(data) {
-    dragData.value = data;
-  },
-});
 
 useHotkey(
   [APP_DEFAULT_HOTKEY.newSnippet, APP_DEFAULT_HOTKEY.newFolder],

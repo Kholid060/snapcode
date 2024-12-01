@@ -44,6 +44,9 @@
     </div>
     <EditorSidebarSearch v-if="false" />
     <EditorSidebarSnippets :hide="false" />
+    <EditorSidebarContextMenu :ctx-data="contextMenuItemData">
+      <button ref="context-menu-trigger" class="hidden"></button>
+    </EditorSidebarContextMenu>
   </aside>
 </template>
 <script setup lang="ts">
@@ -62,11 +65,23 @@ import {
   DialogContent,
   DialogTrigger,
   TooltipSimple,
+  useToast,
 } from '@snippy/ui';
 import { useHotkey } from '@/composables/hotkey.composable';
 import { APP_DEFAULT_HOTKEY } from '@/utils/const/app.const';
 import type { EditorSidebarItems } from '@/interface/editor.interface';
 import { useEditorStore } from '@/stores/editor.store';
+import type {
+  EditorSidebarContextMenuData,
+  EditorSidebarProvider,
+} from '@/providers/editor.provider';
+import { EDITOR_SIDEBAR_PROVIDER_KEY } from '@/providers/editor.provider';
+import EditorSidebarContextMenu from './EditorSidebarContextMenu.vue';
+import type { TreeDataItem } from '@/utils/tree-data-utils';
+import { store } from '@/services/store.service';
+import { logger } from '@/services/logger.service';
+import { useAppDialog } from '@/providers/app-dialog.provider';
+import { getLogMessage } from '@/utils/helper';
 
 const items: { icon: Component; id: EditorSidebarItems; label: string }[] = [
   { icon: FolderFileStorageIcon, id: 'snippets', label: 'Snippets' },
@@ -74,9 +89,73 @@ const items: { icon: Component; id: EditorSidebarItems; label: string }[] = [
   { icon: Search01Icon, id: 'search', label: 'Search' },
 ];
 
+const contextMenuTrigger = useTemplateRef('context-menu-trigger');
+
+const { toast } = useToast();
+const appDialog = useAppDialog();
 const editorStore = useEditorStore();
 
 const showSettings = shallowRef(false);
+const selectedItems = ref<TreeDataItem[]>([]);
+
+const contextMenuItemData = shallowReactive<
+  Omit<EditorSidebarContextMenuData, 'event'>
+>({
+  id: '',
+  type: 'folder',
+  isTopOfSelected: false,
+});
+
+function handleContextMenu({
+  id,
+  type,
+  event,
+  isTopOfSelected,
+}: EditorSidebarContextMenuData) {
+  if (!contextMenuTrigger.value) return;
+
+  contextMenuTrigger.value.dispatchEvent(new PointerEvent(event.type, event));
+  Object.assign(contextMenuItemData, { id, type, isTopOfSelected });
+}
+async function deleteSelectedItems() {
+  try {
+    const dontShowDialog = await store.xGet(store.xKeys.noDeletePrompt, false);
+    let dontAskPrompt = false;
+
+    if (!dontShowDialog) {
+      const { isConfirmed, dontAskValue } = await appDialog.confirm({
+        title: 'Delete snippets/folders?',
+        body: `Are you sure you want to delete "${selectedItems.value.length} items"? This will be permanently deleted and it cannot be undone.`,
+        okBtnLabel: 'Delete',
+        okBtnVariant: 'destructive',
+        showDontAsk: true,
+      });
+      if (!isConfirmed) return;
+
+      dontAskPrompt = dontAskValue;
+    }
+
+    await editorStore.data.deleteItems(selectedItems.value);
+    selectedItems.value = [];
+
+    if (dontAskPrompt) {
+      await store.xSet(store.xKeys.noDeletePrompt, true);
+    }
+  } catch (error) {
+    console.error(error);
+    logger.error(getLogMessage('sidebar-delete-ctx-menu', error));
+    toast({
+      variant: 'destructive',
+      title: `Error deleting items`,
+    });
+  }
+}
+
+provide<EditorSidebarProvider>(EDITOR_SIDEBAR_PROVIDER_KEY, {
+  selectedItems,
+  handleContextMenu,
+  deleteSelectedItems,
+});
 
 useHotkey(
   [
