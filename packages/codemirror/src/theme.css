@@ -2,10 +2,10 @@
   .cm-scroller {
     font-size: theme('fontSize.sm');
     font-family: theme('fontFamily.mono');
+    /* color: #BFBDB6; */
   }
 
-  .cm-lineNumbers,
-  .cm-scroller {
+  .cm-lineNumbers {
     color: theme('colors.muted.foreground');
   }
 
@@ -42,7 +42,7 @@
 
       li[aria-selected] {
         border-radius: theme('borderRadius.sm');
-        background-color: theme('colors.lime.7');
+        background-color: hsl(var(--primary) / 0.20);
       }
     }
   }

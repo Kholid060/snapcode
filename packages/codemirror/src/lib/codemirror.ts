@@ -2,8 +2,8 @@ import { EditorView, EditorViewConfig, keymap } from '@codemirror/view';
 import { basicSetup } from 'codemirror';
 import { vscodeKeymap } from '@replit/codemirror-vscode-keymap';
 import { languages } from '@codemirror/language-data';
-import { themeExtension } from './extensions';
 import { EditorState, EditorStateConfig, Extension } from '@codemirror/state';
+import { themeExtension } from './theme';
 
 export function getLanguageByExt(ext: string) {
   const language = languages.find((lang) => lang.extensions.includes(ext));

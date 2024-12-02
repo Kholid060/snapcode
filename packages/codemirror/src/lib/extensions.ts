@@ -1,6 +1,5 @@
 import { EditorView } from 'codemirror';
 import { indentWithTab } from '@codemirror/commands';
-import { tokyoNightInit } from '@uiw/codemirror-theme-tokyo-night';
 import {
   Decoration,
   DecorationSet,
@@ -9,15 +8,6 @@ import {
   ViewPlugin,
   ViewUpdate,
 } from '@codemirror/view';
-
-export const themeExtension = tokyoNightInit({
-  settings: {
-    background: 'transparent',
-    selection: 'hsl(var(--lime-4))',
-    gutterBackground: 'hsl(var(--background))',
-    lineHighlight: 'hsl(var(--accent) / 0.45)',
-  },
-});
 
 export const onUpdateExtension = (cb: (update: ViewUpdate) => void) =>
   EditorView.updateListener.of(cb);
