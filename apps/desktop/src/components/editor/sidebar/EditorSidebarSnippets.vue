@@ -1,5 +1,5 @@
 <template>
-  <div class="flex items-center p-4 pb-1">
+  <div class="flex items-center p-4 pb-0">
     <p class="text-muted-foreground grow cursor-default text-sm font-semibold">
       Snippets
     </p>
@@ -52,7 +52,7 @@
         event: $event.event,
       })
     "
-    class="grow overflow-auto px-2 pb-4 pt-2"
+    class="mt-3 grow overflow-auto px-2 pb-4"
   />
 </template>
 

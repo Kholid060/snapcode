@@ -22,9 +22,10 @@
   </div>
   <EditorTreeRoot
     v-model="selectedItems"
-    class="grow overflow-auto px-2 pb-4 pt-2"
+    class="mt-3 grow overflow-auto px-2 pb-4"
     :items="sortedItems"
     :get-children="() => undefined"
+    @item:select="handleSelectItem"
     @item:context-menu="
       sidebarProvider.handleContextMenu({
         data: {
@@ -43,6 +44,7 @@
 </template>
 <script lang="ts" setup>
 import { Button, Select, SelectContent, SelectItem } from '@snippy/ui';
+import type { TreeItemSelectEvent } from 'radix-vue';
 import { SelectTrigger } from 'radix-vue';
 import type { AppBookmarkSort } from '@/interface/app.interface';
 import { useEditorStore } from '@/stores/editor.store';
@@ -100,6 +102,39 @@ const sortedItems = computed(() => {
   );
 });
 
+function handleSelectItem(event: TreeItemSelectEvent<TreeDataItem>) {
+  const value = event.detail.value!;
+  if (!value.isFolder) return;
+
+  if (!editorStore.state.sidebarState.activeFolderIds.includes(value.id)) {
+    const expandedFolders = new Set(
+      editorStore.state.sidebarState.activeFolderIds,
+    );
+    expandedFolders.add(value.id);
+
+    let iterCount = 0;
+    let currFolder = editorStore.data.folders[value.id];
+    while (currFolder?.parentId) {
+      if (iterCount >= 200) break;
+
+      expandedFolders.add(currFolder.parentId);
+
+      if (
+        !currFolder.parentId ||
+        !editorStore.data.folders[currFolder.parentId]
+      )
+        break;
+
+      currFolder = editorStore.data.folders[currFolder.parentId];
+      iterCount += 1;
+    }
+
+    editorStore.state.setSidebarState('activeFolderIds', [...expandedFolders]);
+  }
+
+  sidebarProvider.setSelectedItems([value]);
+  editorStore.state.setSidebarState('activeMenu', 'snippets');
+}
 function mapToTreeItem(items: Item[], isFolder: boolean): TreeDataItem[] {
   return items.map((item) => ({ id: item.id, isFolder }));
 }

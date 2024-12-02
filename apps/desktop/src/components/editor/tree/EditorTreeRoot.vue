@@ -5,6 +5,7 @@
     multiple
     :items="items"
     :get-key="(item) => item.id"
+    :get-children="getChildren"
     selection-behavior="replace"
     v-model:expanded="editorStore.state.sidebarState.activeFolderIds"
     v-model="selectedItems"
@@ -27,8 +28,8 @@
 <script setup lang="ts">
 import type {
   FlattenedItem,
-  TreeItemSelectEvent,
   TreeRootProps,
+  TreeItemSelectEvent,
 } from 'radix-vue';
 import { TreeRoot } from 'radix-vue';
 import { combine } from '@atlaskit/pragmatic-drag-and-drop/combine';
@@ -49,11 +50,14 @@ defineProps<
     getChildren: (item: TreeDataItem) => TreeDataItem[] | undefined;
   } & Pick<TreeRootProps, 'expanded' | 'modelValue'>
 >();
-defineEmits<{
+const emit = defineEmits<{
   'item:context-menu': [
     { event: PointerEvent; item: FlattenedItem<TreeDataItem> },
   ];
+  'item:select': [event: TreeItemSelectEvent<TreeDataItem>];
 }>();
+
+let isHidden = false;
 
 const { toast } = useToast();
 const editorStore = useEditorStore();
@@ -108,6 +112,10 @@ function handleSelect(
     selectItemsByMouse(event, item, items);
   }
 
+  if (!event.defaultPrevented) {
+    emit('item:select', event);
+  }
+
   if (!item.value.isFolder && !event.defaultPrevented) {
     editorStore.state.setSidebarState('activeFileId', item._id);
   }
@@ -117,8 +125,10 @@ onClickOutside(
   itemsContainerRef,
   // race when click delete in context menu
   debounce(() => {
+    if (isHidden) return;
+
     selectedItems.value = [];
-  }, 100),
+  }, 50),
 );
 
 watchEffect((onCleanup) => {
@@ -160,5 +170,15 @@ watchEffect((onCleanup) => {
   onCleanup(() => {
     dndFunction();
   });
+});
+
+onActivated(() => {
+  setTimeout(() => {
+    isHidden = false;
+  }, 100);
+});
+onDeactivated(() => {
+  console.log('deactive');
+  isHidden = true;
 });
 </script>

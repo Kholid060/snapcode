@@ -117,11 +117,8 @@ const useEditorDataStore = defineStore('editor:snippets', () => {
         aData.name
           ?.toLowerCase()
           ?.localeCompare(zData.name?.toLowerCase() ?? '') ?? 0;
-      console.log(value, { a: aData.name, z: zData.name });
       if (z.isFolder && !a.isFolder) value = 2;
       else if (a.isFolder && !z.isFolder) value = -2;
-
-      console.log(value, { a: aData.name, z: zData.name });
 
       return value;
     });

@@ -121,6 +121,7 @@ async function createFolderFolder() {
 
     await editorStore.data.addFolder({ parentId: props.ctxData.id });
   } catch (error) {
+    console.error(error);
     logger.error(getLogMessage('sidebar-create-folder-ctx-menu', error));
     toast({
       variant: 'destructive',
