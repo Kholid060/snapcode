@@ -17,6 +17,7 @@
     "@nuxtjs/tailwindcss": "^6.12.2",
     "@pinia/nuxt": "^0.7.0",
     "@snippy/ui": "workspace:*",
+    "better-auth": "^1.0.7",
     "nuxt": "^3.14.1592",
     "shadcn-nuxt": "^0.11.3",
     "vue": "latest",
@@ -25,6 +26,7 @@
   "devDependencies": {
     "@nuxt/kit": "^3.14.1592",
     "@snippy/eslint-config": "workspace:*",
-    "tailwindcss": "^3.4.15"
+    "tailwindcss": "^3.4.15",
+    "vite": "^6.0.1"
   }
 }
