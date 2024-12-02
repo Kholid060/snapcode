@@ -1,85 +1,74 @@
 <template>
-  <ContextMenu>
-    <ContextMenuTrigger as-child>
-      <slot />
-    </ContextMenuTrigger>
-    <ContextMenuContent
-      v-if="ctxData.isTopOfSelected"
-      class="context-menu-content min-w-40"
+  <ContextMenuContent
+    v-if="ctxData.isTopOfSelected"
+    class="context-menu-content min-w-40"
+  >
+    <ContextMenuItem
+      class="text-destructive-text focus:text-destructive-text"
+      @click="sidebarProvider.deleteSelectedItems"
     >
+      <DeleteIcon class="mr-2 size-4" />
+      Delete
+    </ContextMenuItem>
+  </ContextMenuContent>
+  <ContextMenuContent v-else class="context-menu-content min-w-40">
+    <template v-if="ctxData.type === 'snippet'">
+      <ContextMenuItem @click="renameItem">
+        <PencilEditIcon class="mr-2 size-4" />
+        Rename
+      </ContextMenuItem>
+      <ContextMenuItem @click="toggleBookmark">
+        <component
+          :is="itemData?.isBookmark ? Bookmark02Icon : BookmarkAdd02Icon"
+          class="mr-2 size-4"
+        />
+        {{ itemData?.isBookmark ? 'Remove from bookmark' : 'Add to bookmark' }}
+      </ContextMenuItem>
+      <ContextMenuSeparator />
       <ContextMenuItem
         class="text-destructive-text focus:text-destructive-text"
-        @click="sidebarProvider.deleteSelectedItems"
+        @click="deleteItem"
       >
         <DeleteIcon class="mr-2 size-4" />
         Delete
       </ContextMenuItem>
-    </ContextMenuContent>
-    <ContextMenuContent v-else class="context-menu-content min-w-40">
-      <template v-if="ctxData.type === 'snippet'">
-        <ContextMenuItem @click="renameItem">
-          <PencilEditIcon class="mr-2 size-4" />
-          Rename
-        </ContextMenuItem>
-        <ContextMenuItem @click="toggleBookmark">
-          <component
-            :is="itemData?.isBookmark ? Bookmark02Icon : BookmarkAdd02Icon"
-            class="mr-2 size-4"
-          />
-          {{
-            itemData?.isBookmark ? 'Remove from bookmark' : 'Add to bookmark'
-          }}
-        </ContextMenuItem>
-        <ContextMenuSeparator />
-        <ContextMenuItem
-          class="text-destructive-text focus:text-destructive-text"
-          @click="deleteItem"
-        >
-          <DeleteIcon class="mr-2 size-4" />
-          Delete
-        </ContextMenuItem>
-      </template>
-      <template v-else>
-        <ContextMenuItem @click="createFolderSnippet">
-          <FileAddIcon class="mr-2 size-4" />
-          New snippet
-        </ContextMenuItem>
-        <ContextMenuItem @click="createFolderFolder">
-          <FolderAddIcon class="mr-2 size-4" />
-          New folder
-        </ContextMenuItem>
-        <ContextMenuSeparator />
-        <ContextMenuItem @click="renameItem">
-          <PencilEditIcon class="mr-2 size-4" />
-          Rename
-        </ContextMenuItem>
-        <ContextMenuItem @click="toggleBookmark">
-          <component
-            :is="itemData?.isBookmark ? Bookmark02Icon : BookmarkAdd02Icon"
-            class="mr-2 size-4"
-          />
-          {{
-            itemData?.isBookmark ? 'Remove from bookmark' : 'Add to bookmark'
-          }}
-        </ContextMenuItem>
-        <ContextMenuSeparator />
-        <ContextMenuItem
-          class="text-destructive-text focus:text-destructive-text"
-          @click="deleteItem"
-        >
-          <DeleteIcon class="mr-2 size-4" />
-          Delete
-        </ContextMenuItem>
-      </template>
-    </ContextMenuContent>
-  </ContextMenu>
+    </template>
+    <template v-else>
+      <ContextMenuItem @click="createFolderSnippet">
+        <FileAddIcon class="mr-2 size-4" />
+        New snippet
+      </ContextMenuItem>
+      <ContextMenuItem @click="createFolderFolder">
+        <FolderAddIcon class="mr-2 size-4" />
+        New folder
+      </ContextMenuItem>
+      <ContextMenuSeparator />
+      <ContextMenuItem @click="renameItem">
+        <PencilEditIcon class="mr-2 size-4" />
+        Rename
+      </ContextMenuItem>
+      <ContextMenuItem @click="toggleBookmark">
+        <component
+          :is="itemData?.isBookmark ? Bookmark02Icon : BookmarkAdd02Icon"
+          class="mr-2 size-4"
+        />
+        {{ itemData?.isBookmark ? 'Remove from bookmark' : 'Add to bookmark' }}
+      </ContextMenuItem>
+      <ContextMenuSeparator />
+      <ContextMenuItem
+        class="text-destructive-text focus:text-destructive-text"
+        @click="deleteItem"
+      >
+        <DeleteIcon class="mr-2 size-4" />
+        Delete
+      </ContextMenuItem>
+    </template>
+  </ContextMenuContent>
 </template>
 <script setup lang="ts">
+import type { EditorSidebarSnippetsCtxMenu } from '@/interface/editor.interface';
 import { useAppDialog } from '@/providers/app-dialog.provider';
-import {
-  useEditorSidebarProvider,
-  type EditorSidebarContextMenuData,
-} from '@/providers/editor.provider';
+import { useEditorSidebarProvider } from '@/providers/editor.provider';
 import { logger } from '@/services/logger.service';
 import { store, STORE_KEYS } from '@/services/store.service';
 import { useEditorStore } from '@/stores/editor.store';
@@ -87,9 +76,7 @@ import { getLogMessage } from '@/utils/helper';
 import {
   ContextMenuItem,
   ContextMenuSeparator,
-  ContextMenu,
   ContextMenuContent,
-  ContextMenuTrigger,
   useToast,
 } from '@snippy/ui';
 import {
@@ -102,7 +89,7 @@ import {
 } from 'hugeicons-vue';
 
 const props = defineProps<{
-  ctxData: Omit<EditorSidebarContextMenuData, 'event'>;
+  ctxData: EditorSidebarSnippetsCtxMenu['data'];
 }>();
 
 const { toast } = useToast();

@@ -42,11 +42,21 @@
         </DialogContent>
       </Dialog>
     </div>
-    <EditorSidebarSearch v-if="false" />
-    <EditorSidebarSnippets :hide="false" />
-    <EditorSidebarContextMenu :ctx-data="contextMenuItemData">
-      <button ref="context-menu-trigger" class="hidden"></button>
-    </EditorSidebarContextMenu>
+    <KeepAlive include="EditorSidebarSnippets">
+      <component
+        :is="sidebarComponentsMap[editorStore.state.sidebarState.activeMenu]"
+      />
+    </KeepAlive>
+    <ContextMenu>
+      <ContextMenuTrigger as-child>
+        <button ref="context-menu-trigger" class="hidden"></button>
+      </ContextMenuTrigger>
+      <component
+        v-if="ctxMenuData"
+        :ctx-data="ctxMenuData.data"
+        :is="ctxMenuComps[ctxMenuData.type]"
+      />
+    </ContextMenu>
   </aside>
 </template>
 <script setup lang="ts">
@@ -61,6 +71,8 @@ import {
 } from 'hugeicons-vue';
 import {
   Button,
+  ContextMenu,
+  ContextMenuTrigger,
   Dialog,
   DialogContent,
   DialogTrigger,
@@ -69,25 +81,36 @@ import {
 } from '@snippy/ui';
 import { useHotkey } from '@/composables/hotkey.composable';
 import { APP_DEFAULT_HOTKEY } from '@/utils/const/app.const';
-import type { EditorSidebarItems } from '@/interface/editor.interface';
-import { useEditorStore } from '@/stores/editor.store';
 import type {
-  EditorSidebarContextMenuData,
-  EditorSidebarProvider,
-} from '@/providers/editor.provider';
+  EditorSidebarContextMenuItems,
+  EditorSidebarItems,
+} from '@/interface/editor.interface';
+import { useEditorStore } from '@/stores/editor.store';
+import type { EditorSidebarProvider } from '@/providers/editor.provider';
 import { EDITOR_SIDEBAR_PROVIDER_KEY } from '@/providers/editor.provider';
-import EditorSidebarContextMenu from './EditorSidebarContextMenu.vue';
 import type { TreeDataItem } from '@/utils/tree-data-utils';
 import { store } from '@/services/store.service';
 import { logger } from '@/services/logger.service';
 import { useAppDialog } from '@/providers/app-dialog.provider';
 import { getLogMessage } from '@/utils/helper';
+import EditorSidebarBookmarks from './EditorSidebarBookmarks.vue';
+import SidebarContextMenuSnippets from './context-menu/SidebarContextMenuSnippets.vue';
+import SidebarContextMenuBookmarks from './context-menu/SidebarContextMenuBookmarks.vue';
 
 const items: { icon: Component; id: EditorSidebarItems; label: string }[] = [
   { icon: FolderFileStorageIcon, id: 'snippets', label: 'Snippets' },
   { icon: AllBookmarkIcon, id: 'bookmarks', label: 'Bookmarks' },
   { icon: Search01Icon, id: 'search', label: 'Search' },
 ];
+const sidebarComponentsMap: Record<EditorSidebarItems, Component> = {
+  search: EditorSidebarSearch,
+  snippets: EditorSidebarSnippets,
+  bookmarks: EditorSidebarBookmarks,
+};
+const ctxMenuComps: Record<EditorSidebarContextMenuItems['type'], Component> = {
+  snippets: SidebarContextMenuSnippets,
+  bookmarks: SidebarContextMenuBookmarks,
+};
 
 const contextMenuTrigger = useTemplateRef('context-menu-trigger');
 
@@ -97,25 +120,16 @@ const editorStore = useEditorStore();
 
 const showSettings = shallowRef(false);
 const selectedItems = ref<TreeDataItem[]>([]);
+const ctxMenuData = shallowRef<EditorSidebarContextMenuItems | null>(null);
 
-const contextMenuItemData = shallowReactive<
-  Omit<EditorSidebarContextMenuData, 'event'>
->({
-  id: '',
-  type: 'folder',
-  isTopOfSelected: false,
-});
-
-function handleContextMenu({
-  id,
-  type,
-  event,
-  isTopOfSelected,
-}: EditorSidebarContextMenuData) {
+function handleContextMenu(data: EditorSidebarContextMenuItems) {
   if (!contextMenuTrigger.value) return;
 
-  contextMenuTrigger.value.dispatchEvent(new PointerEvent(event.type, event));
-  Object.assign(contextMenuItemData, { id, type, isTopOfSelected });
+  contextMenuTrigger.value.dispatchEvent(
+    new PointerEvent(data.event.type, data.event),
+  );
+
+  ctxMenuData.value = data;
 }
 async function deleteSelectedItems() {
   try {
@@ -155,6 +169,9 @@ provide<EditorSidebarProvider>(EDITOR_SIDEBAR_PROVIDER_KEY, {
   selectedItems,
   handleContextMenu,
   deleteSelectedItems,
+  setSelectedItems(data) {
+    selectedItems.value = data;
+  },
 });
 
 useHotkey(

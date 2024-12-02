@@ -34,7 +34,26 @@
       </DropdownMenuContent>
     </DropdownMenu>
   </div>
-  <EditorTreeRoot class="custom-scroll grow overflow-auto px-2 pb-4 pt-2" />
+  <EditorTreeRoot
+    v-model="selectedItems"
+    ref="tree-root"
+    :items="editorStore.data.treeData.__root"
+    :get-children="getChildren"
+    @item:context-menu="
+      sidebarProvider.handleContextMenu({
+        data: {
+          id: $event.item._id,
+          type: $event.item.value.isFolder ? 'folder' : 'snippet',
+          isTopOfSelected:
+            selectedItems.length > 1 &&
+            selectedItems.includes($event.item.value),
+        },
+        type: 'snippets',
+        event: $event.event,
+      })
+    "
+    class="grow overflow-auto px-2 pb-4 pt-2"
+  />
 </template>
 
 <script setup lang="ts">
@@ -61,15 +80,30 @@ import { APP_DEFAULT_HOTKEY } from '@/utils/const/app.const';
 import SnippetCommands from '@/services/commands/SnippetCommands';
 import { getLogMessage } from '@/utils/helper';
 import { useAppDialog } from '@/providers/app-dialog.provider';
-
-defineProps<{
-  hide?: boolean;
-}>();
+import type { TreeDataItem } from '@/utils/tree-data-utils';
+import { useEditorSidebarProvider } from '@/providers/editor.provider';
 
 const { toast } = useToast();
 const appDialog = useAppDialog();
 const editorStore = useEditorStore();
+const sidebarProvider = useEditorSidebarProvider();
 
+const treeRootRef = useTemplateRef<HTMLElement>('tree-root');
+
+const isHidden = shallowRef(false);
+
+const selectedItems = computed({
+  get() {
+    return sidebarProvider.selectedItems.value;
+  },
+  set(value) {
+    sidebarProvider.selectedItems.value = value;
+  },
+});
+
+function getChildren(item: TreeDataItem) {
+  return item.isFolder ? (editorStore.data.treeData[item.id] ?? []) : undefined;
+}
 async function createNewSnippet() {
   try {
     await editorStore.data.addSnippets([{}]);
@@ -132,4 +166,21 @@ useHotkey(
     }
   },
 );
+useHotkey(
+  {
+    key: 'delete',
+    element: treeRootRef,
+  },
+  () => {
+    if (isHidden.value) return;
+    sidebarProvider.deleteSelectedItems();
+  },
+);
+
+onActivated(() => {
+  isHidden.value = false;
+});
+onDeactivated(() => {
+  isHidden.value = true;
+});
 </script>

@@ -16,6 +16,7 @@ export async function getAllFolders(): Promise<FolderListItem[]> {
       id: true,
       name: true,
       parentId: true,
+      updatedAt: true,
       createdAt: true,
       isBookmark: true,
     },

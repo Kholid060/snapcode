@@ -62,16 +62,19 @@ async function loadLanguageExt() {
 
 const handleContentChange = useDebounceFn(async (value: string) => {
   try {
-    await editorStore.data.updateSnippet(editorStore.state.activeFileId, {
-      content: value,
-    });
+    await editorStore.data.updateSnippet(
+      editorStore.state.sidebarState.activeFileId,
+      {
+        content: value,
+      },
+    );
   } catch (error) {
     logger.error(getLogMessage('save-snippet-content', error));
   }
 }, 1000);
 
 watchEffect(async () => {
-  const snippetId = editorStore.state.activeFileId;
+  const snippetId = editorStore.state.sidebarState.activeFileId;
   if (!snippetId || !cmView.value) return;
 
   try {

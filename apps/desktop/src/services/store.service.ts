@@ -1,13 +1,16 @@
+import { AppBookmarksState } from '@/interface/app.interface';
 import { EditorSidebarState } from '@/interface/editor.interface';
 import { LazyStore } from '@tauri-apps/plugin-store';
 
 export const STORE_KEYS = {
+  bookmarkState: 'bookmark-state',
   noDeletePrompt: 'editor:no-delete-prompt',
   editorSidebarState: 'editor:sidebar-state',
 } as const;
 
 export interface AppStoreState {
   [STORE_KEYS.noDeletePrompt]: boolean;
+  [STORE_KEYS.bookmarkState]: AppBookmarksState;
   [STORE_KEYS.editorSidebarState]: EditorSidebarState;
 }
 

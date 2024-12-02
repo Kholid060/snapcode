@@ -1,5 +1,6 @@
 import * as folderService from '@/db/services/folder.db-service';
 import * as snippetService from '@/db/services/snippet.db-service';
+import * as bookmarkService from '@/db/services/bookmark.db-service';
 import { EditorSidebarState } from '@/interface/editor.interface';
 import {
   FolderListItem,
@@ -116,8 +117,11 @@ const useEditorDataStore = defineStore('editor:snippets', () => {
         aData.name
           ?.toLowerCase()
           ?.localeCompare(zData.name?.toLowerCase() ?? '') ?? 0;
+      console.log(value, { a: aData.name, z: zData.name });
       if (z.isFolder && !a.isFolder) value = 2;
       else if (a.isFolder && !z.isFolder) value = -2;
+
+      console.log(value, { a: aData.name, z: zData.name });
 
       return value;
     });
@@ -195,15 +199,11 @@ const useEditorDataStore = defineStore('editor:snippets', () => {
     const snippet = await snippetService.updateSnippet(snippetId, payload);
     if (!snippet) return;
 
-    if (payload.name || 'folderId' in payload) {
-      if ('folderId' in payload) {
-        moveTreeItem(snippet.id, {
-          to: payload.folderId ?? null,
-          from: snippets.value[snippetId].folderId,
-        });
-      } else {
-        sortTree(snippet.folderId ?? undefined);
-      }
+    if ('folderId' in payload) {
+      moveTreeItem(snippet.id, {
+        to: payload.folderId ?? null,
+        from: snippets.value[snippetId].folderId,
+      });
     }
 
     snippets.value[snippetId] = {
@@ -216,6 +216,10 @@ const useEditorDataStore = defineStore('editor:snippets', () => {
       updatedAt: snippet.updatedAt,
       isBookmark: snippet.isBookmark,
     };
+
+    if ('name' in payload) {
+      sortTree(snippet.folderId ?? undefined);
+    }
   }
 
   function deleteFolderRecursive(folderId: string) {
@@ -262,23 +266,36 @@ const useEditorDataStore = defineStore('editor:snippets', () => {
     const folder = await folderService.updateFolder(folderId, payload);
     if (!folder) return;
 
-    if (payload.name || 'parentId' in payload) {
-      if ('parentId' in payload) {
-        moveTreeItem(folder.id, {
-          to: payload.parentId ?? null,
-          from: folders.value[folderId].parentId,
-        });
-      } else {
-        sortTree(folder.parentId ?? undefined);
-      }
+    if ('parentId' in payload) {
+      moveTreeItem(folder.id, {
+        to: payload.parentId ?? null,
+        from: folders.value[folderId].parentId,
+      });
     }
 
     folders.value[folderId] = {
       ...folders.value[folderId],
       name: folder.name,
       parentId: folder.parentId,
+      updatedAt: folder.updatedAt,
       isBookmark: folder.isBookmark,
     };
+
+    if ('name' in payload) {
+      sortTree(folder.parentId ?? undefined);
+    }
+  }
+
+  async function removeBookmarks(items: TreeDataItem[]) {
+    await bookmarkService.updateBookmarks(items, false);
+
+    for (const item of items) {
+      if (item.isFolder) {
+        folders.value[item.id].isBookmark = false;
+      } else {
+        snippets.value[item.id].isBookmark = false;
+      }
+    }
   }
 
   async function deleteItems(items: TreeDataItem[]) {
@@ -345,6 +362,7 @@ const useEditorDataStore = defineStore('editor:snippets', () => {
     deleteSnippet,
     updateSnippet,
     activeSnippet,
+    removeBookmarks,
   };
 });
 

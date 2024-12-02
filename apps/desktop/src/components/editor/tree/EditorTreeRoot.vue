@@ -1,12 +1,10 @@
 <template>
   <TreeRoot
     v-slot="{ flattenItems }"
-    ref="tree-root"
     class="text-muted-foreground select-none list-none text-sm"
-    :items="editorStore.data.treeData.__root"
-    :get-key="(item) => item.id"
-    :get-children="getChildren"
     multiple
+    :items="items"
+    :get-key="(item) => item.id"
     selection-behavior="replace"
     v-model:expanded="editorStore.state.sidebarState.activeFolderIds"
     v-model="selectedItems"
@@ -18,13 +16,7 @@
         :item="item"
         @select="handleSelect($event, item, flattenItems)"
         @contextmenu.prevent="
-          sidebarProvider.handleContextMenu({
-            id: item._id,
-            event: $event,
-            type: item.value.isFolder ? 'folder' : 'snippet',
-            isTopOfSelected:
-              selectedItems.length > 1 && selectedItems.includes(item.value),
-          })
+          $emit('item:context-menu', { event: $event, item })
         "
       />
       <EditorTreeRootItemPlaceholder />
@@ -33,7 +25,11 @@
 </template>
 
 <script setup lang="ts">
-import type { FlattenedItem, TreeItemSelectEvent } from 'radix-vue';
+import type {
+  FlattenedItem,
+  TreeItemSelectEvent,
+  TreeRootProps,
+} from 'radix-vue';
 import { TreeRoot } from 'radix-vue';
 import { combine } from '@atlaskit/pragmatic-drag-and-drop/combine';
 import { monitorForElements } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
@@ -45,29 +41,29 @@ import { useToast } from '@snippy/ui';
 import { getLogMessage } from '@/utils/helper';
 import EditorTreeRootItemPlaceholder from './EditorTreeRootItemPlaceholder.vue';
 import { onClickOutside } from '@vueuse/core';
-import { useHotkey } from '@/composables/hotkey.composable';
-import { useEditorSidebarProvider } from '@/providers/editor.provider';
 import { debounce } from '@snippy/shared';
+
+defineProps<
+  {
+    items: TreeDataItem[];
+    getChildren: (item: TreeDataItem) => TreeDataItem[] | undefined;
+  } & Pick<TreeRootProps, 'expanded' | 'modelValue'>
+>();
+defineEmits<{
+  'item:context-menu': [
+    { event: PointerEvent; item: FlattenedItem<TreeDataItem> },
+  ];
+}>();
 
 const { toast } = useToast();
 const editorStore = useEditorStore();
-const sidebarProvider = useEditorSidebarProvider();
 
 const itemsContainerRef = useTemplateRef('items-container');
-const treeRootRef = useTemplateRef<HTMLElement>('tree-root');
 
-const selectedItems = computed({
-  get() {
-    return sidebarProvider.selectedItems.value;
-  },
-  set(value) {
-    sidebarProvider.selectedItems.value = value;
-  },
+const selectedItems = defineModel<TreeDataItem[]>({
+  default: () => [],
 });
 
-function getChildren(item: TreeDataItem) {
-  return item.isFolder ? (editorStore.data.treeData[item.id] ?? []) : undefined;
-}
 function selectItemsByMouse(
   event: TreeItemSelectEvent<TreeDataItem>,
   item: FlattenedItem<TreeDataItem>,
@@ -75,13 +71,13 @@ function selectItemsByMouse(
 ) {
   const { originalEvent } = event.detail;
   if (originalEvent.ctrlKey || originalEvent.metaKey) {
-    const itemIndex = sidebarProvider.selectedItems.value.indexOf(item.value);
-    if (itemIndex === -1) sidebarProvider.selectedItems.value.push(item.value);
-    else sidebarProvider.selectedItems.value.splice(itemIndex, 1);
+    const itemIndex = selectedItems.value.indexOf(item.value);
+    if (itemIndex === -1) selectedItems.value.push(item.value);
+    else selectedItems.value.splice(itemIndex, 1);
     event.preventDefault();
   }
 
-  const [firstValue] = sidebarProvider.selectedItems.value;
+  const [firstValue] = selectedItems.value;
   if (!originalEvent.shiftKey || !firstValue) return;
 
   const firstIndex = items.findIndex(
@@ -100,7 +96,7 @@ function selectItemsByMouse(
     .map((treeItem) => treeItem.value);
   if (isAfter) newSelectedItems.unshift(items[firstIndex].value);
 
-  sidebarProvider.selectedItems.value = newSelectedItems;
+  selectedItems.value = newSelectedItems;
   event.preventDefault();
 }
 function handleSelect(
@@ -117,21 +113,12 @@ function handleSelect(
   }
 }
 
-onClickOutside(itemsContainerRef, () =>
+onClickOutside(
+  itemsContainerRef,
   // race when click delete in context menu
   debounce(() => {
-    sidebarProvider.selectedItems.value = [];
-  }, 200),
-);
-
-useHotkey(
-  {
-    key: 'delete',
-    element: treeRootRef,
-  },
-  () => {
-    sidebarProvider.deleteSelectedItems();
-  },
+    selectedItems.value = [];
+  }, 100),
 );
 
 watchEffect((onCleanup) => {

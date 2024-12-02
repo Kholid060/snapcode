@@ -1,6 +1,6 @@
 import { NewFolder, SelectFolder } from '@/db/schema';
 
-export type FolderListItem = Omit<SelectFolder, 'updatedAt'>;
+export type FolderListItem = SelectFolder;
 
 export type FolderNewPayload = Omit<NewFolder, 'id'>;
 
