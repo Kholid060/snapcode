@@ -1,11 +1,14 @@
 import {
+  SnippetId,
   SnippetListItem,
   SnippetNewPayload,
+  SnippetSearchListItem,
   SnippetUpdatePayload,
 } from '@/interface/snippet.interface';
 import { db } from '../db';
-import { snippetsTable } from '../schema';
-import { eq, inArray } from 'drizzle-orm';
+import { snippetsTable, snippetsVTable } from '../schema';
+import { and, AnyColumn, eq, inArray, like, SQL, sql } from 'drizzle-orm';
+import { DB_VIRTUAL_TABLE_NAME } from '@/utils/const/db.const';
 
 export async function createNewSnippets(snippets: SnippetNewPayload[]) {
   return await db.insert(snippetsTable).values(snippets).returning();
@@ -30,7 +33,7 @@ export async function getAllSnippets(): Promise<SnippetListItem[]> {
   });
 }
 
-export async function deleteSnippets(ids: string | string[]) {
+export async function deleteSnippets(ids: SnippetId | SnippetId[]) {
   await db
     .delete(snippetsTable)
     .where(
@@ -41,7 +44,7 @@ export async function deleteSnippets(ids: string | string[]) {
 }
 
 export async function updateSnippet(
-  snippetId: string,
+  snippetId: SnippetId,
   {
     ext,
     name,
@@ -71,7 +74,7 @@ export async function updateSnippet(
   return snippet;
 }
 
-export function getSnippetContent(snippetId: string) {
+export function getSnippetContent(snippetId: SnippetId) {
   return db.query.snippetsTable
     .findFirst({
       columns: {
@@ -82,4 +85,72 @@ export function getSnippetContent(snippetId: string) {
       },
     })
     .execute();
+}
+
+function snippetQueryParser(query: string) {
+  const result: { content: string; name: string } = {
+    name: query,
+    content: '',
+  };
+
+  result.name = query
+    .replace(/\b\w+:\w+\b/g, (match) => {
+      const [key, value] = match.split(':');
+      switch (key) {
+        case 'cnt':
+          result.content = value;
+          break;
+      }
+
+      return '';
+    })
+    .trim();
+
+  return result;
+}
+function vtSnippetFunc<T extends AnyColumn>(
+  column: T,
+  index: number,
+  max = 64,
+) {
+  return sql
+    .raw(
+      `snippet(vt_snippets, ${index}, '<span search-result>', '</span>', '...', ${max}) as ${column.name}`,
+    )
+    .mapWith(column);
+}
+export async function querySnippets(
+  query: string,
+): Promise<SnippetSearchListItem[]> {
+  const trimmedQuery = query.trim();
+  if (!trimmedQuery) return [];
+
+  const { content, name } =
+    trimmedQuery.length < 3
+      ? { name: query, content: '' }
+      : snippetQueryParser(query);
+  if (!name && !content) return [];
+
+  let dbQuery = db
+    .select({
+      id: sql<string>`id`,
+      ...(content && { content: vtSnippetFunc(snippetsVTable.content, 2) }),
+      name: name ? vtSnippetFunc(snippetsVTable.name, 1) : sql<string>`name`,
+    })
+    .from(snippetsVTable)
+    .orderBy(sql.raw(`bm25(${DB_VIRTUAL_TABLE_NAME.snippets}) DESC`))
+    .$dynamic();
+
+  if (query.length < 3) {
+    dbQuery = dbQuery.where(sql.raw(`name like '%${name}%'`));
+  } else {
+    dbQuery = dbQuery.where(
+      and(
+        name ? sql.raw(`name MATCH '"${name}"'`) : undefined,
+        content ? sql.raw(`content MATCH '"${content}"'`) : undefined,
+      ),
+    );
+  }
+
+  return dbQuery.execute();
 }

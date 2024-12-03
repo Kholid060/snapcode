@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "808b750f-d256-45b2-8b14-f6ba77079bf6",
+  "id": "6a38c584-9b86-4f41-929b-fda160d00238",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "folders": {
@@ -24,6 +24,13 @@
         },
         "created_at": {
           "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "is_bookmark": {
+          "name": "is_bookmark",
           "type": "integer",
           "primaryKey": false,
           "notNull": false,
@@ -59,6 +66,13 @@
           ],
           "isUnique": false
         },
+        "folder_bookmark_idx": {
+          "name": "folder_bookmark_idx",
+          "columns": [
+            "is_bookmark"
+          ],
+          "isUnique": false
+        },
         "folder_created_at_idx": {
           "name": "folder_created_at_idx",
           "columns": [
@@ -89,10 +103,17 @@
     "snippets": {
       "name": "snippets",
       "columns": {
+        "_id": {
+          "name": "_id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
         "id": {
           "name": "id",
           "type": "text",
-          "primaryKey": true,
+          "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
@@ -103,6 +124,14 @@
           "notNull": false,
           "autoincrement": false,
           "default": "'txt'"
+        },
+        "keyword": {
+          "name": "keyword",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "''"
         },
         "content": {
           "name": "content",
@@ -141,6 +170,13 @@
           "notNull": false,
           "autoincrement": false
         },
+        "is_bookmark": {
+          "name": "is_bookmark",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
         "folder_id": {
           "name": "folder_id",
           "type": "text",
@@ -157,6 +193,13 @@
         }
       },
       "indexes": {
+        "snippets_id_unique": {
+          "name": "snippets_id_unique",
+          "columns": [
+            "id"
+          ],
+          "isUnique": true
+        },
         "snippet_ext_idx": {
           "name": "snippet_ext_idx",
           "columns": [
@@ -182,6 +225,13 @@
           "name": "snippet_folder_idx",
           "columns": [
             "folder_id"
+          ],
+          "isUnique": false
+        },
+        "snippet_bookmark_idx": {
+          "name": "snippet_bookmark_idx",
+          "columns": [
+            "is_bookmark"
           ],
           "isUnique": false
         },
@@ -213,7 +263,42 @@
       "checkConstraints": {}
     }
   },
-  "views": {},
+  "views": {
+    "vt_snippets": {
+      "columns": {
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "rowid": {
+          "name": "rowid",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "content": {
+          "name": "content",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "keyword": {
+          "name": "keyword",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "name": "vt_snippets",
+      "isExisting": true
+    }
+  },
   "enums": {},
   "_meta": {
     "schemas": {},

@@ -1,3 +1,4 @@
+import { FolderId } from '@/interface/folder.interface';
 import { ButtonVariants } from '@snippy/ui';
 
 export const APP_SELECT_FOLDER_PROVIDER_KEY = Symbol('app-select-folder');
@@ -7,7 +8,7 @@ export interface AppDialogSelectFolderOptions {
 }
 export interface AppDialogSelectFolderResult {
   canceled: boolean;
-  folderId: string | null;
+  folderId: FolderId | null;
 }
 export interface AppDialogSelectFolder {
   type: 'select-folder';

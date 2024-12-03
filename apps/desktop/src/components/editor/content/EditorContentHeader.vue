@@ -35,11 +35,6 @@
         @submit="$event.isDirty && updateSnippetName($event.value ?? 'Unnamed')"
       />
       <div class="pointer-events-none grow"></div>
-      <UiEditable
-        :value="activeFile.keyword ?? ''"
-        class="bg-secondary hover:bg-secondary-hover text-muted-foreground ml-4 h-7 min-w-24 rounded-md border px-1 py-1 text-sm transition before:pl-1"
-        placeholder="keyword"
-      />
       <TooltipSimple
         :label="
           activeFile.isBookmark ? 'Remove from bookmark' : 'Add to bookmark'

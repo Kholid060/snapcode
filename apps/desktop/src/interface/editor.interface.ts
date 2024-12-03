@@ -1,11 +1,13 @@
 import { TreeDataItem } from '@/utils/tree-data-utils';
+import { SnippetId } from './snippet.interface';
+import { FolderId } from './folder.interface';
 
 export type EditorSidebarItems = 'snippets' | 'bookmarks' | 'search';
 
 export interface EditorSidebarState {
   show: boolean;
-  activeFileId: string;
-  activeFolderIds: string[];
+  activeFileId: SnippetId;
+  activeFolderIds: FolderId[];
   activeMenu: EditorSidebarItems;
 }
 
@@ -18,7 +20,7 @@ export interface EditorSidebarCtxMenuBase<T, D> {
 export type EditorSidebarSnippetsCtxMenu = EditorSidebarCtxMenuBase<
   'snippets',
   {
-    id: string;
+    id: SnippetId;
     isTopOfSelected: boolean;
     type: 'folder' | 'snippet';
   }

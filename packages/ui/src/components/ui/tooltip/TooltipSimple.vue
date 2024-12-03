@@ -4,10 +4,11 @@
       <slot />
     </TooltipTrigger>
     <TooltipContent
-      :align="align"
       :side="side"
-      :align-offset="alignOffset"
+      :align="align"
+      :class="contentClass"
       :side-offset="sideOffset"
+      :align-offset="alignOffset"
     >
       {{ label }}
     </TooltipContent>
@@ -26,8 +27,7 @@ import TooltipContent from './TooltipContent.vue';
 
 const emits = defineEmits<TooltipRootEmits>();
 const props = defineProps<
-  TooltipRootProps &
-    Pick<
+  TooltipRootProps & { contentClass?: string } & Pick<
       TooltipContentProps,
       'align' | 'side' | 'sideOffset' | 'alignOffset'
     > & { label: string }

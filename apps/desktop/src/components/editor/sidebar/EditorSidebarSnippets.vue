@@ -37,7 +37,7 @@
   <EditorTreeRoot
     v-model="selectedItems"
     ref="tree-root"
-    :items="editorStore.data.treeData.__root"
+    :items="editorStore.data.treeData[TREE_ROOT_KEY]"
     :get-children="getChildren"
     @item:context-menu="
       sidebarProvider.handleContextMenu({
@@ -80,7 +80,7 @@ import { APP_DEFAULT_HOTKEY } from '@/utils/const/app.const';
 import SnippetCommands from '@/services/commands/SnippetCommands';
 import { getLogMessage } from '@/utils/helper';
 import { useAppDialog } from '@/providers/app-dialog.provider';
-import type { TreeDataItem } from '@/utils/tree-data-utils';
+import { TREE_ROOT_KEY, type TreeDataItem } from '@/utils/tree-data-utils';
 import { useEditorSidebarProvider } from '@/providers/editor.provider';
 
 const { toast } = useToast();
@@ -108,6 +108,7 @@ async function createNewSnippet() {
   try {
     await editorStore.data.addSnippets([{}]);
   } catch (error) {
+    console.error(error);
     if (error instanceof Error) {
       await logger.error(`[create-snippet] ${error.message}`);
     }

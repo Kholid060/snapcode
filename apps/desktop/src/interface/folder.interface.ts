@@ -7,3 +7,5 @@ export type FolderNewPayload = Omit<NewFolder, 'id'>;
 export type FolderUpdatePayload = Partial<
   Omit<NewFolder, 'id' | 'createdAt' | 'updatedAt'>
 >;
+
+export type FolderId = SelectFolder['id'];

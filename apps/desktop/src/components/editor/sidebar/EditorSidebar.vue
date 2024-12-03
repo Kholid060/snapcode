@@ -3,7 +3,12 @@
     <div
       class="text-muted-foreground relative flex h-14 flex-shrink-0 items-center gap-1 border-b px-4"
     >
-      <TooltipSimple v-for="item in items" :key="item.id" :label="item.label">
+      <TooltipSimple
+        v-for="item in items"
+        :key="item.id"
+        content-class="capitalize"
+        :label="`${item.label} (${getHotkeyLabel(item.hotkey)})`"
+      >
         <Button
           size="icon"
           :variant="
@@ -30,7 +35,10 @@
       </Dialog>
       <div class="grow"></div>
       <Dialog v-model:open="showSettings">
-        <TooltipSimple label="Settings">
+        <TooltipSimple
+          content-class="capitalize"
+          :label="`Settings (${getHotkeyLabel(APP_DEFAULT_HOTKEY.openSettings)})`"
+        >
           <DialogTrigger>
             <Button size="icon" variant="ghost">
               <Settings01Icon class="size-5" />
@@ -42,7 +50,7 @@
         </DialogContent>
       </Dialog>
     </div>
-    <KeepAlive include="EditorSidebarSnippets">
+    <KeepAlive include="EditorSidebarSnippets,EditorSidebarSearch">
       <component
         :is="sidebarComponentsMap[editorStore.state.sidebarState.activeMenu]"
       />
@@ -79,7 +87,7 @@ import {
   TooltipSimple,
   useToast,
 } from '@snippy/ui';
-import { useHotkey } from '@/composables/hotkey.composable';
+import { getHotkeyLabel, useHotkey } from '@/composables/hotkey.composable';
 import { APP_DEFAULT_HOTKEY } from '@/utils/const/app.const';
 import type {
   EditorSidebarContextMenuItems,
@@ -97,10 +105,30 @@ import EditorSidebarBookmarks from './EditorSidebarBookmarks.vue';
 import SidebarContextMenuSnippets from './context-menu/SidebarContextMenuSnippets.vue';
 import SidebarContextMenuBookmarks from './context-menu/SidebarContextMenuBookmarks.vue';
 
-const items: { icon: Component; id: EditorSidebarItems; label: string }[] = [
-  { icon: FolderFileStorageIcon, id: 'snippets', label: 'Snippets' },
-  { icon: AllBookmarkIcon, id: 'bookmarks', label: 'Bookmarks' },
-  { icon: Search01Icon, id: 'search', label: 'Search' },
+const items: {
+  label: string;
+  hotkey: string;
+  icon: Component;
+  id: EditorSidebarItems;
+}[] = [
+  {
+    id: 'snippets',
+    label: 'Snippets',
+    icon: FolderFileStorageIcon,
+    hotkey: APP_DEFAULT_HOTKEY.snippetsMenu,
+  },
+  {
+    id: 'bookmarks',
+    label: 'Bookmarks',
+    icon: AllBookmarkIcon,
+    hotkey: APP_DEFAULT_HOTKEY.bookmarksMenu,
+  },
+  {
+    id: 'search',
+    label: 'Search',
+    icon: Search01Icon,
+    hotkey: APP_DEFAULT_HOTKEY.searchMenu,
+  },
 ];
 const sidebarComponentsMap: Record<EditorSidebarItems, Component> = {
   search: EditorSidebarSearch,

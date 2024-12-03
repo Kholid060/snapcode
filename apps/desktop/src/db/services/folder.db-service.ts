@@ -1,4 +1,5 @@
 import {
+  FolderId,
   FolderListItem,
   FolderUpdatePayload,
 } from '@/interface/folder.interface';
@@ -26,7 +27,7 @@ export async function getAllFolders(): Promise<FolderListItem[]> {
   });
 }
 
-export async function deleteFolders(ids: string | string[]) {
+export async function deleteFolders(ids: FolderId | FolderId[]) {
   await db
     .delete(foldersTable)
     .where(
@@ -37,7 +38,7 @@ export async function deleteFolders(ids: string | string[]) {
 }
 
 export async function updateFolder(
-  folderId: string,
+  folderId: FolderId,
   { name, parentId, isBookmark }: FolderUpdatePayload,
 ) {
   const [folder] = await db

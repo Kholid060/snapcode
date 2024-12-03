@@ -7,12 +7,22 @@ import * as schema from './schema';
 export const sqlite = await Database.load('sqlite:app.db');
 export const db = drizzle(
   async (sql, params, method) => {
+    if (import.meta.env.DEV) {
+      console.log('DB=', {
+        sql,
+        params,
+        method,
+        isSelectQuery: isSelectQuery(sql),
+      });
+    }
+
     if (!isSelectQuery(sql)) {
       await sqlite.select(sql, params);
       return { rows: [] };
     }
 
     let rows: any[] = await sqlite.select(sql, params);
+    console.log(rows);
     rows = rows.map((item) => Object.values(item));
 
     return { rows: method === 'all' ? rows : rows[0] };

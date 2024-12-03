@@ -1,10 +1,12 @@
 import { SnippetPlaceholder } from '@/interface/snippet.interface';
+import { DB_VIRTUAL_TABLE_NAME } from '@/utils/const/db.const';
 import { relations } from 'drizzle-orm';
 import {
   AnySQLiteColumn,
   index,
   integer,
   sqliteTable,
+  sqliteView,
   text,
 } from 'drizzle-orm/sqlite-core';
 import { nanoid } from 'nanoid';
@@ -43,17 +45,19 @@ export const foldersRelations = relations(foldersTable, ({ one, many }) => ({
     references: [foldersTable.id],
     fields: [foldersTable.parentId],
   }),
-  files: many(snippetsTable),
+  snippets: many(snippetsTable),
 }));
 
 export const snippetsTable = sqliteTable(
   'snippets',
   {
+    _id: integer('_id').primaryKey({ autoIncrement: true }),
     id: text('id')
-      .primaryKey()
-      .$default(() => nanoid()),
+      .unique()
+      .$default(() => nanoid())
+      .notNull(),
     ext: text('ext').default('txt'),
-    keyword: text('keyword').default('txt'),
+    keyword: text('keyword').default(''),
     content: text('content').default(''),
     name: text('name').default('Unnamed'),
     tags: text({ mode: 'json' })
@@ -83,9 +87,16 @@ export const snippetsTable = sqliteTable(
 export type NewSnippet = typeof snippetsTable.$inferInsert;
 export type SelectSnippet = typeof snippetsTable.$inferSelect;
 
-export const filesRelations = relations(snippetsTable, ({ one }) => ({
+export const snippetsRelations = relations(snippetsTable, ({ one }) => ({
   folder: one(foldersTable, {
     references: [foldersTable.id],
     fields: [snippetsTable.folderId],
   }),
 }));
+
+export const snippetsVTable = sqliteView(DB_VIRTUAL_TABLE_NAME.snippets, {
+  id: text('id'),
+  name: text('name'),
+  content: text('content'),
+  keyword: text('keyword'),
+}).existing();

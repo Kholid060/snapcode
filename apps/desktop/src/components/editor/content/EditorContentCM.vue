@@ -131,6 +131,7 @@ onUnmounted(() => {
   .cm-gutters {
     user-select: none;
     padding-left: theme('padding.1');
+    background-color: theme('colors.background');
   }
 
   .cm-search.cm-panel {

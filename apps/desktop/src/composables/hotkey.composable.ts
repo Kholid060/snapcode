@@ -38,6 +38,14 @@ function parseKey(key: string | string[]) {
   return result;
 }
 
+export function getHotkeyLabel(keys: string) {
+  return keys.replace(/mod/g, () => (IS_MAC ? '⌘' : 'ctrl'));
+}
+
+hotkeys.filter = function ({ target }) {
+  return !(target as HTMLElement).classList.contains('no-hotkeys');
+};
+
 export function useHotkey(
   option: string | string[] | KeyOption,
   handlerFn: KeyHandler,

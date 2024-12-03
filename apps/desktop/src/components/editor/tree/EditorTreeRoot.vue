@@ -4,7 +4,7 @@
     class="text-muted-foreground select-none list-none text-sm"
     multiple
     :items="items"
-    :get-key="(item) => item.id"
+    :get-key="(item) => item.id.toString()"
     :get-children="getChildren"
     selection-behavior="replace"
     v-model:expanded="editorStore.state.sidebarState.activeFolderIds"
@@ -43,6 +43,8 @@ import { getLogMessage } from '@/utils/helper';
 import EditorTreeRootItemPlaceholder from './EditorTreeRootItemPlaceholder.vue';
 import { onClickOutside } from '@vueuse/core';
 import { debounce } from '@snippy/shared';
+import type { FolderId } from '@/interface/folder.interface';
+import type { SnippetId } from '@/interface/snippet.interface';
 
 defineProps<
   {
@@ -148,13 +150,16 @@ watchEffect((onCleanup) => {
 
         try {
           if (previous.data.isFolder) {
-            await editorStore.data.updateFolder(previous.data.id as string, {
+            await editorStore.data.updateFolder(previous.data.id as FolderId, {
               parentId: parentOrFolderId,
             });
           } else {
-            await editorStore.data.updateSnippet(previous.data.id as string, {
-              folderId: parentOrFolderId,
-            });
+            await editorStore.data.updateSnippet(
+              previous.data.id as SnippetId,
+              {
+                folderId: parentOrFolderId,
+              },
+            );
           }
         } catch (error) {
           logger.error(getLogMessage('sidebar-create-folder-ctx-menu', error));
@@ -178,7 +183,6 @@ onActivated(() => {
   }, 100);
 });
 onDeactivated(() => {
-  console.log('deactive');
   isHidden = true;
 });
 </script>
