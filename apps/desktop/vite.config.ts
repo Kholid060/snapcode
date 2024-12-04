@@ -1,4 +1,4 @@
-import { fileURLToPath, URL } from 'node:url';
+import { fileURLToPath, resolve, URL } from 'node:url';
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import VueRouter from 'unplugin-vue-router/vite';
@@ -7,7 +7,7 @@ import AutoImport from 'unplugin-auto-import/vite';
 const host = process.env.TAURI_DEV_HOST;
 
 // https://vitejs.dev/config/
-export default defineConfig(async () => ({
+export default defineConfig({
   plugins: [
     VueRouter(),
     vue(),
@@ -26,6 +26,15 @@ export default defineConfig(async () => ({
   esbuild: {
     supported: {
       'top-level-await': true,
+    },
+  },
+
+  build: {
+    rollupOptions: {
+      input: {
+        main: resolve(__dirname, 'index.html'),
+        popup: resolve(__dirname, 'popup.html'),
+      },
     },
   },
 
@@ -55,4 +64,4 @@ export default defineConfig(async () => ({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
-}));
+});

@@ -2,12 +2,7 @@ use tauri::Manager;
 use tauri_plugin_decorum::WebviewWindowExt;
 
 mod commands;
-
-// Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-#[tauri::command]
-fn greet(name: &str) -> String {
-    format!("Hello, {}! You've been greeted from Rust!", name)
-}
+mod snippy;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -30,16 +25,29 @@ pub fn run() {
         )
         .plugin(tauri_plugin_sql::Builder::default().build())
         .plugin(tauri_plugin_shell::init())
-        .invoke_handler(tauri::generate_handler![greet])
         .invoke_handler(tauri::generate_handler![
+            commands::window::open_popup_window,
             commands::snippet::import_snippet_from_file
         ])
+        .on_window_event(|window, event| match event {
+            tauri::WindowEvent::CloseRequested { api, .. } if window.label() == "main" => {
+                window.hide().unwrap();
+                api.prevent_close();
+            }
+            _ => {}
+        })
         .setup(|app| {
             let main_window = app.get_webview_window("main").unwrap();
             main_window.create_overlay_titlebar().unwrap();
 
+            #[cfg(desktop)]
+            app.handle()
+                .plugin(tauri_plugin_global_shortcut::Builder::new().build())?;
+
+            snippy::init_app(app)?;
+
             Ok(())
         })
         .run(tauri::generate_context!())
-        .expect("error while running tauri application");
+        .expect("error while running tauri application")
 }

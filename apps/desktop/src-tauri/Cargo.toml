@@ -18,7 +18,7 @@ crate-type = ["staticlib", "cdylib", "rlib"]
 tauri-build = { version = "2", features = [] }
 
 [dependencies]
-tauri = { version = "2", features = [] }
+tauri = { version = "2", features = ["tray-icon"] }
 tauri-plugin-shell = "2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
@@ -32,4 +32,7 @@ grep-matcher = "0.1.7"
 grep-searcher = "0.1.14"
 grep-regex = "0.1.13"
 tauri-plugin-dialog = "2.0.3"
+
+[target.'cfg(any(target_os = "macos", windows, target_os = "linux"))'.dependencies]
+tauri-plugin-global-shortcut = "2.0.1"
 

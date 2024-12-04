@@ -52,7 +52,7 @@
         event: $event.event,
       })
     "
-    class="mt-3 grow overflow-auto px-2 pb-4"
+    class="mt-2 grow overflow-auto px-2 pb-4 pt-1"
   />
 </template>
 
@@ -77,11 +77,11 @@ import {
 } from 'hugeicons-vue';
 import { useHotkey } from '@/composables/hotkey.composable';
 import { APP_DEFAULT_HOTKEY } from '@/utils/const/app.const';
-import SnippetCommands from '@/services/commands/SnippetCommands';
 import { getLogMessage } from '@/utils/helper';
 import { useAppDialog } from '@/providers/app-dialog.provider';
 import { TREE_ROOT_KEY, type TreeDataItem } from '@/utils/tree-data-utils';
 import { useEditorSidebarProvider } from '@/providers/editor.provider';
+import { appCommand } from '@/services/app-command.service';
 
 const { toast } = useToast();
 const appDialog = useAppDialog();
@@ -133,7 +133,10 @@ async function createNewFolder() {
 }
 async function importSnippetFromFiles() {
   try {
-    const files = await SnippetCommands.importSnippetFromFiles();
+    const files = await appCommand.invoke(
+      'import_snippet_from_file',
+      undefined,
+    );
     if (files.length === 0) return;
 
     const selectedFolder = await appDialog.selectFolder({
