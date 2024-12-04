@@ -11,7 +11,7 @@ import type { CMEditorView, ViewUpdate } from '@snippy/codemirror';
 import { Compartment, EditorState } from '@codemirror/state';
 import {
   loadCodemirror,
-  getLanguageByExt,
+  getLanguageByName,
   onUpdateExtension,
   snippetPlaceholder,
   indentWithTabExtension,
@@ -38,8 +38,6 @@ const cursorPos = shallowReactive({
   line: 0,
 });
 
-const snippetExt = computed(() => editorStore.data.activeSnippet.ext ?? '');
-
 function updateCursorPos(update: ViewUpdate) {
   const head = update.state.selection.main.head;
   const cursor = update.state.doc.lineAt(head);
@@ -49,10 +47,10 @@ function updateCursorPos(update: ViewUpdate) {
     col: head - cursor.from,
   });
 }
-async function loadLanguageExt() {
+async function loadLanguage() {
   if (!cmView.value) return;
 
-  const language = getLanguageByExt(snippetExt.value ?? '');
+  const language = getLanguageByName(editorStore.data.activeSnippet.lang!);
   const langExt = (await language?.load()) ?? [];
   cmView.value.dispatch({
     effects: languageComp.reconfigure(langExt),
@@ -85,13 +83,13 @@ watchEffect(async () => {
       });
       cmView.value.replaceContent(newState);
 
-      await loadLanguageExt();
+      await loadLanguage();
     }
   } catch (error) {
     logger.error(getLogMessage('get-snippet-content', error));
   }
 });
-watch(snippetExt, loadLanguageExt);
+watch(() => editorStore.data.activeSnippet.lang, loadLanguage);
 
 onMounted(() => {
   const updateListenerExt = onUpdateExtension((update) => {
@@ -112,7 +110,7 @@ onMounted(() => {
       indentWithTabExtension,
     ],
   });
-  loadLanguageExt();
+  loadLanguage();
 });
 onUnmounted(() => {
   cmView.value?.destroy();

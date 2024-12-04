@@ -35,8 +35,8 @@
       :is="isExpanded ? Folder02Icon : Folder01Icon"
     />
     <AppFileExtIcon
-      v-else-if="itemData.ext && itemData.ext !== 'txt'"
-      :ext="itemData.ext"
+      v-else-if="itemData.lang && itemData.lang !== 'lang'"
+      :lang="itemData.lang"
       class="size-4 flex-shrink-0"
     >
       <File01Icon class="size-4 flex-shrink-0" />
@@ -90,11 +90,11 @@ const itemData = computed(() => {
     : editorStore.data.snippets[item.id];
   if (!data) return { name: '', parentId: null };
 
-  return 'ext' in data
+  return 'lang' in data
     ? {
-        ext: data.ext,
+        lang: data.lang,
+        name: data.name,
         parentId: data.folderId,
-        name: `${data.name}.${data.ext}`,
       }
     : {
         ext: null,
@@ -161,7 +161,7 @@ watchEffect((onCleanup) => {
                 {
                   class: 'bg-card rounded-md text-sm px-2 py-1.5 border',
                 },
-                itemData.value.name,
+                itemData.value.name ?? '',
               ),
               container,
             );

@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "6a38c584-9b86-4f41-929b-fda160d00238",
+  "id": "f3b3bff6-aeff-4f11-ae19-f8c973bd8661",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "folders": {
@@ -117,13 +117,12 @@
           "notNull": true,
           "autoincrement": false
         },
-        "ext": {
-          "name": "ext",
+        "lang": {
+          "name": "lang",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
-          "autoincrement": false,
-          "default": "'txt'"
+          "autoincrement": false
         },
         "keyword": {
           "name": "keyword",
@@ -147,7 +146,7 @@
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false,
-          "default": "'Unnamed'"
+          "default": "'unnamed.txt'"
         },
         "tags": {
           "name": "tags",
@@ -199,13 +198,6 @@
             "id"
           ],
           "isUnique": true
-        },
-        "snippet_ext_idx": {
-          "name": "snippet_ext_idx",
-          "columns": [
-            "ext"
-          ],
-          "isUnique": false
         },
         "snippet_name_idx": {
           "name": "snippet_name_idx",
@@ -266,16 +258,16 @@
   "views": {
     "vt_snippets": {
       "columns": {
-        "name": {
-          "name": "name",
+        "id": {
+          "name": "id",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
-        "rowid": {
-          "name": "rowid",
-          "type": "integer",
+        "name": {
+          "name": "name",
+          "type": "text",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false

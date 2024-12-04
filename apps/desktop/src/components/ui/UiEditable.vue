@@ -10,6 +10,7 @@
     @keydown="handleKeydown"
     @keydown.esc="
       resetState();
+      ($event.target as HTMLElement).textContent = value;
       ($event.target as HTMLElement).blur();
     "
   >

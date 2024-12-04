@@ -4,7 +4,7 @@ export function unimplFunc() {
 
 export function getLogMessage<T>(scope: string, value: T): string {
   let message: T | string = value;
-  if (value instanceof Error) message = value.name;
+  if (value instanceof Error) message = `${value.name}: ${value.message}`;
 
   return `[${scope}] ${message}`;
 }

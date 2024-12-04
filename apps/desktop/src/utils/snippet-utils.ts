@@ -1,12 +1,14 @@
 import { extname } from '@tauri-apps/api/path';
+import { languages } from '@snippy/codemirror';
 import { catchAsyncFn } from './helper';
 
-export async function getSnippetExtFromName(snippetName: string) {
+export async function getSnippetLangFromName(snippetName: string) {
   const ext = await catchAsyncFn(() => extname(snippetName), null);
-  const name = ext ? snippetName.slice(0, -(ext.length + 1)) : snippetName;
+  const language = languages.find(
+    (lang) =>
+      (ext && lang.extensions?.includes(ext)) ||
+      (lang.filename && lang.filename.test(snippetName)),
+  );
 
-  return {
-    name,
-    ext: ext || 'txt',
-  };
+  return language ?? null;
 }

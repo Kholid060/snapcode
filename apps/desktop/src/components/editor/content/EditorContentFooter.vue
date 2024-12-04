@@ -25,32 +25,32 @@
             <CommandGroup>
               <CommandItem
                 value="txt"
-                @select="updateSnippetExt('txt')"
+                @select="updateSnippetLang('txt')"
                 :class="{
                   'text-lime-10 hover:!text-lime-10':
-                    activeSnippet.ext === 'txt',
+                    activeSnippet.lang === 'txt',
                 }"
               >
                 <span class="grow">Plain Text</span>
                 <Tick02Icon
                   class="ml-2 size-4"
-                  v-if="activeSnippet.ext === 'txt'"
+                  v-if="activeSnippet.lang === 'txt'"
                 />
               </CommandItem>
               <CommandItem
-                v-for="language in filteredLangs"
+                v-for="language in sortedLangs"
                 :key="language.name"
                 :value="language.name"
-                @select="updateSnippetExt(language.extensions[0])"
+                @select="updateSnippetLang(language.name)"
                 :class="{
                   'text-lime-10 hover:!text-lime-10':
-                    language.extensions.includes(activeSnippet.ext),
+                    language.extensions.includes(activeSnippet.lang),
                 }"
               >
                 <span class="grow">{{ language.name }}</span>
                 <Tick02Icon
                   class="ml-2 size-4"
-                  v-if="language.extensions.includes(activeSnippet.ext)"
+                  v-if="language.extensions.includes(activeSnippet.lang)"
                 />
               </CommandItem>
             </CommandGroup>
@@ -78,7 +78,9 @@ import {
 import { languages } from '@snippy/codemirror';
 import { useEditorStore } from '@/stores/editor.store';
 import { logger } from '@/services/logger.service';
-import { getLogMessage } from '@/utils/helper';
+import { catchAsyncFn, getLogMessage } from '@/utils/helper';
+import { computedAsync } from '@vueuse/core';
+import { extname } from '@tauri-apps/api/path';
 
 defineProps<{
   languageLabel: string;
@@ -96,23 +98,29 @@ const editorStore = useEditorStore();
 const updatedAtKey = shallowRef(-10000);
 const openLangSelector = shallowRef(false);
 
-const activeSnippet = computed(() => ({
-  ext: editorStore.data.activeSnippet.ext ?? '',
-  updatedAt: editorStore.data.activeSnippet.updatedAt,
-}));
+const activeSnippet = computedAsync(
+  async () => ({
+    updatedAt: editorStore.data.activeSnippet.updatedAt,
+    lang: await catchAsyncFn(
+      () => extname(editorStore.data.activeSnippet.name ?? ''),
+      'txt',
+    ),
+  }),
+  { lang: 'txt', updatedAt: new Date() },
+);
 
-const filteredLangs = languages
-  .filter((lang) => lang.extensions.length > 0)
-  .sort((a, z) => a.name.localeCompare(z.name));
+const sortedLangs = languages.sort((a, z) => a.name.localeCompare(z.name));
 
-async function updateSnippetExt(ext: string) {
+async function updateSnippetLang(lang: string) {
   try {
     openLangSelector.value = false;
+
     await editorStore.data.updateSnippet(editorStore.data.activeSnippet.id!, {
-      ext,
+      lang,
     });
   } catch (error) {
-    logger.error(getLogMessage('editor-update-ext', error));
+    console.error(error);
+    logger.error(getLogMessage('editor-update-lang', error));
     toast({
       variant: 'destructive',
       title: `Error updating snippet`,

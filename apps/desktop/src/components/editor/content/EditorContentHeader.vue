@@ -29,7 +29,7 @@
     </TooltipSimple>
     <template v-if="activeFile">
       <UiEditable
-        :value="`${activeFile.name ?? ''}.${activeFile.ext ?? 'txt'}`"
+        :value="activeFile.name ?? ''"
         placeholder="Snippet name"
         class="hover:bg-secondary focus:bg-secondary ml-2 inline-block flex-shrink-0 truncate rounded px-1 py-0.5 transition before:pl-1 focus:outline-none"
         @submit="$event.isDirty && updateSnippetName($event.value ?? 'Unnamed')"

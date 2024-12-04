@@ -15,10 +15,10 @@ CREATE INDEX `folder_created_at_idx` ON `folders` (`created_at`);--> statement-b
 CREATE TABLE `snippets` (
 	`_id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`id` text NOT NULL,
-	`ext` text DEFAULT 'txt',
+	`lang` text,
 	`keyword` text DEFAULT '',
 	`content` text DEFAULT '',
-	`name` text DEFAULT 'Unnamed',
+	`name` text DEFAULT 'unnamed.txt',
 	`tags` text,
 	`placeholders` text,
 	`created_at` integer,
@@ -29,7 +29,6 @@ CREATE TABLE `snippets` (
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `snippets_id_unique` ON `snippets` (`id`);--> statement-breakpoint
-CREATE INDEX `snippet_ext_idx` ON `snippets` (`ext`);--> statement-breakpoint
 CREATE INDEX `snippet_name_idx` ON `snippets` (`name`);--> statement-breakpoint
 CREATE INDEX `snippet_tags_idx` ON `snippets` (`tags`);--> statement-breakpoint
 CREATE INDEX `snippet_folder_idx` ON `snippets` (`folder_id`);--> statement-breakpoint

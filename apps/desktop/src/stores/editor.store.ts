@@ -15,7 +15,6 @@ import {
   SnippetUpdatePayload,
 } from '@/interface/snippet.interface';
 import { store } from '@/services/store.service';
-import { getSnippetExtFromName } from '@/utils/snippet-utils';
 import {
   buildTreeData,
   TREE_ROOT_KEY,
@@ -25,6 +24,7 @@ import {
 import { watchDebounced } from '@vueuse/core';
 import { defineStore } from 'pinia';
 import { SelectFolder } from '@/db/schema';
+import { getSnippetLangFromName } from '@/utils/snippet-utils';
 
 const DEFAULT_SIDEBAR_STATE: EditorSidebarState = {
   show: true,
@@ -154,7 +154,7 @@ const useEditorDataStore = defineStore('editor:snippets', () => {
 
       snippets.value[snippet.id] = {
         id: snippet.id,
-        ext: snippet.ext,
+        lang: snippet.lang,
         name: snippet.name,
         tags: snippet.tags,
         keyword: snippet.keyword,
@@ -193,10 +193,9 @@ const useEditorDataStore = defineStore('editor:snippets', () => {
   ) {
     if (!snippets.value[snippetId]) return;
 
-    if (payload.name && !payload.ext) {
-      const { ext, name } = await getSnippetExtFromName(payload.name);
-      payload.ext = ext;
-      payload.name = name;
+    if ('name' in payload) {
+      const lang = await getSnippetLangFromName(payload.name ?? '');
+      if (lang) payload.lang = lang.name;
     }
 
     const snippet = await snippetService.updateSnippet(snippetId, payload);
@@ -211,8 +210,8 @@ const useEditorDataStore = defineStore('editor:snippets', () => {
 
     snippets.value[snippetId] = {
       ...snippets.value[snippetId],
-      ext: snippet.ext,
       name: snippet.name,
+      lang: snippet.lang,
       tags: snippet.tags,
       keyword: snippet.keyword,
       folderId: snippet.folderId,

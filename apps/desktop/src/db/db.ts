@@ -22,7 +22,6 @@ export const db = drizzle(
     }
 
     let rows: any[] = await sqlite.select(sql, params);
-    console.log(rows);
     rows = rows.map((item) => Object.values(item));
 
     return { rows: method === 'all' ? rows : rows[0] };

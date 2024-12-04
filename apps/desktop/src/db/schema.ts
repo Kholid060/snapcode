@@ -56,10 +56,10 @@ export const snippetsTable = sqliteTable(
       .unique()
       .$default(() => nanoid())
       .notNull(),
-    ext: text('ext').default('txt'),
+    lang: text('lang'),
     keyword: text('keyword').default(''),
     content: text('content').default(''),
-    name: text('name').default('Unnamed'),
+    name: text('name').default('unnamed.txt'),
     tags: text({ mode: 'json' })
       .$type<string[]>()
       .$default(() => []),
@@ -76,7 +76,6 @@ export const snippetsTable = sqliteTable(
       .$onUpdate(() => new Date()),
   },
   (table) => ({
-    extIdx: index('snippet_ext_idx').on(table.ext),
     nameIdx: index('snippet_name_idx').on(table.name),
     tagsIdx: index('snippet_tags_idx').on(table.tags),
     folderIdx: index('snippet_folder_idx').on(table.folderId),

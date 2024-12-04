@@ -7,7 +7,7 @@ import {
 } from '@/interface/snippet.interface';
 import { db } from '../db';
 import { snippetsTable, snippetsVTable } from '../schema';
-import { and, AnyColumn, eq, inArray, like, SQL, sql } from 'drizzle-orm';
+import { and, AnyColumn, eq, inArray, sql } from 'drizzle-orm';
 import { DB_VIRTUAL_TABLE_NAME } from '@/utils/const/db.const';
 
 export async function createNewSnippets(snippets: SnippetNewPayload[]) {
@@ -18,9 +18,9 @@ export async function getAllSnippets(): Promise<SnippetListItem[]> {
   return db.query.snippetsTable.findMany({
     columns: {
       id: true,
-      ext: true,
       tags: true,
       name: true,
+      lang: true,
       keyword: true,
       folderId: true,
       updatedAt: true,
@@ -46,9 +46,9 @@ export async function deleteSnippets(ids: SnippetId | SnippetId[]) {
 export async function updateSnippet(
   snippetId: SnippetId,
   {
-    ext,
     name,
     tags,
+    lang,
     content,
     keyword,
     folderId,
@@ -59,9 +59,9 @@ export async function updateSnippet(
   const [snippet] = await db
     .update(snippetsTable)
     .set({
-      ext,
       name,
       tags,
+      lang,
       content,
       keyword,
       folderId,

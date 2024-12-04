@@ -12,6 +12,10 @@ export function getLanguageByExt(ext: string) {
   return language;
 }
 
+export function getLanguageByName(name: string) {
+  return languages.find((lang) => lang.name === name);
+}
+
 export class CMEditorView extends EditorView {
   private extensions?: Extension;
 
