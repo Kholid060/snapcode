@@ -1,19 +1,20 @@
 import { NewSnippet, SelectSnippet } from '@/db/schema';
 
 export interface SnippetPlaceholder {
+  end: number;
   name: string;
-  defValue: string;
+  start: number;
 }
 
 export type SnippetListItem = Omit<
   SelectSnippet,
-  'content' | 'placeholders' | '_id'
+  'content' | 'placeholders' | '_id' | 'checkPlaceholder'
 >;
 
 export type SnippetNewPayload = Omit<NewSnippet, 'id' | '_id'>;
 
 export type SnippetUpdatePayload = Partial<
-  Omit<NewSnippet, 'id' | 'createdAt' | 'updatedAt'>
+  Omit<NewSnippet, 'id' | 'createdAt' | 'updatedAt' | 'placeholderCheckAt'>
 >;
 
 export interface SnippetImportFileItem {
@@ -29,3 +30,8 @@ export interface SnippetSearchListItem {
   name: string;
   content?: string;
 }
+
+export type SnippetWithPlaceholder = Pick<
+  SelectSnippet,
+  'content' | 'placeholders'
+>;

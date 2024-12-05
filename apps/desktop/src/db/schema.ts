@@ -1,6 +1,6 @@
 import { SnippetPlaceholder } from '@/interface/snippet.interface';
 import { DB_VIRTUAL_TABLE_NAME } from '@/utils/const/db.const';
-import { relations } from 'drizzle-orm';
+import { relations, sql } from 'drizzle-orm';
 import {
   AnySQLiteColumn,
   index,
@@ -58,15 +58,21 @@ export const snippetsTable = sqliteTable(
       .notNull(),
     lang: text('lang'),
     keyword: text('keyword').default(''),
-    content: text('content').default(''),
+    content: text('content').notNull().default(''),
     name: text('name').default('unnamed.txt'),
     tags: text({ mode: 'json' })
       .$type<string[]>()
       .$default(() => []),
-    placeholders: text({ mode: 'json' }).$type<SnippetPlaceholder[]>(),
+    placeholders: text({ mode: 'json' })
+      .$type<SnippetPlaceholder[]>()
+      .default(sql`(json_array())`)
+      .notNull(),
     createdAt: integer('created_at', { mode: 'timestamp' }).$default(
       () => new Date(),
     ),
+    checkPlaceholder: integer('check_placeholder', {
+      mode: 'boolean',
+    }).$default(() => true),
     isBookmark: integer('is_bookmark', { mode: 'boolean' }),
     folderId: text('folder_id').references(() => foldersTable.id, {
       onDelete: 'cascade',

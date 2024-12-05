@@ -47,7 +47,7 @@ pub fn init_app_tray(app: &App) -> Result<(), Error> {
                 app.exit(0);
             }
             "search" => {
-                snippy::window::create_or_show_popup_window(&app).unwrap();
+                snippy::window::PopupWindow::create_or_show(&app).unwrap();
             }
             _ => {}
         })

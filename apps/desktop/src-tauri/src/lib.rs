@@ -1,5 +1,4 @@
 use tauri::Manager;
-use tauri_plugin_decorum::WebviewWindowExt;
 
 mod commands;
 mod snippy;
@@ -27,7 +26,8 @@ pub fn run() {
         .plugin(tauri_plugin_shell::init())
         .invoke_handler(tauri::generate_handler![
             commands::window::open_popup_window,
-            commands::snippet::import_snippet_from_file
+            commands::snippet::import_snippet_from_file,
+            commands::snippet::get_snippet_with_placeholder,
         ])
         .on_window_event(|window, event| match event {
             tauri::WindowEvent::CloseRequested { api, .. } if window.label() == "main" => {
@@ -37,8 +37,7 @@ pub fn run() {
             _ => {}
         })
         .setup(|app| {
-            let main_window = app.get_webview_window("main").unwrap();
-            main_window.create_overlay_titlebar().unwrap();
+            snippy::window::MainWindow::create_or_show(app.app_handle())?;
 
             #[cfg(desktop)]
             app.handle()

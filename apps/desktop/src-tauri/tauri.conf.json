@@ -9,19 +9,6 @@
     "beforeBuildCommand": "pnpm build",
     "frontendDist": "../dist"
   },
-  "app": {
-    "windows": [
-      {
-        "title": "desktop",
-        "minWidth": 800,
-        "minHeight": 600,
-        "dragDropEnabled": false
-      }
-    ],
-    "security": {
-      "csp": null
-    }
-  },
   "bundle": {
     "resources": ["./db"],
     "active": true,

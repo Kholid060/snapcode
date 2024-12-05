@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "f3b3bff6-aeff-4f11-ae19-f8c973bd8661",
+  "id": "dd8f809c-7e4d-4623-9f8c-ab1341c7d494",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "folders": {
@@ -159,11 +159,19 @@
           "name": "placeholders",
           "type": "text",
           "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(json_array())"
         },
         "created_at": {
           "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "check_placeholder": {
+          "name": "check_placeholder",
           "type": "integer",
           "primaryKey": false,
           "notNull": false,

@@ -6,7 +6,7 @@ import {
   SnippetUpdatePayload,
 } from '@/interface/snippet.interface';
 import { db } from '../db';
-import { snippetsTable, snippetsVTable } from '../schema';
+import { NewSnippet, snippetsTable, snippetsVTable } from '../schema';
 import { and, AnyColumn, eq, inArray, sql } from 'drizzle-orm';
 import { DB_VIRTUAL_TABLE_NAME } from '@/utils/const/db.const';
 
@@ -56,18 +56,23 @@ export async function updateSnippet(
     placeholders,
   }: SnippetUpdatePayload,
 ) {
+  const payload: Partial<NewSnippet> = {
+    name,
+    tags,
+    lang,
+    content,
+    keyword,
+    folderId,
+    isBookmark,
+    placeholders,
+  };
+  if (typeof content === 'string') {
+    payload.checkPlaceholder = true;
+  }
+
   const [snippet] = await db
     .update(snippetsTable)
-    .set({
-      name,
-      tags,
-      lang,
-      content,
-      keyword,
-      folderId,
-      isBookmark,
-      placeholders,
-    })
+    .set(payload)
     .where(eq(snippetsTable.id, snippetId))
     .returning();
 
@@ -119,38 +124,36 @@ function vtSnippetFunc<T extends AnyColumn>(
     )
     .mapWith(column);
 }
+function vtMatchQuery(column: string, query: string) {
+  return query.length < 3
+    ? sql`${sql.raw(column)} GLOB '*${query}*'`
+    : sql`${sql.raw(column)} MATCH '"${sql.raw(query)}"'`;
+}
 export async function querySnippets(
   query: string,
 ): Promise<SnippetSearchListItem[]> {
   const trimmedQuery = query.trim();
   if (!trimmedQuery) return [];
 
-  const { content, name } =
-    trimmedQuery.length < 3
-      ? { name: query, content: '' }
-      : snippetQueryParser(query);
+  const useGlob = trimmedQuery.length < 3;
+  const { content, name } = useGlob
+    ? { name: query, content: '' }
+    : snippetQueryParser(query);
   if (!name && !content) return [];
 
-  let dbQuery = db
+  return await db
     .select({
       id: sql<string>`id`,
       ...(content && { content: vtSnippetFunc(snippetsVTable.content, 2) }),
       name: name ? vtSnippetFunc(snippetsVTable.name, 1) : sql<string>`name`,
     })
     .from(snippetsVTable)
-    .orderBy(sql.raw(`bm25(${DB_VIRTUAL_TABLE_NAME.snippets}) DESC`))
-    .$dynamic();
-
-  if (query.length < 3) {
-    dbQuery = dbQuery.where(sql.raw(`name like '%${name}%'`));
-  } else {
-    dbQuery = dbQuery.where(
+    .where(
       and(
-        name ? sql.raw(`name MATCH '"${name}"'`) : undefined,
-        content ? sql.raw(`content MATCH '"${content}"'`) : undefined,
+        name ? vtMatchQuery('name', name) : undefined,
+        content ? vtMatchQuery('content', content) : undefined,
       ),
-    );
-  }
-
-  return dbQuery.execute();
+    )
+    .orderBy(sql.raw(`bm25(${DB_VIRTUAL_TABLE_NAME.snippets}) DESC`))
+    .execute();
 }

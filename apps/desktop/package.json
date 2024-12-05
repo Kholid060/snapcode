@@ -32,6 +32,7 @@
     "@tauri-apps/plugin-store": "^2.1.0",
     "@uiw/codemirror-theme-tokyo-night": "^4.23.6",
     "@vueuse/core": "^11.0.1",
+    "@vueuse/motion": "^2.2.6",
     "dayjs": "^1.11.13",
     "drizzle-orm": "^0.36.4",
     "hotkeys-js": "^3.13.7",

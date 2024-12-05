@@ -9,6 +9,9 @@
     "log:default",
     "log:allow-log",
     "sql:allow-execute",
+    "core:window:allow-hide",
+    "core:window:allow-close",
+    "core:window:allow-start-dragging",
     "store:default"
   ]
 }

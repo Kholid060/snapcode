@@ -18,6 +18,7 @@
     "core:window:allow-set-focus",
     "global-shortcut:allow-register",
     "global-shortcut:allow-unregister",
+    "global-shortcut:allow-is-registered",
     "core:window:allow-is-maximized",
     "core:window:allow-start-dragging",
     "core:window:allow-toggle-maximize",
