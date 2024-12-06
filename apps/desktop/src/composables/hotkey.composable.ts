@@ -3,6 +3,8 @@ import { platform } from '@tauri-apps/plugin-os';
 import { unrefElement } from '@vueuse/core';
 interface KeyOption {
   scope?: string;
+  single?: boolean;
+  capture?: boolean;
   key: string | string[];
   element?: MaybeRef<HTMLElement | null>;
 }
@@ -73,7 +75,7 @@ export function useHotkey(
       hotkeys(
         parsedHotkey.key,
         {
-          scope: option.scope,
+          ...option,
           element: unrefElement(option.element),
         },
         handler,

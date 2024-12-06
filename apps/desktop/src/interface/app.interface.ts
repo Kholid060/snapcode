@@ -10,4 +10,4 @@ export interface AppBookmarksState {
   sortBy: AppBookmarkSort;
 }
 
-export type AppPopupMenuItems = 'search' | 'new-snippet';
+export type AppPopupMenuItems = 'search' | 'new-snippet' | 'bookmarks';

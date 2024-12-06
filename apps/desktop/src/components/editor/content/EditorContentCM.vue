@@ -51,9 +51,9 @@ async function loadLanguage() {
   if (!cmView.value) return;
 
   const language = getLanguageByName(editorStore.data.activeSnippet.lang!);
-  const langExt = (await language?.load()) ?? [];
+  const langExt = language ? await language.load() : null;
   cmView.value.dispatch({
-    effects: languageComp.reconfigure(langExt),
+    effects: languageComp.reconfigure(langExt ?? []),
   });
   langLabel.value = language ? language.name : 'Plain Text';
 }
@@ -116,53 +116,4 @@ onUnmounted(() => {
   cmView.value?.destroy();
 });
 </script>
-<style lang="postcss">
-@import '@snippy/codemirror/src/theme.css';
-
-.codemirror {
-  .cm-scroller {
-    padding: theme('padding.1');
-    padding-left: 0;
-    padding-bottom: 0;
-  }
-
-  .cm-gutters {
-    user-select: none;
-    padding-left: theme('padding.1');
-    background-color: theme('colors.background');
-  }
-
-  .cm-search.cm-panel {
-    padding-left: theme('padding.2');
-    padding-right: theme('padding.2');
-    border-top: 1px solid theme('colors.border');
-    background-color: theme('backgroundColor.background');
-
-    input,
-    button {
-      border-radius: theme('borderRadius.md');
-    }
-
-    .cm-button {
-      border: none;
-      background-image: none;
-      background-color: theme('colors.secondary.DEFAULT');
-
-      &:hover {
-        background-color: theme('colors.secondary.hover');
-      }
-    }
-  }
-
-  .cm-snippet-placeholders {
-    padding: 1px theme('padding[0.5]');
-    border-radius: theme('borderRadius.sm');
-    background-color: hsl(var(--primary) / 0.15);
-    color: theme('colors.primary.DEFAULT') !important;
-
-    * {
-      color: theme('colors.primary.DEFAULT') !important;
-    }
-  }
-}
-</style>
+<style src="@/assets/css/editor.css"></style>

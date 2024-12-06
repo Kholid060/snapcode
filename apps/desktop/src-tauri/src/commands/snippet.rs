@@ -95,7 +95,8 @@ pub async fn get_snippet_with_placeholder(
     .map_err(|err| err.to_string())?;
 
     snippet.placeholders = if snippet.check_placeholder == 1 {
-        let placeholders = snippy::snippet::extract_snippet_placeholders(&snippet.content);
+        let placeholders = snippy::snippet::extract_snippet_placeholders(&snippet.content)
+            .map_err(|err| err.to_string())?;
 
         sqlx::query(
             "UPDATE snippets SET placeholders = ?, check_placeholder = ? WHERE snippets.id = ?",

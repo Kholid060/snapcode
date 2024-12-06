@@ -4,23 +4,25 @@
     @update:search-term="search = $event"
     :filter-function="(value) => value"
   >
-    <div class="search-input relative p-4 pb-3">
-      <ComboboxAnchor class="relative">
-        <Search01Icon
-          class="text-muted-foreground pointer-events-none absolute left-3 top-1/2 size-5 -translate-y-1/2"
-        />
-        <ComboboxInput
-          class="focus:ring-ring focus:ring-offset-background h-9 w-full rounded-md border bg-inherit px-10 text-sm transition focus:outline-none focus:ring-2 focus:ring-offset-2"
-          ref="search-input"
-          placeholder="Search..."
-        />
-        <CancelCircleIcon
-          v-if="search"
-          @click="clearSearch"
-          class="text-muted-foreground absolute right-3 top-1/2 size-5 -translate-y-1/2"
-        />
-      </ComboboxAnchor>
-    </div>
+    <slot name="search" v-bind="{ search }">
+      <div class="search-input relative p-4 pb-3">
+        <ComboboxAnchor class="relative">
+          <Search01Icon
+            class="text-muted-foreground pointer-events-none absolute left-3 top-1/2 size-5 -translate-y-1/2"
+          />
+          <ComboboxInput
+            class="focus:ring-ring focus:ring-offset-background h-9 w-full rounded-md border bg-inherit px-10 text-sm transition focus:outline-none focus:ring-2 focus:ring-offset-2"
+            ref="search-input"
+            placeholder="Search..."
+          />
+          <CancelCircleIcon
+            v-if="search"
+            @click="clearSearch"
+            class="text-muted-foreground absolute right-3 top-1/2 size-5 -translate-y-1/2"
+          />
+        </ComboboxAnchor>
+      </div>
+    </slot>
     <CommandList class="max-h-none px-4 pt-1">
       <slot v-if="!searchDebounce" name="empty">
         <ul class="text-sm">

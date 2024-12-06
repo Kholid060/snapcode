@@ -1,0 +1,48 @@
+@import '@snippy/codemirror/src/theme.css';
+
+.codemirror {
+  .cm-scroller {
+    padding-left: 0;
+    padding-bottom: 0;
+    padding: theme('padding.1');
+  }
+
+  .cm-gutters {
+    user-select: none;
+    padding-left: theme('padding.1');
+    background-color: theme('colors.background');
+  }
+
+  .cm-search.cm-panel {
+    padding-left: theme('padding.2');
+    padding-right: theme('padding.2');
+    border-top: 1px solid theme('colors.border');
+    background-color: theme('backgroundColor.background');
+
+    input,
+    button {
+      border-radius: theme('borderRadius.md');
+    }
+
+    .cm-button {
+      border: none;
+      background-image: none;
+      background-color: theme('colors.secondary.DEFAULT');
+
+      &:hover {
+        background-color: theme('colors.secondary.hover');
+      }
+    }
+  }
+
+  .cm-snippet-placeholders {
+    padding: 1px theme('padding[0.5]');
+    border-radius: theme('borderRadius.sm');
+    background-color: hsl(var(--primary) / 0.15);
+    color: theme('colors.primary.DEFAULT') !important;
+
+    * {
+      color: theme('colors.primary.DEFAULT') !important;
+    }
+  }
+}

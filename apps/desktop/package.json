@@ -19,6 +19,8 @@
     "@atlaskit/pragmatic-drag-and-drop-hitbox": "^1.0.3",
     "@codemirror/language": "^6.10.4",
     "@codemirror/state": "^6.4.1",
+    "@lezer/common": "^1.2.3",
+    "@lezer/highlight": "^1.2.1",
     "@snippy/codemirror": "workspace:*",
     "@snippy/shared": "workspace:*",
     "@snippy/ui": "workspace:*",
@@ -41,6 +43,7 @@
     "pinia": "^2.2.6",
     "radix-vue": "^1.9.10",
     "sanitize-html": "^2.13.1",
+    "style-mod": "^4.1.2",
     "unplugin-auto-import": "^0.18.2",
     "vue": "^3.3.4",
     "vue-router": "4"

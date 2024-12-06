@@ -29,6 +29,10 @@
   &::-webkit-scrollbar-thumb:hover {
     background-color: theme('colors.olive.6'); 
   }
+
+  &::-webkit-scrollbar-corner {
+    background-color: transparent; 
+  }
 }
 
 html {
