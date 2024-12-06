@@ -9,16 +9,32 @@ import {
   ViewUpdate,
 } from '@codemirror/view';
 
+export const PLACEHOLDER_REGEX = /\[\[(\w+)\]\]/g;
+
 export const onUpdateExtension = (cb: (update: ViewUpdate) => void) =>
   EditorView.updateListener.of(cb);
 
-export function snippetPlaceholder() {
-  const decoration = Decoration.mark({
-    class: 'cm-snippet-placeholders',
-  });
+export interface CMPlaceholderOptions {
+  blockDecoration?:
+    | Decoration
+    | ((
+        match: RegExpExecArray,
+        view: EditorView,
+        pos: number,
+      ) => Decoration | null);
+}
+export function snippetPlaceholder({
+  blockDecoration,
+}: CMPlaceholderOptions = {}) {
   const decorator = new MatchDecorator({
-    regexp: /\[\[(\w+)\]\]/g,
-    decoration: () => decoration,
+    regexp: PLACEHOLDER_REGEX,
+    decoration:
+      blockDecoration ||
+      ((match) =>
+        Decoration.mark({
+          value: match[1],
+          class: 'cm-snippet-placeholders',
+        })),
   });
   const highlighterExt = ViewPlugin.fromClass(
     class {
@@ -35,11 +51,18 @@ export function snippetPlaceholder() {
           update.viewportChanged
         ) {
           this.decorations = decorator.updateDeco(update, this.decorations);
+          console.log(this.decorations);
         }
       }
     },
     {
       decorations: (value) => value.decorations,
+      provide: blockDecoration
+        ? (plugin) =>
+            EditorView.atomicRanges.of((view) => {
+              return view.plugin(plugin)?.decorations || Decoration.none;
+            })
+        : undefined,
     },
   );
 

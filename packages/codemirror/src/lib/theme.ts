@@ -1,5 +1,6 @@
 import { tags as t } from '@lezer/highlight';
 import { createTheme } from '@uiw/codemirror-themes';
+import { TagStyle } from '@codemirror/language';
 
 // https://github.com/ayu-theme/ayu-colors
 const ayuColors = {
@@ -43,6 +44,26 @@ function varColor(name: string, alpha?: number) {
   return `hsl(var(--${name}) ${typeof alpha === 'number' ? `/ ${alpha}` : ''})`;
 }
 
+export const themeStyles: TagStyle[] = [
+  { tag: t.comment, color: ayuColors['syntax.comment'] },
+  { tag: t.variableName, color: ayuColors['syntax.special'] },
+  { tag: [t.string, t.special(t.brace)], color: ayuColors['syntax.special'] },
+  { tag: t.string, color: ayuColors['syntax.string'] },
+  { tag: t.number, color: ayuColors['syntax.constant'] },
+  { tag: t.bool, color: ayuColors['syntax.constant'] },
+  { tag: t.null, color: ayuColors['syntax.constant'] },
+  { tag: t.keyword, color: ayuColors['syntax.keyword'] },
+  { tag: t.operator, color: ayuColors['syntax.operator'] },
+  { tag: t.className, color: ayuColors['syntax.entity'] },
+  { tag: t.definition(t.typeName), color: ayuColors['syntax.tag'] },
+  { tag: t.typeName, color: ayuColors['syntax.tag'] },
+  { tag: t.angleBracket, color: '#39bae680' },
+  { tag: t.tagName, color: ayuColors['syntax.entity'] },
+  { tag: t.attributeName, color: ayuColors['syntax.func'] },
+  { tag: t.regexp, color: ayuColors['syntax.regexp'] },
+  { tag: t.self, color: ayuColors['syntax.entity'] },
+];
+
 export const themeExtension = createTheme({
   theme: 'dark',
   settings: {
@@ -57,23 +78,5 @@ export const themeExtension = createTheme({
     gutterBackground: 'inherit',
     gutterForeground: 'inherit',
   },
-  styles: [
-    { tag: t.comment, color: ayuColors['syntax.comment'] },
-    { tag: t.variableName, color: ayuColors['syntax.special'] },
-    { tag: [t.string, t.special(t.brace)], color: ayuColors['syntax.special'] },
-    { tag: t.string, color: ayuColors['syntax.string'] },
-    { tag: t.number, color: ayuColors['syntax.constant'] },
-    { tag: t.bool, color: ayuColors['syntax.constant'] },
-    { tag: t.null, color: ayuColors['syntax.constant'] },
-    { tag: t.keyword, color: ayuColors['syntax.keyword'] },
-    { tag: t.operator, color: ayuColors['syntax.operator'] },
-    { tag: t.className, color: ayuColors['syntax.entity'] },
-    { tag: t.definition(t.typeName), color: ayuColors['syntax.tag'] },
-    { tag: t.typeName, color: ayuColors['syntax.tag'] },
-    { tag: t.angleBracket, color: '#39bae680' },
-    { tag: t.tagName, color: ayuColors['syntax.entity'] },
-    { tag: t.attributeName, color: ayuColors['syntax.func'] },
-    { tag: t.regexp, color: ayuColors['syntax.regexp'] },
-    { tag: t.self, color: ayuColors['syntax.entity'] },
-  ],
+  styles: themeStyles,
 });

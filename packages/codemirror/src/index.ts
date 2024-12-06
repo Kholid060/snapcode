@@ -1,5 +1,5 @@
-export { EditorView } from '@codemirror/view';
 export { EditorState } from '@codemirror/state';
+export { EditorView, WidgetType, Decoration } from '@codemirror/view';
 
 export type * from '@codemirror/view';
 export type * from '@codemirror/state';

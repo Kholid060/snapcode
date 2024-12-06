@@ -27,11 +27,14 @@
     "@codemirror/lang-wast": "^6.0.2",
     "@codemirror/lang-xml": "^6.1.0",
     "@codemirror/lang-yaml": "^6.1.1",
+    "@codemirror/language": "^6.10.4",
     "@codemirror/language-data": "^6.5.1",
     "@codemirror/legacy-modes": "^6.4.2",
     "@codemirror/state": "^6.4.1",
     "@codemirror/view": "^6.35.0",
+    "@lezer/common": "^1.2.3",
     "@lezer/highlight": "^1.2.1",
+    "@lezer/lr": "^1.4.2",
     "@replit/codemirror-vscode-keymap": "^6.0.2",
     "@uiw/codemirror-theme-tokyo-night": "^4.23.6",
     "@uiw/codemirror-themes": "^4.23.6",
@@ -39,6 +42,7 @@
     "vue": "^3.5.13"
   },
   "devDependencies": {
+    "@lezer/generator": "^1.7.1",
     "@snippy/eslint-config": "workspace:*",
     "typescript": "^5.7.2"
   }
