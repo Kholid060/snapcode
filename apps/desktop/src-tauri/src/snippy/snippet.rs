@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use regex::Regex;
 use serde::{ser::SerializeStruct, Deserialize, Serialize, Serializer};
 
@@ -12,7 +14,7 @@ impl Serialize for SnippetPlaceholderItem {
     where
         S: Serializer,
     {
-        let mut s = serializer.serialize_struct("SnippetPlaceholderItem", 4)?;
+        let mut s = serializer.serialize_struct("SnippetPlaceholderItem", 3)?;
         s.serialize_field("end", &self.end)?;
         s.serialize_field("name", &self.name)?;
         s.serialize_field("start", &self.start)?;
@@ -22,7 +24,7 @@ impl Serialize for SnippetPlaceholderItem {
 }
 
 pub fn extract_snippet_placeholders(
-    content: &String,
+    content: &str,
 ) -> Result<Vec<SnippetPlaceholderItem>, Box<dyn std::error::Error>> {
     let regex = Regex::new(r"\[\[(\w+)\]\]")?;
     Ok(regex
@@ -33,4 +35,19 @@ pub fn extract_snippet_placeholders(
             name: entry.as_str().to_owned(),
         })
         .collect())
+}
+
+pub fn replace_snippet_placeholders<'a>(
+    content: &'a mut String,
+    placeholders: &Vec<SnippetPlaceholderItem>,
+    placeholders_value: &HashMap<String, String>,
+) -> &'a String {
+    println!("{:?} {placeholders_value:?}", placeholders);
+
+    for placeholder in placeholders.iter().rev() {
+        let value = placeholders_value.get(&placeholder.name).unwrap_or(&placeholder.name);
+        content.replace_range(placeholder.start..placeholder.end, value);
+    }
+
+    content
 }

@@ -46,7 +46,7 @@
         class="border-border/50 mb-px block"
         @select.prevent="$emit('select-item', item)"
       >
-        <slot name="item" :html="getSafeHtml(item.name)">
+        <slot name="item" :html="getSafeHtml(item.name)" :item="item">
           <p v-html="getSafeHtml(item.name)"></p>
         </slot>
         <p

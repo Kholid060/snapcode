@@ -33,5 +33,5 @@ export interface SnippetSearchListItem {
 
 export type SnippetWithPlaceholder = Pick<
   SelectSnippet,
-  'content' | 'placeholders' | 'lang'
+  'content' | 'placeholders' | 'lang' | 'name'
 >;

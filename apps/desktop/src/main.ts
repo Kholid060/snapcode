@@ -24,12 +24,7 @@ async function attachGlobalShortcuts() {
   ]);
   await globalShortcut.register(searchShortcut, async ({ state }) => {
     if (state !== 'Pressed') return;
-
-    try {
-      await appCommand.invoke('open_popup_window', undefined);
-    } catch (error) {
-      logger.error(getLogMessage('shortcut-search', error));
-    }
+    await appCommand.invoke('open_popup_window', undefined);
   });
   await globalShortcut.register(newSnippetShortcut, ({ state }) => {
     if (state !== 'Pressed') return;

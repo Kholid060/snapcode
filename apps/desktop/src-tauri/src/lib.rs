@@ -1,13 +1,15 @@
 use tauri::Manager;
 
-mod commands;
 mod snippy;
+mod common;
+mod commands;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_decorum::init())
         .plugin(tauri_plugin_store::Builder::new().build())
@@ -26,6 +28,8 @@ pub fn run() {
         .plugin(tauri_plugin_shell::init())
         .invoke_handler(tauri::generate_handler![
             commands::window::open_popup_window,
+            commands::snippet::open_snippet,
+            commands::snippet::send_snippet_content,
             commands::snippet::import_snippet_from_file,
             commands::snippet::get_snippet_with_placeholder,
         ])

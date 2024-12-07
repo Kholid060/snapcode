@@ -34,6 +34,8 @@ grep-regex = "0.1.13"
 tauri-plugin-dialog = "2.0.3"
 sqlx = "0.8.2"
 regex = "1.11.1"
+enigo = "0.3.0"
+tauri-plugin-clipboard-manager = "2.0.2"
 
 [target.'cfg(any(target_os = "macos", windows, target_os = "linux"))'.dependencies]
 tauri-plugin-global-shortcut = "2.0.1"

@@ -19,58 +19,104 @@
     </div>
   </div>
   <div ref="placeholder-container" class="grow overflow-auto px-4 pt-1">
-    <div v-for="placeholder in placeholders" :key="placeholder.name">
-      <label :for="placeholder.name">
-        {{ placeholder.name.slice(2, -2) }}
+    <div v-for="(value, key) in placeholders" :key="key">
+      <label :for="key" class="truncate">
+        {{ key.slice(2, -2) }}
       </label>
       <Textarea
         type="text"
+        v-model="placeholders[key]"
         class="min-h-[auto] resize-none overflow-hidden bg-inherit"
-        :id="placeholder.name"
+        :id="key"
         autogrow
         rows="1"
       />
     </div>
   </div>
-  <div class="sticky bottom-0 flex px-4 py-2">
-    <Button size="sm"> Paste ({{ getHotkeyLabel('mod+enter') }}) </Button>
+  <div class="sticky bottom-0 space-x-2 px-4 py-2">
+    <Button
+      :disabled="!!actionState && actionState !== 'paste'"
+      :is-loading="!!actionState && actionState === 'paste'"
+      size="sm"
+      class="gap-0 text-sm"
+      @click="sendContent('paste')"
+    >
+      Paste
+      <Kbd variant="primary-top" class="ml-1 capitalize">
+        {{ getHotkeyLabel('mod') }}
+      </Kbd>
+      <Kbd variant="primary-top" class="ml-px"> ↵ </Kbd>
+    </Button>
+    <Button
+      size="sm"
+      variant="secondary"
+      class="gap-0 text-sm"
+      :disabled="!!actionState && actionState !== 'copy'"
+      :is-loading="!!actionState && actionState === 'copy'"
+      @click="sendContent('copy')"
+    >
+      Copy
+      <Kbd variant="primary-top" class="ml-1"> Alt </Kbd>
+      <Kbd variant="primary-top" class="ml-px"> ↵ </Kbd>
+    </Button>
   </div>
 </template>
 <script lang="ts" setup>
-import type { SelectSnippet } from '@/db/schema';
 import AppFileExtIcon from '../app/AppFileExtIcon.vue';
 import { ArrowLeft01Icon, File01Icon } from 'hugeicons-vue';
-import { Button, Textarea } from '@snippy/ui';
+import { Button, Kbd, Textarea, useToast } from '@snippy/ui';
 import { getHotkeyLabel, useHotkey } from '@/composables/hotkey.composable';
-
-interface PlaceholderItem {
-  name: string;
-  value: string;
-}
+import { appCommand } from '@/services/app-command.service';
+import type { SnippetWithPlaceholder } from '@/interface/snippet.interface';
 
 const props = defineProps<{
-  snippet: Pick<SelectSnippet, 'name' | 'content' | 'lang' | 'placeholders'>;
+  snippet: SnippetWithPlaceholder;
 }>();
 const emit = defineEmits<{
   close: [];
+  sended: [];
 }>();
 
+const { toast } = useToast();
 const container = useTemplateRef('placeholder-container');
 
-const placeholders = shallowRef<Record<string, PlaceholderItem>>({});
+const placeholders = shallowRef<Record<string, string>>({});
+const actionState = shallowRef<'paste' | 'copy' | null>(null);
+
+async function sendContent(action: 'paste' | 'copy') {
+  try {
+    actionState.value = action;
+    await appCommand.invoke('send_snippet_content', {
+      action,
+      content: props.snippet.content,
+      plaholdersValue: placeholders.value,
+      placeholders: props.snippet.placeholders,
+    });
+
+    emit('sended');
+  } catch {
+    toast({
+      variant: 'destructive',
+      title: 'An error occured',
+    });
+  } finally {
+    actionState.value = null;
+  }
+}
 
 useHotkey({ key: 'esc', capture: true, single: true }, (event) => {
   event.stopPropagation();
   emit('close');
 });
+useHotkey(['mod+enter', 'alt+enter'], (_, { shortcut }) => {
+  sendContent(shortcut === 'alt+enter' ? 'copy' : 'paste');
+});
 
 onMounted(() => {
   placeholders.value = props.snippet.placeholders.reduce<
-    Record<string, PlaceholderItem>
+    Record<string, string>
   >((acc, item) => {
-    if (!acc[item.name]) {
-      acc[item.name] = { name: item.name, value: '' };
-    }
+    if (!acc[item.name]) acc[item.name] = '';
 
     return acc;
   }, {});

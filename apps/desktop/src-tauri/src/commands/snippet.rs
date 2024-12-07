@@ -1,9 +1,14 @@
 use serde::{ser::SerializeStruct, Deserialize, Serialize, Serializer};
 use std::{collections::HashMap, fs};
+use tauri::Emitter;
+use tauri_plugin_clipboard_manager::ClipboardExt;
 use tauri_plugin_dialog::DialogExt;
 use tauri_plugin_sql::DbPool;
 
-use crate::snippy::{self, snippet::SnippetPlaceholderItem};
+use crate::{
+    common::stringify,
+    snippy::{self, snippet::SnippetPlaceholderItem},
+};
 
 type ImportedSnippetItem = HashMap<String, String>;
 
@@ -54,6 +59,7 @@ pub fn import_snippet_from_file(
 
 #[derive(sqlx::FromRow, Deserialize)]
 pub struct SnippetWithPlaceholders {
+    name: String,
     lang: String,
     content: String,
     check_placeholder: i16,
@@ -64,7 +70,8 @@ impl Serialize for SnippetWithPlaceholders {
     where
         S: Serializer,
     {
-        let mut s = serializer.serialize_struct("SnippetWithPlaceholders", 3)?;
+        let mut s = serializer.serialize_struct("SnippetWithPlaceholders", 4)?;
+        s.serialize_field("name", &self.name)?;
         s.serialize_field("lang", &self.lang)?;
         s.serialize_field("content", &self.content)?;
         s.serialize_field("placeholders", &self.placeholders)?;
@@ -87,7 +94,7 @@ pub async fn get_snippet_with_placeholder(
     };
 
     let mut snippet = sqlx::query_as::<_, SnippetWithPlaceholders>(
-        "SELECT check_placeholder, lang, placeholders, content FROM snippets WHERE id = ?",
+        "SELECT check_placeholder, lang, placeholders, content, name FROM snippets WHERE id = ?",
     )
     .bind(&snippet_id)
     .fetch_one(db)
@@ -114,4 +121,67 @@ pub async fn get_snippet_with_placeholder(
     };
 
     Ok(snippet)
+}
+
+#[tauri::command]
+pub fn send_snippet_content(
+    app_handle: tauri::AppHandle,
+    action: String,
+    mut content: String,
+    plaholders_value: HashMap<String, String>,
+    placeholders: Vec<SnippetPlaceholderItem>,
+) -> Result<(), String> {
+    let content = if placeholders.len() > 0 {
+        snippy::snippet::replace_snippet_placeholders(
+            &mut content,
+            &placeholders,
+            &plaholders_value,
+        )
+    } else {
+        &content
+    };
+
+    match action.as_str() {
+        "copy" => {
+            app_handle
+                .clipboard()
+                .write_text(content)
+                .map_err(stringify)?;
+        }
+        "paste" => {
+            let clipboard_text = app_handle.clipboard().read_text().unwrap_or_default();
+
+            app_handle
+                .clipboard()
+                .write_text(content)
+                .map_err(stringify)?;
+            snippy::window::PopupWindow::hide(&app_handle);
+
+            let mut enigo = enigo::Enigo::new(&enigo::Settings::default()).map_err(stringify)?;
+            snippy::keyboard::press_paste(&mut enigo).map_err(stringify)?;
+
+            if !clipboard_text.is_empty() {
+                std::thread::sleep(std::time::Duration::from_millis(10));
+                app_handle
+                    .clipboard()
+                    .write_text(clipboard_text)
+                    .map_err(stringify)?;
+            }
+        }
+        other => {
+            return Err(format!("\"{}\" is invalid action", other));
+        }
+    }
+
+    Ok(())
+}
+
+#[tauri::command]
+pub fn open_snippet(app: tauri::AppHandle, snippet_id: String) -> Result<(), String> {
+    let main_window = snippy::window::MainWindow::create_or_show(&app).map_err(stringify)?;
+    main_window
+        .emit("snippet:open", snippet_id)
+        .map_err(stringify)?;
+
+    Ok(())
 }

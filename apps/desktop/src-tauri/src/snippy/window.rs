@@ -9,6 +9,12 @@ pub const POPUP_WINDOW_SIZE: PhysicalSize<u32> = PhysicalSize {
 pub struct PopupWindow;
 
 impl PopupWindow {
+    pub fn hide(app: &AppHandle) {
+        if let Some(window) = app.get_webview_window("popup") {
+            let _ = window.hide();
+        }
+    }
+
     pub fn get_pos_from_cursor(app: &AppHandle) -> Result<PhysicalPosition<u32>, tauri::Error> {
         let cursor_pos = app.cursor_position()?;
 
@@ -67,7 +73,13 @@ pub struct MainWindow;
 impl MainWindow {
     pub fn create_or_show(app: &tauri::AppHandle) -> Result<WebviewWindow, tauri::Error> {
         let popup_window = match app.get_webview_window("main") {
-            Some(window) => window,
+            Some(window) => {
+                let _ = window.show();
+                let _ = window.unminimize();
+                let _ = window.set_focus();
+
+                window
+            },
             None => {
                 let window = tauri::WebviewWindowBuilder::new(
                     app,

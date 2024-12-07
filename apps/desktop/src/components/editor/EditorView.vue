@@ -19,6 +19,7 @@ import EditorContentCM from './content/EditorContentCM.vue';
 import EditorContentHeader from './content/EditorContentHeader.vue';
 import EditorSidebar from './sidebar/EditorSidebar.vue';
 import { useEditorStore } from '@/stores/editor.store';
+import { useTauriWindowEvent } from '@/composables/tauri.composable';
 
 const editorStore = useEditorStore();
 
@@ -28,6 +29,10 @@ const editorState = shallowReactive<{
 }>({
   errorMessage: '',
   status: 'loading',
+});
+
+useTauriWindowEvent('snippet:open', (event) => {
+  editorStore.state.setSidebarState('activeFileId', event.payload);
 });
 
 editorStore

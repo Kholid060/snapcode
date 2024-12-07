@@ -126,7 +126,7 @@ function vtSnippetFunc<T extends AnyColumn>(
 }
 function vtMatchQuery(column: string, query: string) {
   return query.length < 3
-    ? sql`${sql.raw(column)} GLOB '*${query}*'`
+    ? sql.raw(`${column} LIKE '%${query}%'`)
     : sql`${sql.raw(column)} MATCH '"${sql.raw(query)}"'`;
 }
 export async function querySnippets(
