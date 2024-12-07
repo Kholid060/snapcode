@@ -19,7 +19,7 @@
     </div>
   </div>
   <div ref="placeholder-container" class="grow overflow-auto px-4 pt-1">
-    <div v-for="(value, key) in placeholders" :key="key">
+    <div v-for="(_value, key) in placeholders" :key="key">
       <label :for="key" class="truncate">
         {{ key.slice(2, -2) }}
       </label>

@@ -7,11 +7,13 @@ export const STORE_KEYS = {
   noDeletePrompt: 'editor:no-delete-prompt',
   editorSidebarState: 'editor:sidebar-state',
   shortcutNewSnippet: 'shortcut:new-snippet',
+  recentSnippets: 'quick-access:recent-snippets',
   shortcutSearchWindow: 'shortcut:search-window',
 } as const;
 
 export interface AppStoreState {
   [STORE_KEYS.noDeletePrompt]: boolean;
+  [STORE_KEYS.recentSnippets]: string[];
   [STORE_KEYS.shortcutNewSnippet]: string;
   [STORE_KEYS.shortcutSearchWindow]: string;
   [STORE_KEYS.bookmarkState]: AppBookmarksState;

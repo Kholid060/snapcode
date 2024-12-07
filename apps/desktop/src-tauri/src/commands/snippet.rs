@@ -59,6 +59,7 @@ pub fn import_snippet_from_file(
 
 #[derive(sqlx::FromRow, Deserialize)]
 pub struct SnippetWithPlaceholders {
+    id: String,
     name: String,
     lang: String,
     content: String,
@@ -70,7 +71,8 @@ impl Serialize for SnippetWithPlaceholders {
     where
         S: Serializer,
     {
-        let mut s = serializer.serialize_struct("SnippetWithPlaceholders", 4)?;
+        let mut s = serializer.serialize_struct("SnippetWithPlaceholders", 5)?;
+        s.serialize_field("id", &self.id)?;
         s.serialize_field("name", &self.name)?;
         s.serialize_field("lang", &self.lang)?;
         s.serialize_field("content", &self.content)?;
@@ -94,7 +96,7 @@ pub async fn get_snippet_with_placeholder(
     };
 
     let mut snippet = sqlx::query_as::<_, SnippetWithPlaceholders>(
-        "SELECT check_placeholder, lang, placeholders, content, name FROM snippets WHERE id = ?",
+        "SELECT check_placeholder, lang, placeholders, content, name, id FROM snippets WHERE id = ?",
     )
     .bind(&snippet_id)
     .fetch_one(db)

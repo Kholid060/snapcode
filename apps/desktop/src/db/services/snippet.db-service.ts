@@ -14,6 +14,27 @@ export async function createNewSnippets(snippets: SnippetNewPayload[]) {
   return await db.insert(snippetsTable).values(snippets).returning();
 }
 
+export async function getSnippetByIds(
+  ids: string[],
+): Promise<SnippetListItem[]> {
+  return db.query.snippetsTable.findMany({
+    columns: {
+      id: true,
+      tags: true,
+      name: true,
+      lang: true,
+      keyword: true,
+      folderId: true,
+      updatedAt: true,
+      createdAt: true,
+      isBookmark: true,
+    },
+    where(fields, operators) {
+      return operators.inArray(fields.id, ids);
+    },
+  });
+}
+
 export async function getAllSnippets(): Promise<SnippetListItem[]> {
   return db.query.snippetsTable.findMany({
     columns: {
