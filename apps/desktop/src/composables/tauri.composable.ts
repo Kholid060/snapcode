@@ -21,5 +21,5 @@ export function useTauriWindowEvent<
     handler as EventCallback<unknown>,
   );
 
-  onBeforeUnmount(unlisten);
+  onBeforeUnmount(() => unlisten.then((unlisten) => unlisten()));
 }

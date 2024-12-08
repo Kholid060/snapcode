@@ -16,7 +16,7 @@
         </Button>
       </div>
       <PopupMenu v-model="activeMenu" class="mt-2" />
-      <PopupSearch />
+      <component :is="popupComponentsMap[activeMenu]" />
     </div>
   </TooltipProvider>
   <Toaster />
@@ -29,10 +29,32 @@ import { Cancel01Icon } from 'hugeicons-vue';
 import PopupSearch from './components/popup/PopupSearch.vue';
 import PopupMenu from './components/popup/PopupMenu.vue';
 import type { AppPopupMenuItems } from './interface/app.interface';
+import PopupBookmarks from './components/popup/PopupBookmarks.vue';
+import PopupNewSnippet from './components/popup/PopupNewSnippet.vue';
+import { useTauriWindowEvent } from './composables/tauri.composable';
+
+const TIMEOUT_WINDOW_MS = 5 * 60 * 1000;
+let timeout = -1;
+
+const popupComponentsMap: Record<AppPopupMenuItems, Component> = {
+  search: PopupSearch,
+  bookmarks: PopupBookmarks,
+  'new-snippet': PopupNewSnippet,
+};
 
 const currWindow = getCurrentWindow();
 
 const activeMenu = shallowRef<AppPopupMenuItems>('search');
+
+useTauriWindowEvent('tauri://focus', () => {
+  clearTimeout(timeout);
+});
+useTauriWindowEvent('tauri://blur', () => {
+  clearTimeout(timeout);
+  timeout = setTimeout(() => {
+    currWindow.close();
+  }, TIMEOUT_WINDOW_MS);
+});
 
 window.addEventListener('keydown', (event) => {
   if (event.key !== 'Escape' || event.ctrlKey || event.shiftKey || event.altKey)

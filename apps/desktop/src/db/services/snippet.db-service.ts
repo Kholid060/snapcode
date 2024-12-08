@@ -7,35 +7,36 @@ import {
 } from '@/interface/snippet.interface';
 import { db } from '../db';
 import { NewSnippet, snippetsTable, snippetsVTable } from '../schema';
-import { and, AnyColumn, eq, inArray, sql } from 'drizzle-orm';
+import {
+  and,
+  AnyColumn,
+  eq,
+  inArray,
+  Operators,
+  OrderByOperators,
+  SQL,
+  sql,
+} from 'drizzle-orm';
 import { DB_VIRTUAL_TABLE_NAME } from '@/utils/const/db.const';
 
 export async function createNewSnippets(snippets: SnippetNewPayload[]) {
   return await db.insert(snippetsTable).values(snippets).returning();
 }
 
-export async function getSnippetByIds(
-  ids: string[],
-): Promise<SnippetListItem[]> {
-  return db.query.snippetsTable.findMany({
-    columns: {
-      id: true,
-      tags: true,
-      name: true,
-      lang: true,
-      keyword: true,
-      folderId: true,
-      updatedAt: true,
-      createdAt: true,
-      isBookmark: true,
-    },
-    where(fields, operators) {
-      return operators.inArray(fields.id, ids);
-    },
-  });
+interface GetAllSnippetsOptions {
+  filter?: (
+    fields: typeof snippetsTable._.columns,
+    operators: Operators,
+  ) => SQL | undefined;
+  orderBy?: (
+    fields: typeof snippetsTable._.columns,
+    operators: OrderByOperators,
+  ) => SQL | SQL[];
 }
-
-export async function getAllSnippets(): Promise<SnippetListItem[]> {
+export async function getAllSnippets({
+  filter,
+  orderBy,
+}: GetAllSnippetsOptions = {}): Promise<SnippetListItem[]> {
   return db.query.snippetsTable.findMany({
     columns: {
       id: true,
@@ -48,9 +49,12 @@ export async function getAllSnippets(): Promise<SnippetListItem[]> {
       createdAt: true,
       isBookmark: true,
     },
-    orderBy(fields, operators) {
-      return operators.sql`${fields.name} COLLATE NOCASE ASC`;
-    },
+    orderBy:
+      orderBy ||
+      ((fields, operators) => {
+        return operators.sql`${fields.name} COLLATE NOCASE ASC`;
+      }),
+    where: filter,
   });
 }
 

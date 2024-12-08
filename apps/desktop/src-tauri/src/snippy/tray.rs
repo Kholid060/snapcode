@@ -44,7 +44,10 @@ pub fn init_app_tray(app: &App) -> Result<(), Error> {
                 app.exit(0);
             }
             "quick-access" => {
-                snippy::window::PopupWindow::create_or_show(&app).unwrap();
+                if let Ok(window) = snippy::window::PopupWindow::get_or_create(&app) {
+                    let _ = window.show();
+                    let _ = window.set_focus();
+                }
             }
             _ => {}
         })

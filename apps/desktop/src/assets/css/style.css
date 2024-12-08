@@ -61,3 +61,7 @@ html {
     position: absolute;
   }
 }
+
+span[search-result] {
+  @apply bg-primary/40 text-foreground rounded;
+}

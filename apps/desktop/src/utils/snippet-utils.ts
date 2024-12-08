@@ -1,3 +1,4 @@
+import sanitizeHtml from 'sanitize-html';
 import { extname } from '@tauri-apps/api/path';
 import { languages } from '@snippy/codemirror';
 import { catchAsyncFn } from './helper';
@@ -11,4 +12,11 @@ export async function getSnippetLangFromName(snippetName: string) {
   );
 
   return language ?? null;
+}
+
+export function sanitizeSnippetHTML(str: string) {
+  return sanitizeHtml(str, {
+    allowedTags: ['span'],
+    allowedAttributes: { span: ['search-result'] },
+  });
 }

@@ -40,15 +40,10 @@ impl PopupWindow {
         Ok(PhysicalPosition { x: pos_x, y: pos_y })
     }
 
-    pub fn create_or_show(app: &tauri::AppHandle) -> Result<WebviewWindow, tauri::Error> {
+    pub fn get_or_create(app: &tauri::AppHandle) -> Result<WebviewWindow, tauri::Error> {
         let initial_pos = PopupWindow::get_pos_from_cursor(&app)?;
         let popup_window = match app.get_webview_window("popup") {
-            Some(window) => {
-                let _ = window.show();
-                let _ = window.set_focus();
-
-                window
-            },
+            Some(window) => window,
             None => tauri::WebviewWindowBuilder::new(
                 app,
                 "popup",
