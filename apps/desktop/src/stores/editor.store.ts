@@ -141,6 +141,31 @@ const useEditorDataStore = defineStore('editor:snippets', () => {
     addTreeItem([itemData], folder.to ?? undefined);
   }
 
+  function registerSnippets(snippetList: SnippetListItem[]) {
+    const groupedSnippets: Record<FolderId, TreeDataItem[]> = {};
+    snippetList.forEach((snippet) => {
+      const folderId = snippet.folderId ?? TREE_ROOT_KEY;
+      if (!groupedSnippets[folderId]) groupedSnippets[folderId] = [];
+
+      groupedSnippets[folderId].push({ id: snippet.id, isFolder: false });
+
+      snippets.value[snippet.id] = {
+        id: snippet.id,
+        lang: snippet.lang,
+        name: snippet.name,
+        tags: snippet.tags,
+        keyword: snippet.keyword,
+        folderId: snippet.folderId,
+        updatedAt: snippet.updatedAt,
+        createdAt: snippet.createdAt,
+        isBookmark: snippet.isBookmark,
+      };
+    });
+
+    for (const folderId in groupedSnippets) {
+      addTreeItem(groupedSnippets[folderId], folderId);
+    }
+  }
   async function addSnippets(payload: SnippetNewPayload[]) {
     if (payload.length === 0) return;
 
@@ -368,6 +393,7 @@ const useEditorDataStore = defineStore('editor:snippets', () => {
     updateSnippet,
     activeSnippet,
     removeBookmarks,
+    registerSnippets,
   };
 });
 

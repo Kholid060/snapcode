@@ -1,5 +1,5 @@
 import { EditorView, EditorViewConfig, keymap } from '@codemirror/view';
-import { basicSetup } from 'codemirror';
+import { basicSetup, minimalSetup } from 'codemirror';
 import { vscodeKeymap } from '@replit/codemirror-vscode-keymap';
 import { languages } from '@codemirror/language-data';
 import { EditorState, EditorStateConfig, Extension } from '@codemirror/state';
@@ -39,6 +39,18 @@ export function loadCodemirror(config: EditorViewConfig = {}) {
     ...config,
     extensions: [
       basicSetup,
+      themeExtension,
+      keymap.of(vscodeKeymap),
+      config.extensions ?? [],
+    ],
+  });
+}
+
+export function loadCodemirrorMinimal(config: EditorViewConfig = {}) {
+  return new CMEditorView({
+    ...config,
+    extensions: [
+      minimalSetup,
       themeExtension,
       keymap.of(vscodeKeymap),
       config.extensions ?? [],

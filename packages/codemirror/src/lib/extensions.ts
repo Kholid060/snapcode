@@ -51,7 +51,6 @@ export function snippetPlaceholder({
           update.viewportChanged
         ) {
           this.decorations = decorator.updateDeco(update, this.decorations);
-          console.log(this.decorations);
         }
       }
     },

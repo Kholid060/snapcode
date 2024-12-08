@@ -34,6 +34,9 @@ const editorState = shallowReactive<{
 useTauriWindowEvent('snippet:open', (event) => {
   editorStore.state.setSidebarState('activeFileId', event.payload);
 });
+useTauriWindowEvent('snippet:created', (event) => {
+  editorStore.data.registerSnippets([event.payload]);
+});
 
 editorStore
   .init()

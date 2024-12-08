@@ -11,3 +11,5 @@ export interface AppBookmarksState {
 }
 
 export type AppPopupMenuItems = 'search' | 'new-snippet' | 'bookmarks';
+
+export type AppWindowLabel = 'main' | 'popup';
