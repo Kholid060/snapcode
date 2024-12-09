@@ -22,6 +22,7 @@ import { getLogMessage } from '@/utils/helper';
 import { getSnippetContent } from '@/db/services/snippet.db-service';
 import { useDebounceFn } from '@vueuse/core';
 import EditorContentFooter from './EditorContentFooter.vue';
+import { getSnippetLangFromName } from '@/utils/snippet-utils';
 
 let isReplaceValue = false;
 const languageComp = new Compartment();
@@ -50,7 +51,11 @@ function updateCursorPos(update: ViewUpdate) {
 async function loadLanguage() {
   if (!cmView.value) return;
 
-  const language = getLanguageByName(editorStore.data.activeSnippet.lang!);
+  const snippet = editorStore.data.activeSnippet;
+
+  const language = snippet.lang
+    ? getLanguageByName(editorStore.data.activeSnippet.lang!)
+    : await getSnippetLangFromName(snippet.name ?? '');
   const langExt = language ? await language.load() : null;
   cmView.value.dispatch({
     effects: languageComp.reconfigure(langExt ?? []),

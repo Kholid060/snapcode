@@ -37,7 +37,7 @@ pub fn import_snippet_from_file(
         let mut snippet = HashMap::new();
 
         let file_name = path
-            .file_stem()
+            .file_name()
             .unwrap_or_default()
             .to_str()
             .unwrap_or_default();

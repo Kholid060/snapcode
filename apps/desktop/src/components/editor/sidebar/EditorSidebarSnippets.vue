@@ -82,6 +82,7 @@ import { useAppDialog } from '@/providers/app-dialog.provider';
 import { TREE_ROOT_KEY, type TreeDataItem } from '@/utils/tree-data-utils';
 import { useEditorSidebarProvider } from '@/providers/editor.provider';
 import { appCommand } from '@/services/app-command.service';
+import { getSnippetLang } from '@/utils/snippet-utils';
 
 const { toast } = useToast();
 const appDialog = useAppDialog();
@@ -146,9 +147,9 @@ async function importSnippetFromFiles() {
 
     await editorStore.data.addSnippets(
       files.map((file) => ({
-        ext: file.ext,
         name: file.name,
         content: file.content,
+        lang: getSnippetLang(file)?.name,
         folderId: selectedFolder.folderId,
       })),
     );
