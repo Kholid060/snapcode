@@ -7,6 +7,7 @@ mod commands;
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_http::init())
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_clipboard_manager::init())
@@ -41,13 +42,18 @@ pub fn run() {
             _ => {}
         })
         .setup(|app| {
-            snippy::window::MainWindow::create_or_show(app.app_handle())?;
+            let salt_path = app
+                .path()
+                .app_local_data_dir()
+                .expect("could not resolve app local data path")
+                .join("salt.txt");
+            app.handle().plugin(tauri_plugin_stronghold::Builder::with_argon2(&salt_path).build())?;
+
+            snippy::init_app(app)?;
 
             #[cfg(desktop)]
             app.handle()
                 .plugin(tauri_plugin_global_shortcut::Builder::new().build())?;
-
-            snippy::init_app(app)?;
 
             Ok(())
         })

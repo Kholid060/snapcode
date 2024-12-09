@@ -14,6 +14,14 @@ export async function getSnippetLangFromName(snippetName: string) {
   return language ?? null;
 }
 
+export function getSnippetLang({ name, ext }: { name: string; ext?: string }) {
+  return languages.find(
+    (lang) =>
+      (ext ? lang.extensions.includes(ext) : false) ??
+      lang.filename?.test(name),
+  );
+}
+
 export function sanitizeSnippetHTML(str: string) {
   return sanitizeHtml(str, {
     allowedTags: ['span'],

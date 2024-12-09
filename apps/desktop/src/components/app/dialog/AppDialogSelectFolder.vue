@@ -78,7 +78,9 @@ const search = shallowRef('');
 
 async function createFolder() {
   try {
-    const folder = await editorStore.data.addFolder({ name: search.value });
+    const [folder] = await editorStore.data.addFolders([
+      { name: search.value },
+    ]);
     emit('close', { canceled: false, folderId: folder.id });
   } catch (error) {
     logger.error(getLogMessage('dialog-select-folder:create-folder', error));

@@ -23,6 +23,8 @@
     "core:window:allow-start-dragging",
     "core:window:allow-toggle-maximize",
     "decorum:allow-show-snap-overlay",
+    "stronghold:default",
+    "stronghold:allow-remove-store-record",
     "fs:default",
     {
       "identifier": "fs:allow-read-dir",
@@ -32,6 +34,10 @@
       "identifier": "fs:allow-read-text-file",
       "allow": [{ "path": "$RESOURCE/db/**/*" }]
     },
+    {
+      "identifier": "http:default",
+      "allow": ["https://api.github.com/**/*", "https://gist.githubusercontent.com/**/*"]
+    }, 
     "shell:allow-open"
   ]
 }

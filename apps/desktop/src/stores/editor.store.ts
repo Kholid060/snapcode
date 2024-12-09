@@ -270,14 +270,17 @@ const useEditorDataStore = defineStore('editor:snippets', () => {
       delete treeData.value[item.id];
     }
   }
-  async function addFolder(payload: FolderNewPayload = {}) {
-    const [folder] = await folderService.createNewFolders([payload]);
+  async function addFolders(payload: FolderNewPayload[]) {
+    const newFolders = await folderService.createNewFolders(payload);
+    newFolders.forEach((folder) => {
+      folders.value[folder.id] = folder;
+      addTreeItem(
+        [{ id: folder.id, isFolder: true }],
+        folder.parentId ?? undefined,
+      );
+    });
 
-    folders.value[folder.id] = folder;
-    addTreeItem(
-      [{ id: folder.id, isFolder: true }],
-      folder.parentId ?? undefined,
-    );
+    return newFolders;
   }
   async function deleteFolder(folderId: FolderId) {
     const folderData = folders.value[folderId];
@@ -384,7 +387,7 @@ const useEditorDataStore = defineStore('editor:snippets', () => {
     folders,
     treeData,
     snippets,
-    addFolder,
+    addFolders,
     deleteItems,
     addSnippets,
     deleteFolder,

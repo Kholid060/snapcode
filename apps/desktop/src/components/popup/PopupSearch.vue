@@ -10,7 +10,12 @@
     @update:search-term="fetchSnippets"
     :item-contains-html="!searchEmpty"
     :filter-function="(value) => value"
-  />
+  >
+    <template #empty>
+      <AppSearchOptionsDescription v-if="searchEmpty" />
+      <span>No results found.</span>
+    </template>
+  </PopupSnippetCombobox>
 </template>
 <script setup lang="ts">
 import { useDebounceFn } from '@vueuse/core';
@@ -27,6 +32,7 @@ import { logger } from '@/services/logger.service';
 import { getLogMessage } from '@/utils/helper';
 import { store } from '@/services/store.service';
 import PopupSnippetCombobox from './PopupSnippetCombobox.vue';
+import AppSearchOptionsDescription from '../app/AppSearchOptionsDescription.vue';
 
 const { toast } = useToast();
 

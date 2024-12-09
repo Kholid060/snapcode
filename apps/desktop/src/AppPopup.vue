@@ -33,7 +33,7 @@ import PopupBookmarks from './components/popup/PopupBookmarks.vue';
 import PopupNewSnippet from './components/popup/PopupNewSnippet.vue';
 import { useTauriWindowEvent } from './composables/tauri.composable';
 
-const TIMEOUT_WINDOW_MS = 5 * 60 * 1000;
+const TIMEOUT_WINDOW_MS = 10 * 60 * 1000;
 let timeout = -1;
 
 const popupComponentsMap: Record<AppPopupMenuItems, Component> = {

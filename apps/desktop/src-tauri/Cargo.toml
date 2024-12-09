@@ -36,6 +36,8 @@ sqlx = "0.8.2"
 regex = "1.11.1"
 enigo = "0.3.0"
 tauri-plugin-clipboard-manager = "2.0.2"
+tauri-plugin-http = "2.0.4"
+tauri-plugin-stronghold = "2"
 
 [target.'cfg(any(target_os = "macos", windows, target_os = "linux"))'.dependencies]
 tauri-plugin-global-shortcut = "2.0.1"

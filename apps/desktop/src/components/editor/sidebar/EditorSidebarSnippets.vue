@@ -23,7 +23,7 @@
         </EditorSidebarIconButton>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem>
+        <DropdownMenuItem @click="showGitHubGistsDialog = true">
           <img src="@/assets/svg/github-mark-white.svg" class="size-4" />
           Import GitHub gists
         </DropdownMenuItem>
@@ -54,6 +54,11 @@
     "
     class="mt-2 grow overflow-auto px-2 pb-4 pt-1"
   />
+  <Dialog v-model:open="showGitHubGistsDialog">
+    <DialogContent class="block space-y-0 p-0">
+      <EditorSidebarGitHubGists @close="showGitHubGistsDialog = false" />
+    </DialogContent>
+  </Dialog>
 </template>
 
 <script setup lang="ts">
@@ -64,6 +69,8 @@ import {
   TooltipSimple,
   DropdownMenuTrigger,
   useToast,
+  Dialog,
+  DialogContent,
 } from '@snippy/ui';
 import EditorSidebarIconButton from './EditorSidebarIconButton.vue';
 import { useEditorStore } from '@/stores/editor.store';
@@ -83,6 +90,7 @@ import { TREE_ROOT_KEY, type TreeDataItem } from '@/utils/tree-data-utils';
 import { useEditorSidebarProvider } from '@/providers/editor.provider';
 import { appCommand } from '@/services/app-command.service';
 import { getSnippetLang } from '@/utils/snippet-utils';
+import EditorSidebarGitHubGists from './EditorSidebarGitHubGists.vue';
 
 const { toast } = useToast();
 const appDialog = useAppDialog();
@@ -92,6 +100,7 @@ const sidebarProvider = useEditorSidebarProvider();
 const treeRootRef = useTemplateRef<HTMLElement>('tree-root');
 
 const isHidden = shallowRef(false);
+const showGitHubGistsDialog = shallowRef(false);
 
 const selectedItems = computed({
   get() {
@@ -121,7 +130,7 @@ async function createNewSnippet() {
 }
 async function createNewFolder() {
   try {
-    await editorStore.data.addFolder();
+    await editorStore.data.addFolders([{}]);
   } catch (error) {
     if (error instanceof Error) {
       await logger.error(`[create-folder] ${error.message}`);

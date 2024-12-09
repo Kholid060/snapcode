@@ -2,7 +2,7 @@
   <div class="px-4 pt-1.5">
     <Input
       v-model="newSnippet.name"
-      class="bg-inherit"
+      class="h-9 bg-inherit"
       ref="name-input"
       placeholder="unnamed.txt"
     />
@@ -12,11 +12,12 @@
     class="codemirror grow overflow-auto px-2 pt-1"
   ></div>
   <div class="flex items-center gap-2 px-4 py-2">
-    <Popover>
+    <Popover v-slot="{ open }">
       <PopoverTrigger as-child>
         <Button
           variant="outline"
-          role="combobox"
+          :role="!open ? 'button' : 'combobox'"
+          size="sm"
           class="grow justify-between bg-inherit text-sm"
         >
           {{ newSnippet.folder.name }}
@@ -49,7 +50,7 @@
         </Command>
       </PopoverContent>
     </Popover>
-    <Button class="gap-0 text-sm" @click="createSnippet">
+    <Button class="gap-0 text-sm" @click="createSnippet" size="sm">
       Create
       <Kbd variant="primary-top" class="ml-1 capitalize">
         {{ getHotkeyLabel('mod') }}

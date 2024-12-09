@@ -20,7 +20,9 @@
         :key="item.id"
         :value="item.id"
         class="border-border/50 mb-px block"
-        @select.prevent="$emit('select-item', item)"
+        @select.prevent="
+          editorStore.state.setSidebarState('activeFileId', item.id)
+        "
       >
         <p v-html="sanitizeSnippetHTML(item.name)"></p>
         <p
@@ -48,6 +50,9 @@ import { debouncedRef } from '@vueuse/core';
 import UiComboboxSearch from '@/components/ui/UiComboboxSearch.vue';
 import AppSearchOptionsDescription from '@/components/app/AppSearchOptionsDescription.vue';
 import { sanitizeSnippetHTML } from '@/utils/snippet-utils';
+import { useEditorStore } from '@/stores/editor.store';
+
+const editorStore = useEditorStore();
 
 const search = shallowRef('');
 const result = shallowRef<SnippetSearchListItem[]>([]);
