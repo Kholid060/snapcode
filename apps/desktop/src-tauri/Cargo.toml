@@ -19,7 +19,6 @@ tauri-build = { version = "2", features = [] }
 
 [dependencies]
 tauri = { version = "2", features = ["tray-icon"] }
-tauri-plugin-shell = "2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 tauri-plugin-sql = { version = "2", features = ["sqlite"] }
@@ -28,9 +27,6 @@ tauri-plugin-log = "2.0.2"
 tauri-plugin-store = "2.1.0"
 tauri-plugin-decorum = { "path" = "../../../packages/tauri-plugin-decorum" }
 tauri-plugin-os = "2.0.1"
-grep-matcher = "0.1.7"
-grep-searcher = "0.1.14"
-grep-regex = "0.1.13"
 tauri-plugin-dialog = "2.0.3"
 sqlx = "0.8.2"
 regex = "1.11.1"
@@ -38,6 +34,8 @@ enigo = "0.3.0"
 tauri-plugin-clipboard-manager = "2.0.2"
 tauri-plugin-http = "2.0.4"
 tauri-plugin-stronghold = "2"
+windows-sys = "0.59.0"
+tauri-plugin-prevent-default = "0.8.0"
 
 [target.'cfg(any(target_os = "macos", windows, target_os = "linux"))'.dependencies]
 tauri-plugin-global-shortcut = "2.0.1"

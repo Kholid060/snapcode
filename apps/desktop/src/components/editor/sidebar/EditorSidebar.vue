@@ -21,18 +21,6 @@
           <component :is="item.icon" class="size-5" />
         </Button>
       </TooltipSimple>
-      <Dialog v-model:open="showSettings">
-        <TooltipSimple label="Code Images">
-          <DialogTrigger>
-            <Button size="icon" variant="ghost">
-              <WebProgrammingIcon class="size-5" />
-            </Button>
-          </DialogTrigger>
-        </TooltipSimple>
-        <DialogContent>
-          <p>Settings</p>
-        </DialogContent>
-      </Dialog>
       <div class="grow"></div>
       <Dialog v-model:open="showSettings">
         <TooltipSimple
@@ -75,7 +63,6 @@ import {
   FolderFileStorageIcon,
   Search01Icon,
   Settings01Icon,
-  WebProgrammingIcon,
 } from 'hugeicons-vue';
 import {
   Button,

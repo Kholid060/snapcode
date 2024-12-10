@@ -13,6 +13,7 @@ pub fn run() {
         .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_decorum::init())
+        .plugin(tauri_plugin_prevent_default::init())
         .plugin(tauri_plugin_store::Builder::new().build())
         .plugin(
             tauri_plugin_log::Builder::new()
@@ -26,7 +27,6 @@ pub fn run() {
                 .build(),
         )
         .plugin(tauri_plugin_sql::Builder::default().build())
-        .plugin(tauri_plugin_shell::init())
         .invoke_handler(tauri::generate_handler![
             commands::window::open_popup_window,
             commands::snippet::open_snippet,

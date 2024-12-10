@@ -12,8 +12,8 @@
     :filter-function="(value) => value"
   >
     <template #empty>
-      <AppSearchOptionsDescription v-if="searchEmpty" />
-      <span>No results found.</span>
+      <AppSearchOptionsDescription v-if="searchEmpty" class="text-left" />
+      <span v-else>No results found.</span>
     </template>
   </PopupSnippetCombobox>
 </template>

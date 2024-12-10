@@ -28,7 +28,8 @@
           <span class="text-muted-foreground">No results found.</span>
         </slot>
       </CommandEmpty>
-      <CommandGroup :heading="groupHeading" class="p-0">
+      <slot name="empty" v-else-if="items.length === 0"></slot>
+      <CommandGroup v-else :heading="groupHeading" class="p-0">
         <CommandItem
           v-for="item in items"
           :key="item.id"

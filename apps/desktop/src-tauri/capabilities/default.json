@@ -37,7 +37,6 @@
     {
       "identifier": "http:default",
       "allow": ["https://api.github.com/**/*", "https://gist.githubusercontent.com/**/*"]
-    }, 
-    "shell:allow-open"
+    }
   ]
 }

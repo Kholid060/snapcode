@@ -31,6 +31,10 @@
           <File01Icon />
           Import from file
         </DropdownMenuItem>
+        <DropdownMenuItem @click="importFromImageFile">
+          <Image02Icon />
+          Import from image file
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   </div>
@@ -81,6 +85,7 @@ import {
   FolderAddIcon,
   File01Icon,
   MoreHorizontalCircle01Icon,
+  Image02Icon,
 } from 'hugeicons-vue';
 import { useHotkey } from '@/composables/hotkey.composable';
 import { APP_DEFAULT_HOTKEY } from '@/utils/const/app.const';
@@ -165,6 +170,9 @@ async function importSnippetFromFiles() {
   } catch (error) {
     logger.error(getLogMessage('import-snippet-from-file', error));
   }
+}
+function importFromImageFile() {
+  console.log('from image');
 }
 
 useHotkey(

@@ -24,10 +24,6 @@
         />
         {{ itemData?.isBookmark ? 'Remove from bookmark' : 'Add to bookmark' }}
       </ContextMenuItem>
-      <ContextMenuItem @click="exportSnippet">
-        <FileUploadIcon class="mr-2 size-4" />
-        Export as file
-      </ContextMenuItem>
       <ContextMenuSeparator />
       <ContextMenuItem
         class="text-destructive-text focus:text-destructive-text"
@@ -90,7 +86,6 @@ import {
   BookmarkAdd02Icon,
   Delete02Icon as DeleteIcon,
   PencilEdit01Icon as PencilEditIcon,
-  FileUploadIcon,
 } from 'hugeicons-vue';
 
 const props = defineProps<{
@@ -108,7 +103,6 @@ const itemData = computed(() =>
     : editorStore.data.folders[props.ctxData.id],
 );
 
-function exportSnippet() {}
 async function createFolderSnippet() {
   try {
     if (props.ctxData.type !== 'folder') return;
