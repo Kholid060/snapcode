@@ -2,6 +2,7 @@ import { ClientOptions, fetch } from '@tauri-apps/plugin-http';
 import appVault from './app-vault.service';
 import { FetchError } from '@/utils/errors';
 import { GitHubGistListItem } from '@/interface/github.interface';
+import { githubLinkHeaderParser } from '@/utils/github-utils';
 
 type FetchInit = RequestInit &
   ClientOptions & {
@@ -42,24 +43,26 @@ async function fetchGitHubApi<T = unknown>(
   return { data: result, headers: response.headers };
 }
 
-export async function listGitHubGistsByUsername(username: string) {
-  const result = await fetchGitHubApi<GitHubGistListItem[]>(
-    `users/${username}/gists`,
-    {
-      auth: true,
-    },
+export async function listGitHubGistsByUsername(
+  username: string,
+  params: Record<string, string> | URLSearchParams = {},
+) {
+  const searchParams = new URLSearchParams(params);
+  const { data, headers } = await fetchGitHubApi<GitHubGistListItem[]>(
+    `/users/${username}/gists?${searchParams.toString()}`,
   );
 
   return {
-    data: result.data,
-    ratelimitRemaining: result.headers.get('x-ratelimit-remaining'),
+    data: data,
+    ratelimitRemaining: headers.get('x-ratelimit-remaining'),
+    pagination: headers.has('link')
+      ? githubLinkHeaderParser(headers.get('link')!)
+      : null,
   };
 }
 
 export async function getGitHubGistsById(id: string) {
-  const result = await fetchGitHubApi<GitHubGistListItem>(`/gists/${id}`, {
-    auth: true,
-  });
+  const result = await fetchGitHubApi<GitHubGistListItem>(`/gists/${id}`);
 
   return {
     data: result.data,

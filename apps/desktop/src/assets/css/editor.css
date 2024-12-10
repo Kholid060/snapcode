@@ -2,9 +2,9 @@
 
 .codemirror {
   .cm-scroller {
+    padding: theme('padding.1');
     padding-left: 0;
     padding-bottom: 0;
-    padding: theme('padding.1');
   }
 
   .cm-gutters {

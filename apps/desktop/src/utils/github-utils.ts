@@ -1,4 +1,9 @@
-import { GitHubGistFile } from '@/interface/github.interface';
+import {
+  GitHubApiPagination,
+  GitHubGistFile,
+  GitHubGistListItem,
+  GitHubLinkHeaderRel,
+} from '@/interface/github.interface';
 import { SnippetNewPayload } from '@/interface/snippet.interface';
 import { fetch } from '@tauri-apps/plugin-http';
 import { FetchError } from './errors';
@@ -46,4 +51,21 @@ export function githubGistFilesToSnippet(
   return Promise.all(
     files.map((file) => githubGistFileToSnippet(file, folderId)),
   );
+}
+
+export function githubLinkHeaderParser(header: string) {
+  const pagination: GitHubApiPagination = {};
+  for (const str of header.split(',')) {
+    const [rawUrl, rawRel] = str.split(';');
+    const url = rawUrl.trim().slice(1, -1);
+    const rel = rawRel.trim().slice(5, -1) as GitHubLinkHeaderRel;
+
+    pagination[rel] = url;
+  }
+
+  return pagination;
+}
+
+export function getGitHubGistName(gist: GitHubGistListItem) {
+  return gist.description || Object.keys(gist.files)[0] || '(unnamed gist)';
 }

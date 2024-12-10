@@ -16,3 +16,7 @@ export interface GitHubGistListItem {
   description: string | null;
   files: Record<string, GitHubGistFile>;
 }
+
+export type GitHubLinkHeaderRel = 'next' | 'first' | 'last' | 'prev';
+
+export type GitHubApiPagination = Partial<Record<GitHubLinkHeaderRel, string>>;
