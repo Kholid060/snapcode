@@ -18,7 +18,9 @@
         <Input
           v-model="gistState.url"
           id="gist-input"
-          :disabled="Boolean(listGistsByUsernameData)"
+          :disabled="
+            Boolean(listGistsByUsernameData) || listImportState.isLoading
+          "
           placeholder="https://gists.github.com/john_doe/92kd91ads"
         />
       </div>
@@ -65,7 +67,7 @@
           <p class="text-muted-foreground mt-0.5 text-xs">
             Use
             <a
-              href="https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic"
+              href="https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-fine-grained-personal-access-token"
               target="_blank"
               class="underline"
             >
@@ -150,23 +152,25 @@
             v-if="selectedGists.length !== listGistsByUsernameData.length"
           />
         </Checkbox>
-        <Label for="select-all-checkbox"
-          >{{
+        <Label for="select-all-checkbox">
+          {{
             selectedGists.length !== listGistsByUsernameData.length
               ? 'Select'
               : 'Deselect'
           }}
-          all</Label
-        >
+          all
+        </Label>
       </template>
       <div class="grow"></div>
-      <Button
-        type="button"
-        variant="outline"
-        :disabled="listImportState.isLoading"
-      >
-        Import all
-      </Button>
+      <DialogClose as-child>
+        <Button
+          type="button"
+          variant="outline"
+          :disabled="listImportState.isLoading || listImportState.isLoading"
+        >
+          Cancel
+        </Button>
+      </DialogClose>
       <Button
         :disabled="listImportState.isLoading || selectedGists.length <= 0"
         class="gap-0"
@@ -178,7 +182,12 @@
       </Button>
     </DialogFooter>
     <DialogFooter v-else class="px-6 pb-6 pt-2">
+      <p v-if="listImportState.isLoading">
+        <Loading03Icon class="inline animate-spin align-top" />
+        {{ listImportState.importCount }} imported
+      </p>
       <Button
+        v-else
         class="px-2"
         variant="ghost"
         type="button"
@@ -197,9 +206,45 @@
       </Button>
       <div class="grow"></div>
       <DialogClose as-child>
-        <Button type="button" variant="outline">Cancel</Button>
+        <Button
+          type="button"
+          variant="outline"
+          :disabled="listImportState.isLoading || listImportState.isLoading"
+        >
+          Cancel
+        </Button>
       </DialogClose>
-      <Button type="submit" :is-loading="gistState.loading">Import</Button>
+      <div
+        class="bg-primary text-primary-foreground relative flex h-9 items-center rounded-md text-sm"
+      >
+        <div
+          v-if="gistState.loading || listImportState.isLoading"
+          style="background-color: inherit; border-radius: inherit"
+          class="absolute left-0 top-0 z-50 flex size-full items-center justify-center"
+        >
+          <Loading03Icon style="color: inherit" class="animate-spin" />
+        </div>
+        <button
+          type="submit"
+          class="hover:bg-lime-10 h-full grow rounded-l-md px-3 font-medium transition-colors"
+          :disabled="gistState.loading || listImportState.isLoading"
+        >
+          Import
+        </button>
+        <hr class="h-6 w-px bg-black/20" />
+        <DropdownMenu>
+          <DropdownMenuTrigger
+            type="button"
+            class="hover:bg-lime-10 h-full w-9 rounded-r-md text-center transition-colors"
+            :disabled="gistState.loading || listImportState.isLoading"
+          >
+            <ArrowDown01Icon class="inline size-5" />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem @click="importAll"> Import all </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
     </DialogFooter>
   </form>
 </template>
@@ -234,11 +279,16 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
   Input,
   Label,
   useToast,
 } from '@snippy/ui';
 import {
+  ArrowDown01Icon,
   ArrowLeft01Icon,
   Cancel01Icon,
   Loading03Icon,
@@ -313,6 +363,55 @@ const githubGistsList = computed(() => {
   );
 });
 
+async function importAll() {
+  const username = gistState.url.trim();
+  if (!username) return;
+  if (username.startsWith(GITHUB_GISTS_BASE_URL)) {
+    importById(username);
+    return;
+  }
+
+  try {
+    const selectFolder = await appDialog.selectFolder({
+      title: 'Select folder where to store the snippets',
+    });
+    if (selectFolder.canceled) return;
+
+    listImportState.isLoading = true;
+    let params: Record<string, string> | URLSearchParams = {
+      per_page: LIST_GIST_PER_PAGE.toString(),
+    };
+
+    while (true) {
+      const result = await listGitHubGistsByUsername(username, params);
+      await storeGitHubGists(result.data, selectFolder.folderId);
+
+      listImportState.importCount += result.data.length;
+      gistState.ratelimitRemaining = result.ratelimitRemaining ?? '';
+
+      const nextLinkUrl = result.pagination?.next;
+      if (!nextLinkUrl) break;
+
+      params = new URL(nextLinkUrl).searchParams;
+    }
+
+    selectedGists.value = [];
+    toast({
+      title: `${listImportState.importCount} snippets imported`,
+    });
+    emit('close');
+  } catch (error) {
+    logger.error(getLogMessage('import-gists:import-all', error));
+    toast({
+      variant: 'destructive',
+      title: 'An error occured',
+      description: (error as Error).message,
+    });
+  } finally {
+    listImportState.importCount = 0;
+    listImportState.isLoading = false;
+  }
+}
 async function importSelectedGists() {
   try {
     const selectFolder = await appDialog.selectFolder({
