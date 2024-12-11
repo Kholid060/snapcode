@@ -66,13 +66,12 @@
           />
           <p class="text-muted-foreground mt-0.5 text-xs">
             Use
-            <a
+            <UiLink
               href="https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-fine-grained-personal-access-token"
-              target="_blank"
               class="underline"
             >
               GitHub fine-grained access tokens
-            </a>
+            </UiLink>
             to increase the API limit. You can use one that doesn't have any
             permissions.
           </p>
@@ -249,6 +248,7 @@
   </form>
 </template>
 <script setup lang="ts">
+import UiLink from '@/components/ui/UiLink.vue';
 import type { FolderNewPayload } from '@/interface/folder.interface';
 import type {
   GitHubApiPagination,

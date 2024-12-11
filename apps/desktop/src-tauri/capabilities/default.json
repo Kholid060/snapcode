@@ -26,6 +26,9 @@
     "stronghold:default",
     "stronghold:allow-remove-store-record",
     "fs:default",
+    "autostart:default",
+    "shell:allow-open",
+    "updater:default",
     {
       "identifier": "fs:allow-read-dir",
       "allow": [{ "path": "$RESOURCE/db/**/*" }]

@@ -36,7 +36,11 @@ tauri-plugin-http = "2.0.4"
 tauri-plugin-stronghold = "2"
 windows-sys = "0.59.0"
 tauri-plugin-prevent-default = "0.8.0"
+tauri-plugin-shell = "2.2.0"
 
 [target.'cfg(any(target_os = "macos", windows, target_os = "linux"))'.dependencies]
+tauri-plugin-autostart = "2.2.0"
 tauri-plugin-global-shortcut = "2.0.1"
+tauri-plugin-single-instance = "2.2.0"
+tauri-plugin-updater = "2.3.0"
 

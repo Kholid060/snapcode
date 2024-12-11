@@ -33,8 +33,8 @@
             </Button>
           </DialogTrigger>
         </TooltipSimple>
-        <DialogContent>
-          <p>Settings</p>
+        <DialogContent class="block max-w-5xl space-y-0 overflow-auto p-0">
+          <EditorSettings />
         </DialogContent>
       </Dialog>
     </div>
@@ -91,6 +91,7 @@ import { getLogMessage } from '@/utils/helper';
 import EditorSidebarBookmarks from './EditorSidebarBookmarks.vue';
 import SidebarContextMenuSnippets from './context-menu/SidebarContextMenuSnippets.vue';
 import SidebarContextMenuBookmarks from './context-menu/SidebarContextMenuBookmarks.vue';
+import EditorSettings from '../EditorSettings.vue';
 
 const items: {
   label: string;

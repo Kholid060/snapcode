@@ -71,6 +71,22 @@ impl PopupWindow {
 pub struct MainWindow;
 
 impl MainWindow {
+    pub fn create(app: &tauri::AppHandle) -> Result<WebviewWindow, tauri::Error> {
+        let window = tauri::WebviewWindowBuilder::new(
+            app,
+            "main",
+            tauri::WebviewUrl::App("index.html".into()),
+        )
+        .min_inner_size(800.0, 600.0)
+        .on_navigation(|url| {
+            url.scheme() == "tauri" || (cfg!(dev) && url.host_str() == Some("localhost"))
+        })
+        .build()?;
+        window.create_overlay_titlebar()?;
+
+        Ok(window)
+    }
+
     pub fn create_or_show(app: &tauri::AppHandle) -> Result<WebviewWindow, tauri::Error> {
         let popup_window = match app.get_webview_window("main") {
             Some(window) => {
@@ -80,21 +96,7 @@ impl MainWindow {
 
                 window
             },
-            None => {
-                let window = tauri::WebviewWindowBuilder::new(
-                    app,
-                    "main",
-                    tauri::WebviewUrl::App("index.html".into()),
-                )
-                .min_inner_size(800.0, 600.0)
-                .on_navigation(|url| {
-                    url.scheme() == "tauri" || (cfg!(dev) && url.host_str() == Some("localhost"))
-                })
-                .build()?;
-                window.create_overlay_titlebar()?;
-
-                window
-            }
+            None => MainWindow::create(app)?,
         };
 
         Ok(popup_window)

@@ -36,10 +36,17 @@
 }
 
 html {
+  cursor: default;
   overflow: hidden;
+  user-select: none;
+}
+
+button {
+  cursor: default;
 }
 
 [data-tauri-decorum-tb] {
+  z-index: 49 !important;
   border-bottom: 1px solid theme('colors.border');
   background-color: theme('colors.background') !important;
   height: theme('height.14') !important;
