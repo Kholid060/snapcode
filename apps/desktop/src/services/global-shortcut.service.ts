@@ -4,15 +4,13 @@ import {
   ShortcutHandler,
   isRegistered,
 } from '@tauri-apps/plugin-global-shortcut';
-
 class GlobalShortcut {
   private handlers = new Map<string, ShortcutHandler>();
 
+  constructor() {}
+
   async register(shortcut: string, handler: ShortcutHandler) {
-    /**
-     * sometime it reload on dev causing error
-     * because the shortcut is already registered
-     */
+    // sometime it reload on dev causing error because the shortcut is already registered
     if (import.meta.env.DEV) {
       if (await isRegistered(shortcut)) {
         await unregister(shortcut);
@@ -42,4 +40,6 @@ class GlobalShortcut {
   }
 }
 
-export const globalShortcut = new GlobalShortcut();
+const globalShortcut = new GlobalShortcut();
+
+export default globalShortcut;

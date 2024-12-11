@@ -31,10 +31,6 @@
           <File01Icon />
           Import from file
         </DropdownMenuItem>
-        <DropdownMenuItem @click="importFromImageFile">
-          <Image02Icon />
-          Import from image file
-        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   </div>
@@ -85,10 +81,8 @@ import {
   FolderAddIcon,
   File01Icon,
   MoreHorizontalCircle01Icon,
-  Image02Icon,
 } from 'hugeicons-vue';
 import { useHotkey } from '@/composables/hotkey.composable';
-import { APP_DEFAULT_HOTKEY } from '@/utils/const/app.const';
 import { getLogMessage } from '@/utils/helper';
 import { useAppDialog } from '@/providers/app-dialog.provider';
 import { TREE_ROOT_KEY, type TreeDataItem } from '@/utils/tree-data-utils';
@@ -171,23 +165,17 @@ async function importSnippetFromFiles() {
     logger.error(getLogMessage('import-snippet-from-file', error));
   }
 }
-function importFromImageFile() {
-  console.log('from image');
-}
 
-useHotkey(
-  [APP_DEFAULT_HOTKEY.newSnippet, APP_DEFAULT_HOTKEY.newFolder],
-  (_, handler) => {
-    switch (handler.key) {
-      case APP_DEFAULT_HOTKEY.newSnippet:
-        createNewSnippet();
-        break;
-      case APP_DEFAULT_HOTKEY.newFolder:
-        createNewFolder();
-        break;
-    }
-  },
-);
+useHotkey(['newSnippet', 'newFolder'], (_, handler) => {
+  switch (handler.hotkeyId) {
+    case 'newSnippet':
+      createNewSnippet();
+      break;
+    case 'newFolder':
+      createNewFolder();
+      break;
+  }
+});
 useHotkey(
   {
     key: 'delete',

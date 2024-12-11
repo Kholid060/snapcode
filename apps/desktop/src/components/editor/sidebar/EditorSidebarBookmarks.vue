@@ -3,7 +3,7 @@
     <p class="text-muted-foreground grow cursor-default text-sm font-semibold">
       Bookmarks
     </p>
-    <Select v-model="appStore.bookmarkState.sortBy">
+    <Select v-model="state.sortBy">
       <SelectTrigger as-child>
         <Button
           variant="ghost"
@@ -46,15 +46,19 @@
 import { Button, Select, SelectContent, SelectItem } from '@snippy/ui';
 import type { TreeItemSelectEvent } from 'radix-vue';
 import { SelectTrigger } from 'radix-vue';
-import type { AppBookmarkSort } from '@/interface/app.interface';
+import type {
+  AppBookmarkSort,
+  AppBookmarksState,
+} from '@/interface/app.interface';
 import { useEditorStore } from '@/stores/editor.store';
-import { useAppStore } from '@/stores/app.store';
 import { Sorting05Icon } from 'hugeicons-vue';
 import type { TreeDataItem } from '@/utils/tree-data-utils';
 import type { FolderListItem } from '@/interface/folder.interface';
 import type { SnippetListItem } from '@/interface/snippet.interface';
 import EditorTreeRoot from '../tree/EditorTreeRoot.vue';
 import { useEditorSidebarProvider } from '@/providers/editor.provider';
+import { store } from '@/services/store.service';
+import { watchDebounced } from '@vueuse/core';
 
 type Item = SnippetListItem | FolderListItem;
 
@@ -67,11 +71,13 @@ const sortItems: { label: string; id: AppBookmarkSort }[] = [
   { id: 'updated-asc', label: 'Updated date (old to new)' },
 ];
 
-const appStore = useAppStore();
 const editorStore = useEditorStore();
 const sidebarProvider = useEditorSidebarProvider();
 
 const selectedItems = ref<TreeDataItem[]>([]);
+const state = shallowReactive<AppBookmarksState>({
+  sortBy: 'name-asc',
+});
 
 const items = computed(() => {
   const folders = Object.values(editorStore.data.folders).filter(
@@ -142,7 +148,7 @@ function getSortData() {
   let sortAsc = false;
   let sortKey: 'updatedAt' | 'createdAt' | 'name';
 
-  switch (appStore.bookmarkState.sortBy) {
+  switch (state.sortBy) {
     case 'created-asc':
       sortKey = 'createdAt';
       sortAsc = true;
@@ -179,4 +185,19 @@ function getSortData() {
     sortKey,
   };
 }
+
+watchDebounced(
+  state,
+  () => {
+    store.xSet(store.xKeys.bookmarkState, state);
+  },
+  { debounce: 500, deep: true },
+);
+
+onBeforeMount(async () => {
+  const storedState = await store.xGet(store.xKeys.bookmarkState, {
+    sortBy: 'name-asc',
+  });
+  Object.assign(state, storedState);
+});
 </script>

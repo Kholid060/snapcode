@@ -1,13 +1,11 @@
-import { ClientOptions, fetch } from '@tauri-apps/plugin-http';
 import appVault from './app-vault.service';
 import { FetchError } from '@/utils/errors';
 import { GitHubGistListItem } from '@/interface/github.interface';
 import { githubLinkHeaderParser } from '@/utils/github-utils';
 
-type FetchInit = RequestInit &
-  ClientOptions & {
-    auth?: boolean;
-  };
+type FetchInit = RequestInit & {
+  auth?: boolean;
+};
 
 const GITHUB_API_BASE_URL = 'https://api.github.com';
 

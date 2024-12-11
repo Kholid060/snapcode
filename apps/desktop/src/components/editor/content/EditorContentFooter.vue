@@ -3,7 +3,7 @@
     <p class="min-w-20 cursor-default text-xs">
       Ln {{ cursorPos.line }}, Col {{ cursorPos.col }}
     </p>
-    <p class="select-none text-xs leading-tight" :key="updatedAtKey">
+    <p class="ml-4 select-none text-xs leading-tight" :key="updatedAtKey">
       Last updated {{ dayjs(activeSnippet.updatedAt).fromNow() }}
     </p>
     <div class="grow"></div>

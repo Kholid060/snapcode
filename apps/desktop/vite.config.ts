@@ -1,8 +1,10 @@
-import { fileURLToPath, resolve, URL } from 'node:url';
+import { fileURLToPath, URL } from 'node:url';
+import { join } from 'node:path';
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import VueRouter from 'unplugin-vue-router/vite';
 import AutoImport from 'unplugin-auto-import/vite';
+import 'dotenv/config';
 
 const host = process.env.TAURI_DEV_HOST;
 
@@ -32,8 +34,8 @@ export default defineConfig({
   build: {
     rollupOptions: {
       input: {
-        main: resolve(__dirname, 'index.html'),
-        popup: resolve(__dirname, 'popup.html'),
+        main: join(__dirname, './index.html'),
+        popup: join(__dirname, './popup.html'),
       },
     },
   },

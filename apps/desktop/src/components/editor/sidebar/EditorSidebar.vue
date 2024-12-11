@@ -7,7 +7,7 @@
         v-for="item in items"
         :key="item.id"
         content-class="capitalize"
-        :label="`${item.label} (${getHotkeyLabel(item.hotkey)})`"
+        :label="`${item.label} (${hotkeysStore.getLabel(item.hotkey)})`"
       >
         <Button
           size="icon"
@@ -22,10 +22,10 @@
         </Button>
       </TooltipSimple>
       <div class="grow"></div>
-      <Dialog v-model:open="showSettings">
+      <Dialog v-model:open="showSettings" modal>
         <TooltipSimple
           content-class="capitalize"
-          :label="`Settings (${getHotkeyLabel(APP_DEFAULT_HOTKEY.openSettings)})`"
+          :label="`Settings (${hotkeysStore.getLabel('openSettings')})`"
         >
           <DialogTrigger>
             <Button size="icon" variant="ghost">
@@ -74,8 +74,8 @@ import {
   TooltipSimple,
   useToast,
 } from '@snippy/ui';
-import { getHotkeyLabel, useHotkey } from '@/composables/hotkey.composable';
-import { APP_DEFAULT_HOTKEY } from '@/utils/const/app.const';
+import { useHotkey } from '@/composables/hotkey.composable';
+import type { AppHotkeys } from '@/utils/const/app.const';
 import type {
   EditorSidebarContextMenuItems,
   EditorSidebarItems,
@@ -92,30 +92,31 @@ import EditorSidebarBookmarks from './EditorSidebarBookmarks.vue';
 import SidebarContextMenuSnippets from './context-menu/SidebarContextMenuSnippets.vue';
 import SidebarContextMenuBookmarks from './context-menu/SidebarContextMenuBookmarks.vue';
 import EditorSettings from '../EditorSettings.vue';
+import { useHotkeysStore } from '@/stores/hotkeys.store';
 
 const items: {
   label: string;
-  hotkey: string;
+  hotkey: AppHotkeys;
   icon: Component;
   id: EditorSidebarItems;
 }[] = [
   {
     id: 'snippets',
     label: 'Snippets',
+    hotkey: 'snippetsMenu',
     icon: FolderFileStorageIcon,
-    hotkey: APP_DEFAULT_HOTKEY.snippetsMenu,
   },
   {
     id: 'bookmarks',
     label: 'Bookmarks',
     icon: AllBookmarkIcon,
-    hotkey: APP_DEFAULT_HOTKEY.bookmarksMenu,
+    hotkey: 'bookmarksMenu',
   },
   {
     id: 'search',
     label: 'Search',
     icon: Search01Icon,
-    hotkey: APP_DEFAULT_HOTKEY.searchMenu,
+    hotkey: 'searchMenu',
   },
 ];
 const sidebarComponentsMap: Record<EditorSidebarItems, Component> = {
@@ -133,6 +134,7 @@ const contextMenuTrigger = useTemplateRef('context-menu-trigger');
 const { toast } = useToast();
 const appDialog = useAppDialog();
 const editorStore = useEditorStore();
+const hotkeysStore = useHotkeysStore();
 
 const showSettings = shallowRef(false);
 const selectedItems = ref<TreeDataItem[]>([]);
@@ -191,24 +193,20 @@ provide<EditorSidebarProvider>(EDITOR_SIDEBAR_PROVIDER_KEY, {
 });
 
 useHotkey(
-  [
-    APP_DEFAULT_HOTKEY.searchMenu,
-    APP_DEFAULT_HOTKEY.snippetsMenu,
-    APP_DEFAULT_HOTKEY.openSettings,
-    APP_DEFAULT_HOTKEY.bookmarksMenu,
-  ],
+  ['searchMenu', 'snippetsMenu', 'openSettings', 'bookmarksMenu'],
   (_, handler) => {
-    switch (handler.key) {
-      case APP_DEFAULT_HOTKEY.bookmarksMenu:
+    console.log(handler);
+    switch (handler.hotkeyId) {
+      case 'bookmarksMenu':
         editorStore.state.setSidebarState('activeMenu', 'bookmarks');
         break;
-      case APP_DEFAULT_HOTKEY.snippetsMenu:
+      case 'snippetsMenu':
         editorStore.state.setSidebarState('activeMenu', 'snippets');
         break;
-      case APP_DEFAULT_HOTKEY.searchMenu:
+      case 'searchMenu':
         editorStore.state.setSidebarState('activeMenu', 'search');
         break;
-      case APP_DEFAULT_HOTKEY.openSettings:
+      case 'openSettings':
         showSettings.value = true;
         break;
     }

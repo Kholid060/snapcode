@@ -12,6 +12,7 @@
   "bundle": {
     "resources": ["./db"],
     "active": true,
+    "createUpdaterArtifacts": true,
     "targets": "all",
     "icon": [
       "icons/32x32.png",
@@ -20,5 +21,13 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ]
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDlGNzIyMEVEREIzNTk0QkMKUldTOGxEWGI3U0J5bjVRM3JiQ1JkUTB4QkVNMDYwMUhDS0JuWHFnNjczRStBWStXekEwR1lzUGgKdW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDlGNzIyMEVEREIzNTk0QkMKUldTOGxEWGI3U0J5bjVRM3JiQ1JkUTB4QkVNMDYwMUhDS0JuWHFnNjczRStBWStXekEwR1lzUGgK",
+      "endpoints": [
+        "https://github.com/kholid060/snippy/releases/latest/download/latest.json"
+      ]
+    }
   }
 }

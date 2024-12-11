@@ -1,6 +1,6 @@
 <template>
   <div
-    class="codemirror w-full"
+    class="codemirror w-full cursor-auto"
     ref="container-ref"
     style="height: calc(100vh - 5rem)"
   ></div>

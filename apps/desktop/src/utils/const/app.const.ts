@@ -8,6 +8,9 @@ export const APP_DEFAULT_HOTKEY = {
 } as const;
 
 export const APP_DEFAULT_GLOBAL_SHORTCUT = {
-  searchWindow: 'CommandOrControl+Shift+K',
-  newSnippetWindow: 'Alt+Shift+N',
-};
+  quickAccessWindow: 'CommandOrControl+Shift+K',
+} as const;
+
+export type AppHotkeys =
+  | keyof typeof APP_DEFAULT_HOTKEY
+  | keyof typeof APP_DEFAULT_GLOBAL_SHORTCUT;
