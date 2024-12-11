@@ -4,8 +4,6 @@ import { vscodeKeymap } from '@replit/codemirror-vscode-keymap';
 import { languages } from '@codemirror/language-data';
 import { EditorState, EditorStateConfig, Extension } from '@codemirror/state';
 import { themeExtension } from './theme';
-import { syntaxHighlighting } from '@codemirror/language';
-import { classHighlighter } from '@lezer/highlight';
 
 export function getLanguageByExt(ext: string) {
   const language = languages.find((lang) => lang.extensions.includes(ext));
@@ -42,7 +40,6 @@ export function loadCodemirror(config: EditorViewConfig = {}) {
     extensions: [
       basicSetup,
       themeExtension,
-      // syntaxHighlighting(classHighlighter),
       keymap.of(vscodeKeymap),
       config.extensions ?? [],
     ],

@@ -46,7 +46,6 @@ function varColor(name: string, alpha?: number) {
 
 export const themeStyles: TagStyle[] = [
   { tag: t.meta, color: ayuColors['syntax.comment'] },
-  { tag: t.definition(t.propertyName), color: ayuColors['syntax.entity'] },
   { tag: t.heading, color: ayuColors['syntax.string'] },
   { tag: t.link, color: ayuColors['syntax.tag'] },
   { tag: t.monospace, color: ayuColors['syntax.special'] },
