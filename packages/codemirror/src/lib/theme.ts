@@ -45,8 +45,19 @@ function varColor(name: string, alpha?: number) {
 }
 
 export const themeStyles: TagStyle[] = [
+  { tag: t.meta, color: ayuColors['syntax.comment'] },
+  { tag: t.definition(t.propertyName), color: ayuColors['syntax.entity'] },
+  { tag: t.heading, color: ayuColors['syntax.string'] },
+  { tag: t.link, color: ayuColors['syntax.tag'] },
+  { tag: t.monospace, color: ayuColors['syntax.special'] },
+  {
+    tag: [t.strong, t.strikethrough, t.emphasis],
+    color: ayuColors['syntax.markup'],
+  },
+  { tag: t.list, color: ayuColors['syntax.func'] },
+  { tag: t.quote, color: ayuColors['syntax.regexp'] },
   { tag: t.comment, color: ayuColors['syntax.comment'] },
-  { tag: t.variableName, color: ayuColors['syntax.special'] },
+  { tag: t.definition(t.variableName), color: ayuColors['syntax.special'] },
   { tag: [t.string, t.special(t.brace)], color: ayuColors['syntax.special'] },
   { tag: t.string, color: ayuColors['syntax.string'] },
   { tag: t.number, color: ayuColors['syntax.constant'] },
@@ -55,6 +66,8 @@ export const themeStyles: TagStyle[] = [
   { tag: t.keyword, color: ayuColors['syntax.keyword'] },
   { tag: t.operator, color: ayuColors['syntax.operator'] },
   { tag: t.className, color: ayuColors['syntax.entity'] },
+  { tag: t.local(t.propertyName), color: ayuColors['syntax.func'] },
+  { tag: t.function(t.propertyName), color: ayuColors['syntax.func'] },
   { tag: t.definition(t.typeName), color: ayuColors['syntax.tag'] },
   { tag: t.typeName, color: ayuColors['syntax.tag'] },
   { tag: t.angleBracket, color: '#39bae680' },
@@ -62,6 +75,7 @@ export const themeStyles: TagStyle[] = [
   { tag: t.attributeName, color: ayuColors['syntax.func'] },
   { tag: t.regexp, color: ayuColors['syntax.regexp'] },
   { tag: t.self, color: ayuColors['syntax.entity'] },
+  { tag: [t.special(t.variableName)], color: ayuColors['syntax.special'] },
 ];
 
 export const themeExtension = createTheme({
