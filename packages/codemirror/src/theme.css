@@ -1,8 +1,7 @@
 .codemirror {
   .cm-scroller {
-    font-size: theme('fontSize.sm');
-    font-family: theme('fontFamily.mono');
-    /* color: #BFBDB6; */
+    font-size: var(--editor-font-size);
+    font-family: var(--editor-font-family);
   }
 
   .cm-lineNumbers {

@@ -1,9 +1,13 @@
 import { EditorView, EditorViewConfig, keymap } from '@codemirror/view';
-import { basicSetup, minimalSetup } from 'codemirror';
 import { vscodeKeymap } from '@replit/codemirror-vscode-keymap';
 import { languages } from '@codemirror/language-data';
 import { EditorState, EditorStateConfig, Extension } from '@codemirror/state';
 import { themeExtension } from './theme';
+import {
+  basicExtensions,
+  BasicExtensionsOptions,
+  minimalExtension,
+} from './basic-extensions';
 
 export function getLanguageByExt(ext: string) {
   const language = languages.find((lang) => lang.extensions.includes(ext));
@@ -34,11 +38,14 @@ export class CMEditorView extends EditorView {
   }
 }
 
-export function loadCodemirror(config: EditorViewConfig = {}) {
+export function loadCodemirror(
+  config: EditorViewConfig = {},
+  extensions?: Partial<BasicExtensionsOptions>,
+) {
   return new CMEditorView({
     ...config,
     extensions: [
-      basicSetup,
+      basicExtensions(extensions),
       themeExtension,
       keymap.of(vscodeKeymap),
       config.extensions ?? [],
@@ -50,7 +57,7 @@ export function loadCodemirrorMinimal(config: EditorViewConfig = {}) {
   return new CMEditorView({
     ...config,
     extensions: [
-      minimalSetup,
+      minimalExtension,
       themeExtension,
       keymap.of(vscodeKeymap),
       config.extensions ?? [],

@@ -4,6 +4,7 @@ export {
   WidgetType,
   Decoration,
   placeholder,
+  lineNumbers,
 } from '@codemirror/view';
 
 export type * from '@codemirror/view';
