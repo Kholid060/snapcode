@@ -10,6 +10,7 @@
       </template>
       <Button
         size="sm"
+        class="text-sm"
         :is-loading="
           state.isCheckingUpdated || appStore.updateState.status === 'updating'
         "

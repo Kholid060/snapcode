@@ -35,6 +35,7 @@ pub fn run() {
         .plugin(tauri_plugin_sql::Builder::default().build())
         .invoke_handler(tauri::generate_handler![
             commands::window::open_popup_window,
+            commands::window::update_popup_window_tray_menu,
             commands::snippet::open_snippet,
             commands::snippet::send_snippet_content,
             commands::snippet::import_snippet_from_file,

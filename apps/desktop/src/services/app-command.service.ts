@@ -19,6 +19,7 @@ interface CommandMap {
     },
     void,
   ];
+  update_popup_window_tray_menu: [{ shortcut: string }, void];
   import_snippet_from_file: [undefined, SnippetImportFileItem[]];
   get_snippet_with_placeholder: [{ snippetId: string }, SnippetWithPlaceholder];
 }

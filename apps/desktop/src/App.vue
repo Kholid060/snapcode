@@ -23,8 +23,16 @@ await useAppStore()
   .catch(() => {});
 await useHotkeysStore().init();
 
-useGlobalHotkey('quickAccessWindow', async ({ state }) => {
-  if (state !== 'Pressed') return;
-  await appCommand.invoke('open_popup_window', undefined);
-});
+useGlobalHotkey(
+  'quickAccessWindow',
+  async ({ state }) => {
+    if (state !== 'Pressed') return;
+    await appCommand.invoke('open_popup_window', undefined);
+  },
+  {
+    onKeyChanged(keys) {
+      appCommand.invoke('update_popup_window_tray_menu', { shortcut: keys });
+    },
+  },
+);
 </script>

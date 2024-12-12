@@ -12,6 +12,8 @@ import {
   KEYBOARD_SHIFT_KEY,
   KeyboardShiftKey,
 } from '@/utils/const/keyboard.const';
+import { logger } from '@/services/logger.service';
+import { getLogMessage } from '@/utils/helper';
 
 type KeyHandler = (
   keyboardEvent: KeyboardEvent,
@@ -120,8 +122,6 @@ export function useHotkey(
       );
     }
 
-    console.log(parsedHotkey);
-
     onCleanUp(() => {
       hotkeys.unbind(parsedHotkey.key, handler);
     });
@@ -131,24 +131,29 @@ export function useHotkey(
 export function useGlobalHotkey(
   name: keyof typeof APP_DEFAULT_GLOBAL_SHORTCUT,
   handler: ShortcutHandler,
-  options?: { onKeyChanged?: () => unknown },
+  options?: { onKeyChanged?: (keys: string) => unknown },
 ) {
   let firstRender = true;
 
   const hotkeysStore = useHotkeysStore();
 
   watchEffect(async (onCleanUp) => {
-    const shortcut = hotkeysStore.hotkeys[name];
-    if (!shortcut) throw new Error(`"${name}" invalid global shortcut`);
+    try {
+      const shortcut = hotkeysStore.hotkeys[name];
+      if (!shortcut) throw new Error(`"${name}" invalid global shortcut`);
 
-    await globalShortcut.register(shortcut, handler);
+      await globalShortcut.register(shortcut, handler);
 
-    if (!firstRender && options?.onKeyChanged) options?.onKeyChanged();
-    firstRender = true;
+      if (!firstRender && options?.onKeyChanged)
+        options?.onKeyChanged(shortcut);
+      firstRender = false;
 
-    onCleanUp(() => {
-      globalShortcut.unregister(shortcut);
-    });
+      onCleanUp(() => {
+        globalShortcut.unregister(shortcut);
+      });
+    } catch (error) {
+      logger.error(getLogMessage('hotkeys:register-global', error));
+    }
   });
 }
 
@@ -181,10 +186,9 @@ export function useHotkeyRecorder(
     if (altKey) mods.push(isShortcutGlobal ? 'Alt' : 'alt');
     if (metaKey) mods.push(isShortcutGlobal ? 'Meta' : 'meta');
 
-    const keyboardKey =
-      shiftKey && !isShortcutGlobal
-        ? (KEYBOARD_SHIFT_KEY[key as KeyboardShiftKey] ?? key)
-        : key;
+    const keyboardKey = shiftKey
+      ? (KEYBOARD_SHIFT_KEY[key as KeyboardShiftKey] ?? key)
+      : key;
     onRecorded(mods.join('+') + `+${keyboardKey}`);
   }
   function stopRecording() {

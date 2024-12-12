@@ -26,7 +26,7 @@
         <img src="@/assets/svg/github-mark-white.svg" class="size-5" />
       </UiLink>
     </div>
-    <div style="height: calc(100vh - 20rem)" class="grow px-8 py-10">
+    <div class="editor-content grow overflow-auto px-8 py-10">
       <h3 class="mb-2 text-lg font-semibold">
         {{ menu.find((item) => item.id === activeMenu)?.label }}
       </h3>
@@ -60,3 +60,14 @@ const settingsComponentsMap: Record<SettingItems, Component> = {
 
 const activeMenu = shallowRef<SettingItems>('general');
 </script>
+<style lang="css" scoped>
+@screen lg {
+  .editor-content {
+    height: calc(100vh - 20rem);
+  }
+}
+
+.editor-content {
+  height: calc(100vh - 10rem);
+}
+</style>
