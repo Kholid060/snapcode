@@ -1,6 +1,7 @@
 import { TreeDataItem } from '@/utils/tree-data-utils';
 import { SnippetId } from './snippet.interface';
 import { FolderId } from './folder.interface';
+import { AppEditorFonts } from '@/utils/const/app.const';
 
 export type EditorSidebarItems = 'snippets' | 'bookmarks' | 'search';
 
@@ -39,3 +40,12 @@ export type EditorSidebarBookmarksCtxMenu = EditorSidebarCtxMenuBase<
 export type EditorSidebarContextMenuItems =
   | EditorSidebarSnippetsCtxMenu
   | EditorSidebarBookmarksCtxMenu;
+
+export interface EditorSettings {
+  fontSize: number;
+  indentSize: number;
+  customFont: string;
+  fontLigatures: boolean;
+  showLineNumbers: boolean;
+  fontFamily: AppEditorFonts | 'custom';
+}

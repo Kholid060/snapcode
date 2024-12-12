@@ -1,7 +1,10 @@
 import * as folderService from '@/db/services/folder.db-service';
 import * as snippetService from '@/db/services/snippet.db-service';
 import * as bookmarkService from '@/db/services/bookmark.db-service';
-import { EditorSidebarState } from '@/interface/editor.interface';
+import {
+  EditorSettings,
+  EditorSidebarState,
+} from '@/interface/editor.interface';
 import {
   FolderId,
   FolderListItem,
@@ -25,6 +28,8 @@ import { watchDebounced } from '@vueuse/core';
 import { defineStore } from 'pinia';
 import { SelectFolder } from '@/db/schema';
 import { getSnippetLangFromName } from '@/utils/snippet-utils';
+import { APP_EDITOR_FONTS, AppEditorFonts } from '@/utils/const/app.const';
+import { fontLoader } from '@/utils/helper';
 
 const DEFAULT_SIDEBAR_STATE: EditorSidebarState = {
   show: true,
@@ -400,19 +405,79 @@ const useEditorDataStore = defineStore('editor:snippets', () => {
   };
 });
 
+const useEditorSettings = defineStore('editor:settings', () => {
+  let initiated = false;
+  const EDITOR_DEFAULT_SETTINGS: EditorSettings = {
+    fontSize: 14,
+    indentSize: 4,
+    customFont: '',
+    fontLigatures: true,
+    showLineNumbers: true,
+    fontFamily: 'jetbrains-mono',
+  };
+  const loadedFonts: Set<AppEditorFonts> = new Set(['jetbrains-mono']);
+
+  const data = shallowReactive<EditorSettings>({ ...EDITOR_DEFAULT_SETTINGS });
+
+  async function init() {
+    if (initiated) return;
+
+    const settings = await store.xGet(store.xKeys.editorSettings);
+    if (settings) {
+      Object.assign(data, { ...EDITOR_DEFAULT_SETTINGS, ...settings });
+    }
+
+    if (settings && settings.fontFamily !== 'custom') {
+      const fontData = APP_EDITOR_FONTS[settings.fontFamily];
+      await fontLoader(
+        fontData.name,
+        fontData.fonts.map((font) => ({
+          url: `url("/fonts/${fontData.id}/${font.name}")`,
+          descriptors: {
+            display: 'swap',
+            style: 'normal',
+            weight: font.weight.toString(),
+          },
+        })),
+      );
+    }
+
+    initiated = true;
+  }
+  function updateSetting<T extends keyof EditorSettings>(
+    key: T,
+    value: EditorSettings[T],
+  ) {
+    data[key] = value;
+  }
+
+  watchDebounced(
+    data,
+    (settings) => {
+      if (!initiated) return;
+
+      store.xSet(store.xKeys.editorSettings, settings);
+    },
+    { debounce: 500, deep: true },
+  );
+
+  return { init, loadedFonts, data, updateSetting };
+});
+
 export const useEditorStore = defineStore('editor', () => {
   let initiated = false;
 
   const state = useEditorState();
   const data = useEditorDataStore();
+  const settings = useEditorSettings();
 
   async function init() {
     if (initiated) return;
 
-    await Promise.all([data.init(), state.init()]);
+    await Promise.all([data.init(), state.init(), settings.init()]);
 
     initiated = true;
   }
 
-  return { data, state, init };
+  return { data, state, settings, init };
 });

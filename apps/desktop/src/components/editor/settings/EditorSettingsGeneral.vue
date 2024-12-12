@@ -1,5 +1,5 @@
 <template>
-  <div class="divide-y">
+  <div class="divide-border/60 divide-y">
     <EditorSettingsItem>
       <template #content>
         <p>App update</p>
@@ -35,6 +35,18 @@
     <EditorSettingsItem>
       <template #content>
         <p>Launch at startup</p>
+        <p class="text-muted-foreground text-sm">
+          Launch the app on the system startup
+        </p>
+      </template>
+      <Switch
+        :checked="settings.startupEnabled"
+        @update:checked="toggleAppStartup"
+      />
+    </EditorSettingsItem>
+    <EditorSettingsItem>
+      <template #content>
+        <p>Backup</p>
         <p class="text-muted-foreground text-sm">
           Launch the app on the system startup
         </p>

@@ -347,6 +347,9 @@ importers:
 
   packages/codemirror:
     dependencies:
+      '@codemirror/autocomplete':
+        specifier: ^6.18.3
+        version: 6.18.3(@codemirror/language@6.10.6)(@codemirror/state@6.4.1)(@codemirror/view@6.35.0)(@lezer/common@1.2.3)
       '@codemirror/commands':
         specifier: ^6.7.1
         version: 6.7.1
@@ -413,6 +416,12 @@ importers:
       '@codemirror/legacy-modes':
         specifier: ^6.4.2
         version: 6.4.2
+      '@codemirror/lint':
+        specifier: ^6.8.4
+        version: 6.8.4
+      '@codemirror/search':
+        specifier: ^6.5.8
+        version: 6.5.8
       '@codemirror/state':
         specifier: ^6.4.1
         version: 6.4.1

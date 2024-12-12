@@ -2,7 +2,11 @@
   <div
     class="codemirror w-full cursor-auto"
     ref="container-ref"
-    style="height: calc(100vh - 5rem)"
+    style="
+      height: calc(100vh - 5rem);
+      --editor-font-size: 14px;
+      --editor-font-family: 'JetBrains Mono';
+    "
   ></div>
   <EditorContentFooter :language-label="langLabel" :cursor-pos="cursorPos" />
 </template>
@@ -15,6 +19,7 @@ import {
   onUpdateExtension,
   snippetPlaceholder,
   indentWithTabExtension,
+  lineNumbers,
 } from '@snippy/codemirror';
 import { useEditorStore } from '@/stores/editor.store';
 import { logger } from '@/services/logger.service';
@@ -23,9 +28,15 @@ import { getSnippetContent } from '@/db/services/snippet.db-service';
 import { useDebounceFn } from '@vueuse/core';
 import EditorContentFooter from './EditorContentFooter.vue';
 import { getSnippetLangFromName } from '@/utils/snippet-utils';
+import { APP_EDITOR_FONTS } from '@/utils/const/app.const';
+import { indentUnit } from '@codemirror/language';
 
 let isReplaceValue = false;
-const languageComp = new Compartment();
+const compartments = {
+  tabSize: new Compartment(),
+  language: new Compartment(),
+  lineNumbers: new Compartment(),
+};
 
 const editorStore = useEditorStore();
 
@@ -58,9 +69,45 @@ async function loadLanguage() {
     : await getSnippetLangFromName(snippet.name ?? '');
   const langExt = language ? await language.load() : null;
   cmView.value.dispatch({
-    effects: languageComp.reconfigure(langExt ?? []),
+    effects: compartments.language.reconfigure(langExt ?? []),
   });
   langLabel.value = language ? language.name : 'Plain Text';
+}
+function loadSettings() {
+  const settings = editorStore.settings.data;
+  const containerEl = containerRef.value;
+
+  if (containerEl) {
+    containerEl.style.setProperty(
+      '--editor-font-family',
+      settings.fontFamily === 'custom'
+        ? settings.customFont
+        : APP_EDITOR_FONTS[settings.fontFamily].name,
+    );
+    containerEl.style.setProperty(
+      '--editor-font-size',
+      `${settings.fontSize}px`,
+    );
+
+    if (settings.fontLigatures) {
+      containerEl.style.fontVariantLigatures = '"liga", "calt"';
+      containerEl.style.removeProperty('font-variant-ligatures');
+    } else {
+      containerEl.style.setProperty('font-feature-settings', 'normal');
+      containerEl.style.setProperty('font-variant-ligatures', 'none');
+    }
+  }
+
+  cmView.value?.dispatch({
+    effects: [
+      compartments.tabSize.reconfigure(
+        indentUnit.of(' '.repeat(settings.indentSize)),
+      ),
+      compartments.lineNumbers.reconfigure(
+        settings.showLineNumbers ? lineNumbers() : [],
+      ),
+    ],
+  });
 }
 
 const handleContentChange = useDebounceFn(async (value: string) => {
@@ -96,6 +143,8 @@ watchEffect(async () => {
 });
 watch(() => editorStore.data.activeSnippet.lang, loadLanguage);
 
+watch(editorStore.settings.data, loadSettings);
+
 onMounted(() => {
   const updateListenerExt = onUpdateExtension((update) => {
     updateCursorPos(update);
@@ -105,16 +154,29 @@ onMounted(() => {
     }
   });
 
-  cmView.value = loadCodemirror({
-    doc: '',
-    parent: containerRef.value!,
-    extensions: [
-      updateListenerExt,
-      snippetPlaceholder(),
-      languageComp.of([]),
-      indentWithTabExtension,
-    ],
-  });
+  const settings = editorStore.settings.data;
+  console.log(
+    settings.indentSize,
+    indentUnit.of(' '.repeat(settings.indentSize)),
+  );
+  cmView.value = loadCodemirror(
+    {
+      doc: '',
+      parent: containerRef.value!,
+      extensions: [
+        updateListenerExt,
+        snippetPlaceholder(),
+        indentWithTabExtension,
+        compartments.language.of([]),
+        compartments.lineNumbers.of(
+          settings.showLineNumbers ? lineNumbers() : [],
+        ),
+        compartments.tabSize.of(indentUnit.of(' '.repeat(settings.indentSize))),
+      ],
+    },
+    { lineNumbers: false },
+  );
+  loadSettings();
   loadLanguage();
 });
 onUnmounted(() => {
