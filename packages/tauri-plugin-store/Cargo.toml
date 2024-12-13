@@ -1,0 +1,33 @@
+[package]
+name = "tauri-plugin-store"
+version = "2.2.0"
+description = "Simple, persistent key-value store."
+authors = ["Tauri Programme within The Commons Conservancy"]
+license = "Apache-2.0 OR MIT"
+edition = "2021"
+rust-version = "1.77.2"
+repository = "https://github.com/tauri-apps/plugins-workspace"
+links = "tauri-plugin-store"
+
+[package.metadata.docs.rs]
+rustc-args = ["--cfg", "docsrs"]
+rustdoc-args = ["--cfg", "docsrs"]
+
+[package.metadata.platforms.support]
+windows = { level = "full", notes = "" }
+linux = { level = "full", notes = "" }
+macos = { level = "full", notes = "" }
+android = { level = "full", notes = "" }
+ios = { level = "full", notes = "" }
+
+[build-dependencies]
+tauri-plugin = { version = "2", features = ["build"] }
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tauri = { version = "2", default-features = false }
+tracing = "0.1"
+thiserror = "2"
+dunce = "1"
+tokio = { version = "1", features = ["sync", "time", "macros"] }
