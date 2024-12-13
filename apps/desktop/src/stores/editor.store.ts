@@ -17,7 +17,6 @@ import {
   SnippetNewPayload,
   SnippetUpdatePayload,
 } from '@/interface/snippet.interface';
-import { store } from '@/services/store.service';
 import {
   buildTreeData,
   TREE_ROOT_KEY,
@@ -30,6 +29,8 @@ import { SelectFolder } from '@/db/schema';
 import { getSnippetLangFromName } from '@/utils/snippet-utils';
 import { APP_EDITOR_FONTS, AppEditorFonts } from '@/utils/const/app.const';
 import { fontLoader } from '@/utils/helper';
+import documentService from '@/services/document.service';
+import { appCommand } from '@/services/app-command.service';
 
 const DEFAULT_SIDEBAR_STATE: EditorSidebarState = {
   show: true,
@@ -54,7 +55,7 @@ const useEditorState = defineStore('editor:state', () => {
   async function init() {
     if (initiated) return;
 
-    const storeData = await store.xGet(store.xKeys.editorSidebarState, {
+    const storeData = await documentService.stores.state.xGet('editor', {
       ...DEFAULT_SIDEBAR_STATE,
     });
     Object.assign(sidebarState, storeData);
@@ -67,7 +68,7 @@ const useEditorState = defineStore('editor:state', () => {
     () => {
       if (!initiated) return;
 
-      store.xSet(store.xKeys.editorSidebarState, toRaw(sidebarState));
+      documentService.stores.state.xSet('editor', toRaw(sidebarState));
     },
     { debounce: 500 },
   );
@@ -174,35 +175,36 @@ const useEditorDataStore = defineStore('editor:snippets', () => {
   async function addSnippets(payload: SnippetNewPayload[]) {
     if (payload.length === 0) return;
 
-    const addedSnippets = await snippetService.createNewSnippets(payload);
-    const groupedSnippets: Record<FolderId, TreeDataItem[]> = {};
-    addedSnippets.forEach((snippet) => {
-      const folderId = snippet.folderId ?? TREE_ROOT_KEY;
-      if (!groupedSnippets[folderId]) groupedSnippets[folderId] = [];
+    const result = await documentService.createSnippets(payload);
+    console.log(result);
+    // const groupedSnippets: Record<FolderId, TreeDataItem[]> = {};
+    // addedSnippets.forEach((snippet) => {
+    //   const folderId = snippet.folderId ?? TREE_ROOT_KEY;
+    //   if (!groupedSnippets[folderId]) groupedSnippets[folderId] = [];
 
-      groupedSnippets[folderId].push({ id: snippet.id, isFolder: false });
+    //   groupedSnippets[folderId].push({ id: snippet.id, isFolder: false });
 
-      snippets.value[snippet.id] = {
-        id: snippet.id,
-        lang: snippet.lang,
-        name: snippet.name,
-        tags: snippet.tags,
-        keyword: snippet.keyword,
-        folderId: snippet.folderId,
-        updatedAt: snippet.updatedAt,
-        createdAt: snippet.createdAt,
-        isBookmark: snippet.isBookmark,
-      };
-    });
+    //   snippets.value[snippet.id] = {
+    //     id: snippet.id,
+    //     lang: snippet.lang,
+    //     name: snippet.name,
+    //     tags: snippet.tags,
+    //     keyword: snippet.keyword,
+    //     folderId: snippet.folderId,
+    //     updatedAt: snippet.updatedAt,
+    //     createdAt: snippet.createdAt,
+    //     isBookmark: snippet.isBookmark,
+    //   };
+    // });
 
-    for (const folderId in groupedSnippets) {
-      addTreeItem(groupedSnippets[folderId], folderId);
-    }
+    // for (const folderId in groupedSnippets) {
+    //   addTreeItem(groupedSnippets[folderId], folderId);
+    // }
 
-    state.setSidebarState(
-      'activeFileId',
-      addedSnippets[addedSnippets.length - 1]?.id ?? -1,
-    );
+    // state.setSidebarState(
+    //   'activeFileId',
+    //   addedSnippets[addedSnippets.length - 1]?.id ?? -1,
+    // );
   }
   async function deleteSnippet(snippetId: SnippetId) {
     const snippetData = snippets.value[snippetId];
@@ -368,6 +370,9 @@ const useEditorDataStore = defineStore('editor:snippets', () => {
   async function init() {
     if (initiated) return;
 
+    const tree = await appCommand.invoke('get_document_flat_tree', undefined);
+    console.log(tree, appCommand.invoke);
+
     const [snippetList, folderList] = await Promise.all([
       snippetService.getAllSnippets(),
       folderService.getAllFolders(),
@@ -422,13 +427,13 @@ const useEditorSettings = defineStore('editor:settings', () => {
   async function init() {
     if (initiated) return;
 
-    const settings = await store.xGet(store.xKeys.editorSettings);
+    const settings = await documentService.stores.settings.xGet('editor');
     if (settings) {
       Object.assign(data, { ...EDITOR_DEFAULT_SETTINGS, ...settings });
     }
 
-    if (settings && settings.fontFamily !== 'custom') {
-      const fontData = APP_EDITOR_FONTS[settings.fontFamily];
+    if (data.fontFamily !== 'custom') {
+      const fontData = APP_EDITOR_FONTS[data.fontFamily];
       await fontLoader(
         fontData.name,
         fontData.fonts.map((font) => ({
@@ -456,7 +461,7 @@ const useEditorSettings = defineStore('editor:settings', () => {
     (settings) => {
       if (!initiated) return;
 
-      store.xSet(store.xKeys.editorSettings, settings);
+      documentService.stores.settings.xSet('editor', settings);
     },
     { debounce: 500, deep: true },
   );

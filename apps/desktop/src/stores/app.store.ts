@@ -51,7 +51,7 @@ export const useAppStore = defineStore('app-store', () => {
   }
 
   async function init() {
-    const autoCheckUpdate = await store.xGet(store.xKeys.autoUpdate, true);
+    const autoCheckUpdate = await store.xGet('autoUpdate', true);
     if (autoCheckUpdate) await checkUpdate();
   }
 

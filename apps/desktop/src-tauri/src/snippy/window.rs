@@ -78,6 +78,7 @@ impl MainWindow {
             tauri::WebviewUrl::App("index.html".into()),
         )
         .min_inner_size(800.0, 600.0)
+        .disable_drag_drop_handler()
         .on_navigation(|url| {
             url.scheme() == "tauri" || (cfg!(dev) && url.host_str() == Some("localhost"))
         })

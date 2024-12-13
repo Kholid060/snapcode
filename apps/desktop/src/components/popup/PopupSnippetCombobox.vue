@@ -23,13 +23,12 @@
       />
     </div>
     <CommandList class="max-h-none px-4 pt-1">
-      <CommandEmpty v-if="!isLoading">
+      <CommandEmpty>
         <slot name="empty">
           <span class="text-muted-foreground">No results found.</span>
         </slot>
       </CommandEmpty>
-      <slot name="empty" v-else-if="items.length === 0"></slot>
-      <CommandGroup v-else :heading="groupHeading" class="p-0">
+      <CommandGroup :heading="groupHeading" class="p-0">
         <CommandItem
           v-for="item in items"
           :key="item.id"
@@ -93,11 +92,8 @@ import {
   useToast,
 } from '@snippy/ui';
 import UiComboboxSearch from '../ui/UiComboboxSearch.vue';
-import {
-  useForwardPropsEmits,
-  type ComboboxRootEmits,
-  type ComboboxRootProps,
-} from 'radix-vue';
+import type { ComboboxRootProps } from 'radix-vue';
+import { useForwardPropsEmits, type ComboboxRootEmits } from 'radix-vue';
 import { Copy02Icon, FileEditIcon } from 'hugeicons-vue';
 import type {
   SnippetListItem,
@@ -117,8 +113,6 @@ defineOptions({
 const props = defineProps<
   ComboboxRootProps & {
     items: T[];
-    isLoading?: boolean;
-    searchable?: boolean;
     groupHeading?: string;
     itemContainsHtml?: boolean;
   }

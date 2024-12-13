@@ -6,6 +6,7 @@ import { logger } from './services/logger.service';
 import { getLogMessage } from './utils/helper';
 import { migrate } from './db/migrate';
 import AppAsync from './AppAsync.vue';
+import documentService from './services/document.service';
 
 (async () => {
   try {
@@ -13,7 +14,7 @@ import AppAsync from './AppAsync.vue';
       await attachConsole();
     }
 
-    await migrate();
+    await Promise.all([migrate(), documentService.init()]);
 
     createApp(AppAsync).use(createPinia()).mount('#app');
   } catch (error) {

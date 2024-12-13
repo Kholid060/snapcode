@@ -1,7 +1,7 @@
 import { getHotkeyLabel } from '@/composables/hotkey.composable';
 import { appCommand } from '@/services/app-command.service';
+import documentService from '@/services/document.service';
 import { logger } from '@/services/logger.service';
-import { store } from '@/services/store.service';
 import {
   APP_DEFAULT_GLOBAL_SHORTCUT,
   APP_DEFAULT_HOTKEY,
@@ -26,7 +26,8 @@ export const useHotkeysStore = defineStore('hotkeys', () => {
     try {
       if (initiated) return;
 
-      const customHotkeys = await store.xGet(store.xKeys.hotkeys);
+      const customHotkeys =
+        await documentService.stores.settings.xGet('hotkeys');
       if (customHotkeys) {
         Object.assign(hotkeys, { ...DEFAULT_HOTKEYS, ...customHotkeys });
       }
@@ -54,7 +55,10 @@ export const useHotkeysStore = defineStore('hotkeys', () => {
       throw new Error(`"${name}" is invalid hotkey`);
     }
 
-    await store.xSet(store.xKeys.hotkeys, { ...hotkeys, [name]: shortcut });
+    await documentService.stores.settings.xSet('hotkeys', {
+      ...hotkeys,
+      [name]: shortcut,
+    });
     hotkeys[name] = shortcut;
   }
 

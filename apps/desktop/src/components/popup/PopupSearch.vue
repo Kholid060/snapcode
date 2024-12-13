@@ -30,9 +30,9 @@ import {
 } from '@/db/services/snippet.db-service';
 import { logger } from '@/services/logger.service';
 import { getLogMessage } from '@/utils/helper';
-import { store } from '@/services/store.service';
 import PopupSnippetCombobox from './PopupSnippetCombobox.vue';
 import AppSearchOptionsDescription from '../app/AppSearchOptionsDescription.vue';
+import documentService from '@/services/document.service';
 
 const { toast } = useToast();
 
@@ -95,8 +95,8 @@ async function addToRecent(snippetId: string) {
       recentSnippets.value.pop();
     }
 
-    await store.xSet(
-      store.xKeys.recentSnippets,
+    await documentService.stores.state.xSet(
+      'recentSnippets',
       recentSnippets.value.map((item) => item.id),
     );
     triggerRef(recentSnippets);
@@ -106,7 +106,10 @@ async function addToRecent(snippetId: string) {
 }
 async function fetchRecentSnippets() {
   try {
-    const snippetIds = await store.xGet(store.xKeys.recentSnippets, []);
+    const snippetIds = await documentService.stores.state.xGet(
+      'recentSnippets',
+      [],
+    );
     if (snippetIds.length === 0) return;
 
     const snippets = await getSnippetByIds(snippetIds);
@@ -114,7 +117,10 @@ async function fetchRecentSnippets() {
       const filteredSnippetIds = snippetIds.filter((id) =>
         snippets.some((snippet) => snippet.id === id),
       );
-      await store.xSet(store.xKeys.recentSnippets, filteredSnippetIds);
+      await documentService.stores.state.xSet(
+        'recentSnippets',
+        filteredSnippetIds,
+      );
     }
 
     recentSnippets.value = snippets;

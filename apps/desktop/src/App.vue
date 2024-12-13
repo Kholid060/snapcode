@@ -17,11 +17,16 @@ import { useAppStore } from './stores/app.store';
 import { useHotkeysStore } from './stores/hotkeys.store';
 import { useGlobalHotkey } from './composables/hotkey.composable';
 import { appCommand } from './services/app-command.service';
+import documentService from './services/document.service';
+import { useEditorStore } from './stores/editor.store';
 
-await useAppStore()
-  .init()
-  .catch(() => {});
-await useHotkeysStore().init();
+await Promise.all([
+  useAppStore().init().catch(console.error),
+  useHotkeysStore().init(),
+  useEditorStore().init(),
+]);
+
+documentService.startWatcher();
 
 useGlobalHotkey(
   'quickAccessWindow',

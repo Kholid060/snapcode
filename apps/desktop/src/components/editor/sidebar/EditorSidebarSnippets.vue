@@ -115,7 +115,11 @@ function getChildren(item: TreeDataItem) {
 }
 async function createNewSnippet() {
   try {
-    await editorStore.data.addSnippets([{}]);
+    await editorStore.data.addSnippets([
+      { path: 'test.json', contents: 'hola', lang: '' },
+      { path: 'test.json', contents: 'hola', lang: '' },
+      { path: 'test.json', contents: 'hola', lang: '' },
+    ]);
   } catch (error) {
     console.error(error);
     if (error instanceof Error) {

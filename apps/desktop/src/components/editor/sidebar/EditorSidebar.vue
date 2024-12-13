@@ -84,7 +84,6 @@ import { useEditorStore } from '@/stores/editor.store';
 import type { EditorSidebarProvider } from '@/providers/editor.provider';
 import { EDITOR_SIDEBAR_PROVIDER_KEY } from '@/providers/editor.provider';
 import type { TreeDataItem } from '@/utils/tree-data-utils';
-import { store } from '@/services/store.service';
 import { logger } from '@/services/logger.service';
 import { useAppDialog } from '@/providers/app-dialog.provider';
 import { getLogMessage } from '@/utils/helper';
@@ -93,6 +92,7 @@ import SidebarContextMenuSnippets from './context-menu/SidebarContextMenuSnippet
 import SidebarContextMenuBookmarks from './context-menu/SidebarContextMenuBookmarks.vue';
 import EditorSettings from '../EditorSettings.vue';
 import { useHotkeysStore } from '@/stores/hotkeys.store';
+import documentService from '@/services/document.service';
 
 const items: {
   label: string;
@@ -151,7 +151,10 @@ function handleContextMenu(data: EditorSidebarContextMenuItems) {
 }
 async function deleteSelectedItems() {
   try {
-    const dontShowDialog = await store.xGet(store.xKeys.noDeletePrompt, false);
+    const dontShowDialog = await documentService.stores.settings.xGet(
+      'noPromptDelete',
+      false,
+    );
     let dontAskPrompt = false;
 
     if (!dontShowDialog) {
@@ -171,7 +174,7 @@ async function deleteSelectedItems() {
     selectedItems.value = [];
 
     if (dontAskPrompt) {
-      await store.xSet(store.xKeys.noDeletePrompt, true);
+      await documentService.stores.settings.xSet('noPromptDelete', true);
     }
   } catch (error) {
     console.error(error);

@@ -151,6 +151,10 @@ pub fn send_snippet_content(
                 .map_err(stringify)?;
         }
         "paste" => {
+            if content.is_empty() {
+                return Ok(());
+            }
+
             let clipboard_text = app_handle.clipboard().read_text().unwrap_or_default();
 
             app_handle
@@ -186,4 +190,24 @@ pub fn open_snippet(app: tauri::AppHandle, snippet_id: String) -> Result<(), Str
         .map_err(stringify)?;
 
     Ok(())
+}
+
+#[tauri::command(async)]
+pub fn create_snippets(
+    app: tauri::AppHandle,
+    snippets: Vec<snippy::snippet::SnippetDoc>,
+) -> Result<Vec<snippy::snippet::SnippetCreatedItem>, String> {
+    let snippets = snippy::snippet::create_snippets(&app, snippets).map_err(stringify)?;
+
+    Ok(snippets)
+}
+
+#[tauri::command(async)]
+pub fn create_folders(
+    app: tauri::AppHandle,
+    folders: Vec<String>,
+) -> Result<Vec<snippy::snippet::SnippetCreatedItem>, String> {
+    let folders = snippy::snippet::create_folders(&app, folders).map_err(stringify)?;
+
+    Ok(folders)
 }

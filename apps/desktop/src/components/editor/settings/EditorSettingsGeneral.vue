@@ -44,18 +44,6 @@
         @update:checked="toggleAppStartup"
       />
     </EditorSettingsItem>
-    <EditorSettingsItem>
-      <template #content>
-        <p>Backup</p>
-        <p class="text-muted-foreground text-sm">
-          Launch the app on the system startup
-        </p>
-      </template>
-      <Switch
-        :checked="settings.startupEnabled"
-        @update:checked="toggleAppStartup"
-      />
-    </EditorSettingsItem>
   </div>
 </template>
 <script setup lang="ts">
@@ -105,7 +93,7 @@ async function toggleAppStartup(enabled: boolean) {
 }
 async function toggleAutoUpdate(enabled: boolean) {
   try {
-    await store.xSet(store.xKeys.autoUpdate, enabled);
+    await store.xSet('autoUpdate', enabled);
     settings.autoUpdateEnabled = enabled;
   } catch (error) {
     logger.error(getLogMessage('settings:toggle-app-autoupdate', error));
@@ -133,7 +121,7 @@ async function initData() {
     const [version, startup, autoUpdate] = await Promise.all([
       getVersion(),
       autoStart.isEnabled(),
-      store.xGet(store.xKeys.autoUpdate, true),
+      store.xGet('autoUpdate', true),
     ]);
 
     settings.appVersion = version;

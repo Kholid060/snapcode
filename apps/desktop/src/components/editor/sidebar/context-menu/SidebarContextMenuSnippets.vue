@@ -69,8 +69,8 @@
 import type { EditorSidebarSnippetsCtxMenu } from '@/interface/editor.interface';
 import { useAppDialog } from '@/providers/app-dialog.provider';
 import { useEditorSidebarProvider } from '@/providers/editor.provider';
+import documentService from '@/services/document.service';
 import { logger } from '@/services/logger.service';
-import { store, STORE_KEYS } from '@/services/store.service';
 import { useEditorStore } from '@/stores/editor.store';
 import { getLogMessage } from '@/utils/helper';
 import {
@@ -183,7 +183,7 @@ async function toggleBookmark() {
 }
 async function deleteItem() {
   try {
-    const dontShowDialog = await store.get<boolean>(STORE_KEYS.noDeletePrompt);
+    const dontShowDialog = await documentService.stores.settings.xGet('noPromptDelete');
     let dontAskPrompt = false;
 
     if (!dontShowDialog) {
@@ -207,7 +207,7 @@ async function deleteItem() {
       : editorStore.data.deleteSnippet(props.ctxData.id));
 
     if (dontAskPrompt) {
-      await store.set(STORE_KEYS.noDeletePrompt, true);
+      await documentService.stores.settings.xSet('noPromptDelete', true);
     }
   } catch (error) {
     logger.error(getLogMessage('sidebar-delete-ctx-menu', error));

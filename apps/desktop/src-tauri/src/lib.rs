@@ -36,7 +36,11 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             commands::window::open_popup_window,
             commands::window::update_popup_window_tray_menu,
+            commands::document::get_document_state,
+            commands::document::get_document_flat_tree,
             commands::snippet::open_snippet,
+            commands::snippet::create_folders,
+            commands::snippet::create_snippets,
             commands::snippet::send_snippet_content,
             commands::snippet::import_snippet_from_file,
             commands::snippet::get_snippet_with_placeholder,

@@ -5,7 +5,6 @@ use tauri::{
     tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
     App, Error, Manager,
 };
-use tauri_plugin_store::StoreExt;
 
 use crate::snippy;
 

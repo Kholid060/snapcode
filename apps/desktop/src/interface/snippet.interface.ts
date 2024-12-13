@@ -11,7 +11,11 @@ export type SnippetListItem = Omit<
   'content' | 'placeholders' | '_id' | 'checkPlaceholder'
 >;
 
-export type SnippetNewPayload = Omit<NewSnippet, 'id' | '_id'>;
+export interface SnippetNewPayload {
+  path: string;
+  lang: string;
+  contents: string;
+}
 
 export type SnippetUpdatePayload = Partial<
   Omit<NewSnippet, 'id' | 'createdAt' | 'updatedAt' | 'placeholderCheckAt'>
@@ -35,3 +39,7 @@ export type SnippetWithPlaceholder = Pick<
   SelectSnippet,
   'content' | 'placeholders' | 'lang' | 'name' | 'id'
 >;
+
+export interface SnippetMetadata {
+  lang: string;
+}

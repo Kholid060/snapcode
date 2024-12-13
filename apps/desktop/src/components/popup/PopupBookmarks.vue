@@ -8,7 +8,7 @@ import { logger } from '@/services/logger.service';
 import { getLogMessage } from '@/utils/helper';
 import PopupSnippetCombobox from './PopupSnippetCombobox.vue';
 import type { AppBookmarksState } from '@/interface/app.interface';
-import { store } from '@/services/store.service';
+import documentService from '@/services/document.service';
 
 const snippets = shallowRef<SnippetListItem[]>([]);
 const bookmarkState = shallowRef<AppBookmarksState>({
@@ -46,7 +46,7 @@ async function fetchBookmarks() {
 
 onBeforeMount(async () => {
   try {
-    bookmarkState.value = await store.xGet(store.xKeys.bookmarkState, {
+    bookmarkState.value = await documentService.stores.bookmarks.xGet('state', {
       sortBy: 'name-asc',
     });
     await fetchBookmarks();

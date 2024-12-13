@@ -57,8 +57,8 @@ import type { FolderListItem } from '@/interface/folder.interface';
 import type { SnippetListItem } from '@/interface/snippet.interface';
 import EditorTreeRoot from '../tree/EditorTreeRoot.vue';
 import { useEditorSidebarProvider } from '@/providers/editor.provider';
-import { store } from '@/services/store.service';
 import { watchDebounced } from '@vueuse/core';
+import documentService from '@/services/document.service';
 
 type Item = SnippetListItem | FolderListItem;
 
@@ -189,13 +189,13 @@ function getSortData() {
 watchDebounced(
   state,
   () => {
-    store.xSet(store.xKeys.bookmarkState, state);
+    documentService.stores.bookmarks.xSet('state', state);
   },
   { debounce: 500, deep: true },
 );
 
 onBeforeMount(async () => {
-  const storedState = await store.xGet(store.xKeys.bookmarkState, {
+  const storedState = await documentService.stores.bookmarks.xGet('state', {
     sortBy: 'name-asc',
   });
   Object.assign(state, storedState);

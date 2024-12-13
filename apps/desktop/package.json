@@ -24,6 +24,7 @@
     "@snippy/codemirror": "workspace:*",
     "@snippy/shared": "workspace:*",
     "@snippy/ui": "workspace:*",
+    "@snippy/tauri-plugin-store": "workspace:*",
     "@tauri-apps/api": "^2",
     "@tauri-apps/plugin-autostart": "^2.2.0",
     "@tauri-apps/plugin-fs": "^2.0.2",

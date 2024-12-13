@@ -24,7 +24,7 @@ serde_json = "1"
 tauri-plugin-sql = { version = "2", features = ["sqlite"] }
 tauri-plugin-fs = { version = "2.0.3", features = ["watch"] }
 tauri-plugin-log = "2.0.2"
-tauri-plugin-store = "2.1.0"
+tauri-plugin-store = { "path" = "../../../packages/tauri-plugin-store" }
 tauri-plugin-decorum = { "path" = "../../../packages/tauri-plugin-decorum" }
 tauri-plugin-os = "2.0.1"
 tauri-plugin-dialog = "2.0.3"
@@ -37,6 +37,8 @@ tauri-plugin-stronghold = "2"
 windows-sys = "0.59.0"
 tauri-plugin-prevent-default = "0.8.0"
 tauri-plugin-shell = "2.2.0"
+notify-debouncer-full = "0.4.0"
+walkdir = "2.5.0"
 
 [target.'cfg(any(target_os = "macos", windows, target_os = "linux"))'.dependencies]
 tauri-plugin-autostart = "2.2.0"

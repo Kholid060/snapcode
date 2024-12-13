@@ -34,8 +34,16 @@
       "allow": [{ "path": "$RESOURCE/db/**/*" }]
     },
     {
+      "identifier": "fs:allow-watch",
+      "allow": [{ "path": "$DOCUMENT/Snippy/snippets" }]
+    },
+    {
       "identifier": "fs:allow-read-text-file",
-      "allow": [{ "path": "$RESOURCE/db/**/*" }]
+      "allow": [{ "path": "$RESOURCE/db/**/*" }, "$DOCUMENT/Snippy/**/*"]
+    },
+    {
+      "identifier": "fs:allow-write-text-file",
+      "allow": ["$DOCUMENT/Snippy/**/*"]
     },
     {
       "identifier": "http:default",

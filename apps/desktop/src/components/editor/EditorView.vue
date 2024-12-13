@@ -1,18 +1,12 @@
 <template>
-  <div v-if="editorState.status === 'error'">
-    <p>Error!</p>
-    <p>{{ editorState.errorMessage }}</p>
+  <EditorSidebar
+    v-if="editorStore.state.sidebarState.show"
+    class="flex-shrink-0"
+  />
+  <div class="min-w-0 grow">
+    <EditorContentHeader />
+    <EditorContentCM v-if="editorStore.data.activeSnippet" />
   </div>
-  <template v-else-if="editorState.status === 'idle'">
-    <EditorSidebar
-      v-if="editorStore.state.sidebarState.show"
-      class="flex-shrink-0"
-    />
-    <div class="min-w-0 grow">
-      <EditorContentHeader />
-      <EditorContentCM v-if="editorStore.data.activeSnippet" />
-    </div>
-  </template>
 </template>
 <script setup lang="ts">
 import EditorContentCM from './content/EditorContentCM.vue';
@@ -23,28 +17,10 @@ import { useTauriWindowEvent } from '@/composables/tauri.composable';
 
 const editorStore = useEditorStore();
 
-const editorState = shallowReactive<{
-  status: 'loading' | 'idle' | 'error';
-  errorMessage: string;
-}>({
-  errorMessage: '',
-  status: 'loading',
-});
-
 useTauriWindowEvent('snippet:open', (event) => {
   editorStore.state.setSidebarState('activeFileId', event.payload);
 });
 useTauriWindowEvent('snippet:created', (event) => {
   editorStore.data.registerSnippets([event.payload]);
 });
-
-editorStore
-  .init()
-  .then(() => {
-    editorState.status = 'idle';
-  })
-  .catch((error) => {
-    editorState.status = 'error';
-    editorState.errorMessage = error.message;
-  });
 </script>
