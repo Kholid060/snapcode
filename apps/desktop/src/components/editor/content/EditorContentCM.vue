@@ -62,7 +62,7 @@ function updateCursorPos(update: ViewUpdate) {
 async function loadLanguage() {
   if (!cmView.value) return;
 
-  const snippet = editorStore.data.activeSnippet;
+  const snippet = editorStore.activeSnippet;
 
   const language = snippet.lang
     ? getLanguageByName(editorStore.data.activeSnippet.lang!)
@@ -113,7 +113,7 @@ function loadSettings() {
 const handleContentChange = useDebounceFn(async (value: string) => {
   try {
     await editorStore.data.updateSnippet(
-      editorStore.state.sidebarState.activeFileId,
+      editorStore.state.state.activeFileId,
       {
         content: value,
       },
@@ -124,7 +124,7 @@ const handleContentChange = useDebounceFn(async (value: string) => {
 }, 1000);
 
 watchEffect(async () => {
-  const snippetId = editorStore.state.sidebarState.activeFileId;
+  const snippetId = editorStore.state.state.activeFileId;
   if (!snippetId || !cmView.value) return;
 
   try {

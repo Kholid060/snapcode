@@ -205,8 +205,8 @@ pub fn create_snippets(
 #[tauri::command(async)]
 pub fn create_folders(
     app: tauri::AppHandle,
-    folders: Vec<String>,
-) -> Result<Vec<snippy::snippet::SnippetCreatedItem>, String> {
+    folders: Vec<snippy::snippet::FolderDoc>,
+) -> Result<Vec<snippy::snippet::FolderCreatedItem>, String> {
     let folders = snippy::snippet::create_folders(&app, folders).map_err(stringify)?;
 
     Ok(folders)

@@ -1,10 +1,7 @@
 import * as folderService from '@/db/services/folder.db-service';
 import * as snippetService from '@/db/services/snippet.db-service';
 import * as bookmarkService from '@/db/services/bookmark.db-service';
-import {
-  EditorSettings,
-  EditorSidebarState,
-} from '@/interface/editor.interface';
+import { EditorSettings } from '@/interface/editor.interface';
 import {
   FolderId,
   FolderListItem,
@@ -17,12 +14,7 @@ import {
   SnippetNewPayload,
   SnippetUpdatePayload,
 } from '@/interface/snippet.interface';
-import {
-  buildTreeData,
-  TREE_ROOT_KEY,
-  TreeData,
-  TreeDataItem,
-} from '@/utils/tree-data-utils';
+import { TREE_ROOT_KEY, TreeData, TreeDataItem } from '@/utils/tree-data-utils';
 import { watchDebounced } from '@vueuse/core';
 import { defineStore } from 'pinia';
 import { SelectFolder } from '@/db/schema';
@@ -31,57 +23,13 @@ import { APP_EDITOR_FONTS, AppEditorFonts } from '@/utils/const/app.const';
 import { fontLoader } from '@/utils/helper';
 import documentService from '@/services/document.service';
 import { appCommand } from '@/services/app-command.service';
-
-const DEFAULT_SIDEBAR_STATE: EditorSidebarState = {
-  show: true,
-  activeFileId: '',
-  activeFolderIds: [],
-  activeMenu: 'snippets',
-};
-
-const useEditorState = defineStore('editor:state', () => {
-  let initiated = false;
-
-  const sidebarState = reactive<EditorSidebarState>({
-    ...DEFAULT_SIDEBAR_STATE,
-  });
-
-  function setSidebarState<T extends keyof EditorSidebarState>(
-    key: T,
-    value: EditorSidebarState[T],
-  ) {
-    sidebarState[key] = value;
-  }
-  async function init() {
-    if (initiated) return;
-
-    const storeData = await documentService.stores.state.xGet('editor', {
-      ...DEFAULT_SIDEBAR_STATE,
-    });
-    Object.assign(sidebarState, storeData);
-
-    initiated = true;
-  }
-
-  watchDebounced(
-    sidebarState,
-    () => {
-      if (!initiated) return;
-
-      documentService.stores.state.xSet('editor', toRaw(sidebarState));
-    },
-    { debounce: 500 },
-  );
-
-  return {
-    init,
-    sidebarState,
-    setSidebarState,
-  };
-});
+import { DocumenFlatTreeMetadataItem } from '@/interface/document.interface';
+import { useEditorState } from './editor/editor-state.store';
+import { useEditorDocument } from './editor/editor-document.store';
 
 const useEditorDataStore = defineStore('editor:snippets', () => {
   let initiated = false;
+  let treeMetadata: Map<string, DocumenFlatTreeMetadataItem> = new Map();
 
   const state = useEditorState();
 
@@ -90,7 +38,7 @@ const useEditorDataStore = defineStore('editor:snippets', () => {
   const snippets = ref<Record<SnippetId, SnippetListItem>>({});
 
   const activeSnippet = computed(
-    () => snippets.value[state.sidebarState.activeFileId] ?? null,
+    () => snippets.value[state.state.activeFileId] ?? null,
   );
 
   function deleteTreeItem(itemId: string, folderId: FolderId = TREE_ROOT_KEY) {
@@ -201,7 +149,7 @@ const useEditorDataStore = defineStore('editor:snippets', () => {
     //   addTreeItem(groupedSnippets[folderId], folderId);
     // }
 
-    // state.setSidebarState(
+    // state.updateState(
     //   'activeFileId',
     //   addedSnippets[addedSnippets.length - 1]?.id ?? -1,
     // );
@@ -213,8 +161,8 @@ const useEditorDataStore = defineStore('editor:snippets', () => {
     await snippetService.deleteSnippets(snippetId);
     deleteTreeItem(snippetId, snippetData.folderId ?? undefined);
 
-    if (state.sidebarState.activeFileId === snippetId) {
-      state.setSidebarState('activeFileId', snippetId);
+    if (state.state.activeFileId === snippetId) {
+      state.updateState('activeFileId', snippetId);
     }
 
     delete snippets.value[snippetId];
@@ -262,8 +210,8 @@ const useEditorDataStore = defineStore('editor:snippets', () => {
 
     for (const item of items) {
       if (!item.isFolder) {
-        if (state.sidebarState.activeFileId === item.id) {
-          state.setSidebarState('activeFileId', '');
+        if (state.state.activeFileId === item.id) {
+          state.updateState('activeFileId', '');
         }
 
         delete snippets.value[item.id];
@@ -371,7 +319,8 @@ const useEditorDataStore = defineStore('editor:snippets', () => {
     if (initiated) return;
 
     const tree = await appCommand.invoke('get_document_flat_tree', undefined);
-    console.log(tree, appCommand.invoke);
+    treeMetadata = new Map(Object.entries(tree.metadata));
+    // treeData.value = tree.flatTree;
 
     const [snippetList, folderList] = await Promise.all([
       snippetService.getAllSnippets(),
@@ -384,11 +333,6 @@ const useEditorDataStore = defineStore('editor:snippets', () => {
     snippets.value = Object.fromEntries(
       snippetList.map((item) => [item.id, item]),
     );
-
-    treeData.value = buildTreeData({
-      folders: folderList,
-      snippets: snippetList,
-    });
     initiated = true;
   }
 
@@ -400,6 +344,7 @@ const useEditorDataStore = defineStore('editor:snippets', () => {
     addFolders,
     deleteItems,
     addSnippets,
+    treeMetadata,
     deleteFolder,
     updateFolder,
     deleteSnippet,
@@ -473,16 +418,19 @@ export const useEditorStore = defineStore('editor', () => {
   let initiated = false;
 
   const state = useEditorState();
-  const data = useEditorDataStore();
+  const document = useEditorDocument();
   const settings = useEditorSettings();
+
+  const activePath = computed(() => state.state.activeFileId);
+  const activeSnippet = computed(() => document.getMetadata(activePath.value));
 
   async function init() {
     if (initiated) return;
 
-    await Promise.all([data.init(), state.init(), settings.init()]);
+    await Promise.all([state.init(), settings.init(), document.init()]);
 
     initiated = true;
   }
 
-  return { data, state, settings, init };
+  return { state, settings, document, activeSnippet, activePath, init };
 });

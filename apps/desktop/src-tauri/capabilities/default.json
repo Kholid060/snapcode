@@ -39,11 +39,15 @@
     },
     {
       "identifier": "fs:allow-read-text-file",
-      "allow": [{ "path": "$RESOURCE/db/**/*" }, "$DOCUMENT/Snippy/**/*"]
+      "allow": [{ "path": "$RESOURCE/db/**/*" }, "$DOCUMENT/Snippy/snippets/**"]
     },
     {
       "identifier": "fs:allow-write-text-file",
-      "allow": ["$DOCUMENT/Snippy/**/*"]
+      "allow": ["$DOCUMENT/Snippy/snippets/**"]
+    },
+    {
+      "identifier": "fs:allow-rename",
+      "allow": ["$DOCUMENT/Snippy/snippets/**"]
     },
     {
       "identifier": "http:default",

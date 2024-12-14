@@ -25,3 +25,36 @@ export interface DocumentStoreState {
 }
 
 export type DocumentStoreMetadata = Record<string, SnippetMetadata>;
+
+export type DocumentFlatTreeBase = Record<string, DocumentFlatTreeItem[]>;
+
+export type DocumentFlatTree = Record<
+  '__root' | (string & {}),
+  DocumentFlatTreeItem[]
+>;
+
+export interface DocumenFlatTreeMetadataItem {
+  name: string;
+  mtime: number;
+  isDir: boolean;
+  stored?: SnippetMetadata;
+}
+
+export interface DocumentFlatTreeItem {
+  path: string;
+  isDir: boolean;
+}
+
+export interface DocumenFlatTreeData {
+  flatTree: DocumentFlatTree;
+  metadata: Record<string, DocumenFlatTreeMetadataItem>;
+}
+
+export interface DocumentCreatedFolder {
+  name: string;
+  path: string;
+}
+
+export interface DocumentCretedSnippet extends DocumentCreatedFolder {
+  stored?: SnippetMetadata;
+}

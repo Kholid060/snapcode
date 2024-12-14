@@ -37,13 +37,13 @@
   <EditorTreeRoot
     v-model="selectedItems"
     ref="tree-root"
-    :items="editorStore.data.treeData[TREE_ROOT_KEY]"
+    :items="editorStore.document.treeData.__root"
     :get-children="getChildren"
     @item:context-menu="
       sidebarProvider.handleContextMenu({
         data: {
           id: $event.item._id,
-          type: $event.item.value.isFolder ? 'folder' : 'snippet',
+          type: $event.item.value.isDir ? 'folder' : 'snippet',
           isTopOfSelected:
             selectedItems.length > 1 &&
             selectedItems.includes($event.item.value),
@@ -85,11 +85,11 @@ import {
 import { useHotkey } from '@/composables/hotkey.composable';
 import { getLogMessage } from '@/utils/helper';
 import { useAppDialog } from '@/providers/app-dialog.provider';
-import { TREE_ROOT_KEY, type TreeDataItem } from '@/utils/tree-data-utils';
 import { useEditorSidebarProvider } from '@/providers/editor.provider';
 import { appCommand } from '@/services/app-command.service';
 import { getSnippetLang } from '@/utils/snippet-utils';
 import EditorSidebarGitHubGists from './EditorSidebarGitHubGists.vue';
+import type { DocumentFlatTreeItem } from '@/interface/document.interface';
 
 const { toast } = useToast();
 const appDialog = useAppDialog();
@@ -110,15 +110,15 @@ const selectedItems = computed({
   },
 });
 
-function getChildren(item: TreeDataItem) {
-  return item.isFolder ? (editorStore.data.treeData[item.id] ?? []) : undefined;
+function getChildren(item: DocumentFlatTreeItem) {
+  return item.isDir
+    ? (editorStore.document.treeData[item.path] ?? [])
+    : undefined;
 }
 async function createNewSnippet() {
   try {
-    await editorStore.data.addSnippets([
-      { path: 'test.json', contents: 'hola', lang: '' },
-      { path: 'test.json', contents: 'hola', lang: '' },
-      { path: 'test.json', contents: 'hola', lang: '' },
+    await editorStore.document.addSnippets([
+      { contents: '', path: 'unnamed.txt', stored: { lang: 'txt' } },
     ]);
   } catch (error) {
     console.error(error);
@@ -133,7 +133,7 @@ async function createNewSnippet() {
 }
 async function createNewFolder() {
   try {
-    await editorStore.data.addFolders([{}]);
+    await editorStore.document.addFolders([{ path: 'unnamed' }]);
   } catch (error) {
     if (error instanceof Error) {
       await logger.error(`[create-folder] ${error.message}`);
@@ -157,12 +157,12 @@ async function importSnippetFromFiles() {
     });
     if (selectedFolder.canceled) return;
 
-    await editorStore.data.addSnippets(
+    await editorStore.document.addSnippets(
       files.map((file) => ({
         name: file.name,
-        content: file.content,
+        contents: file.content,
         lang: getSnippetLang(file)?.name,
-        folderId: selectedFolder.folderId,
+        path: selectedFolder.folderId ?? '',
       })),
     );
   } catch (error) {

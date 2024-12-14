@@ -12,11 +12,9 @@
         <Button
           size="icon"
           :variant="
-            editorStore.state.sidebarState.activeMenu === item.id
-              ? 'default'
-              : 'ghost'
+            editorStore.state.state.activeMenu === item.id ? 'default' : 'ghost'
           "
-          @click="editorStore.state.setSidebarState('activeMenu', item.id)"
+          @click="editorStore.state.updateState('activeMenu', item.id)"
         >
           <component :is="item.icon" class="size-5" />
         </Button>
@@ -40,7 +38,7 @@
     </div>
     <KeepAlive include="EditorSidebarSnippets,EditorSidebarSearch">
       <component
-        :is="sidebarComponentsMap[editorStore.state.sidebarState.activeMenu]"
+        :is="sidebarComponentsMap[editorStore.state.state.activeMenu]"
       />
     </KeepAlive>
     <ContextMenu>
@@ -83,7 +81,6 @@ import type {
 import { useEditorStore } from '@/stores/editor.store';
 import type { EditorSidebarProvider } from '@/providers/editor.provider';
 import { EDITOR_SIDEBAR_PROVIDER_KEY } from '@/providers/editor.provider';
-import type { TreeDataItem } from '@/utils/tree-data-utils';
 import { logger } from '@/services/logger.service';
 import { useAppDialog } from '@/providers/app-dialog.provider';
 import { getLogMessage } from '@/utils/helper';
@@ -93,6 +90,7 @@ import SidebarContextMenuBookmarks from './context-menu/SidebarContextMenuBookma
 import EditorSettings from '../EditorSettings.vue';
 import { useHotkeysStore } from '@/stores/hotkeys.store';
 import documentService from '@/services/document.service';
+import type { DocumentFlatTreeItem } from '@/interface/document.interface';
 
 const items: {
   label: string;
@@ -137,7 +135,7 @@ const editorStore = useEditorStore();
 const hotkeysStore = useHotkeysStore();
 
 const showSettings = shallowRef(false);
-const selectedItems = ref<TreeDataItem[]>([]);
+const selectedItems = ref<DocumentFlatTreeItem[]>([]);
 const ctxMenuData = shallowRef<EditorSidebarContextMenuItems | null>(null);
 
 function handleContextMenu(data: EditorSidebarContextMenuItems) {
@@ -201,13 +199,13 @@ useHotkey(
     console.log(handler);
     switch (handler.hotkeyId) {
       case 'bookmarksMenu':
-        editorStore.state.setSidebarState('activeMenu', 'bookmarks');
+        editorStore.state.updateState('activeMenu', 'bookmarks');
         break;
       case 'snippetsMenu':
-        editorStore.state.setSidebarState('activeMenu', 'snippets');
+        editorStore.state.updateState('activeMenu', 'snippets');
         break;
       case 'searchMenu':
-        editorStore.state.setSidebarState('activeMenu', 'search');
+        editorStore.state.updateState('activeMenu', 'search');
         break;
       case 'openSettings':
         showSettings.value = true;

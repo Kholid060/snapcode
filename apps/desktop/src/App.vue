@@ -40,4 +40,5 @@ useGlobalHotkey(
     },
   },
 );
+console.log(appCommand.invoke);
 </script>

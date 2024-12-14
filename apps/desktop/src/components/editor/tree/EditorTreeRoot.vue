@@ -4,10 +4,10 @@
     class="text-muted-foreground select-none list-none text-sm"
     multiple
     :items="items"
-    :get-key="(item) => item.id.toString()"
+    :get-key="(item) => item.path"
     :get-children="getChildren"
     selection-behavior="replace"
-    v-model:expanded="editorStore.state.sidebarState.activeFolderIds"
+    v-model:expanded="editorStore.state.state.activeFolderIds"
     v-model="selectedItems"
   >
     <div ref="items-container" class="space-y-px">
@@ -36,7 +36,6 @@ import { combine } from '@atlaskit/pragmatic-drag-and-drop/combine';
 import { monitorForElements } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
 import { useEditorStore } from '@/stores/editor.store';
 import EditorTreeItem from './EditorTreeItem.vue';
-import { type TreeDataItem } from '@/utils/tree-data-utils';
 import { logger } from '@/services/logger.service';
 import { useToast } from '@snippy/ui';
 import { getLogMessage } from '@/utils/helper';
@@ -45,18 +44,21 @@ import { onClickOutside } from '@vueuse/core';
 import { debounce } from '@snippy/shared';
 import type { FolderId } from '@/interface/folder.interface';
 import type { SnippetId } from '@/interface/snippet.interface';
+import type { DocumentFlatTreeItem } from '@/interface/document.interface';
 
 defineProps<
   {
-    items: TreeDataItem[];
-    getChildren: (item: TreeDataItem) => TreeDataItem[] | undefined;
+    items: DocumentFlatTreeItem[];
+    getChildren: (
+      item: DocumentFlatTreeItem,
+    ) => DocumentFlatTreeItem[] | undefined;
   } & Pick<TreeRootProps, 'expanded' | 'modelValue'>
 >();
 const emit = defineEmits<{
   'item:context-menu': [
-    { event: PointerEvent; item: FlattenedItem<TreeDataItem> },
+    { event: PointerEvent; item: FlattenedItem<DocumentFlatTreeItem> },
   ];
-  'item:select': [event: TreeItemSelectEvent<TreeDataItem>];
+  'item:select': [event: TreeItemSelectEvent<DocumentFlatTreeItem>];
 }>();
 
 let isHidden = false;
@@ -66,14 +68,14 @@ const editorStore = useEditorStore();
 
 const itemsContainerRef = useTemplateRef('items-container');
 
-const selectedItems = defineModel<TreeDataItem[]>({
+const selectedItems = defineModel<DocumentFlatTreeItem[]>({
   default: () => [],
 });
 
 function selectItemsByMouse(
-  event: TreeItemSelectEvent<TreeDataItem>,
-  item: FlattenedItem<TreeDataItem>,
-  items: FlattenedItem<TreeDataItem>[],
+  event: TreeItemSelectEvent<DocumentFlatTreeItem>,
+  item: FlattenedItem<DocumentFlatTreeItem>,
+  items: FlattenedItem<DocumentFlatTreeItem>[],
 ) {
   const { originalEvent } = event.detail;
   if (originalEvent.ctrlKey || originalEvent.metaKey) {
@@ -106,9 +108,9 @@ function selectItemsByMouse(
   event.preventDefault();
 }
 function handleSelect(
-  event: TreeItemSelectEvent<TreeDataItem>,
-  item: FlattenedItem<TreeDataItem>,
-  items: FlattenedItem<TreeDataItem>[],
+  event: TreeItemSelectEvent<DocumentFlatTreeItem>,
+  item: FlattenedItem<DocumentFlatTreeItem>,
+  items: FlattenedItem<DocumentFlatTreeItem>[],
 ) {
   if (event.detail.originalEvent instanceof PointerEvent) {
     selectItemsByMouse(event, item, items);
@@ -118,8 +120,8 @@ function handleSelect(
     emit('item:select', event);
   }
 
-  if (!item.value.isFolder && !event.defaultPrevented) {
-    editorStore.state.setSidebarState('activeFileId', item._id);
+  if (!item.value.isDir && !event.defaultPrevented) {
+    editorStore.state.updateState('activeFileId', item._id);
   }
 }
 

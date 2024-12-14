@@ -112,9 +112,9 @@ function handleSelectItem(event: TreeItemSelectEvent<TreeDataItem>) {
   const value = event.detail.value!;
   if (!value.isFolder) return;
 
-  if (!editorStore.state.sidebarState.activeFolderIds.includes(value.id)) {
+  if (!editorStore.state.state.activeFolderIds.includes(value.id)) {
     const expandedFolders = new Set(
-      editorStore.state.sidebarState.activeFolderIds,
+      editorStore.state.state.activeFolderIds,
     );
     expandedFolders.add(value.id);
 
@@ -135,11 +135,11 @@ function handleSelectItem(event: TreeItemSelectEvent<TreeDataItem>) {
       iterCount += 1;
     }
 
-    editorStore.state.setSidebarState('activeFolderIds', [...expandedFolders]);
+    editorStore.state.updateState('activeFolderIds', [...expandedFolders]);
   }
 
   sidebarProvider.setSelectedItems([value]);
-  editorStore.state.setSidebarState('activeMenu', 'snippets');
+  editorStore.state.updateState('activeMenu', 'snippets');
 }
 function mapToTreeItem(items: Item[], isFolder: boolean): TreeDataItem[] {
   return items.map((item) => ({ id: item.id, isFolder }));

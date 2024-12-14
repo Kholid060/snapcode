@@ -4,14 +4,14 @@
     data-tauri-drag-region
   >
     <TooltipSimple
-      :label="editorStore.state.sidebarState.show ? 'Collapse' : 'Expand'"
+      :label="editorStore.state.state.showSidebar ? 'Collapse' : 'Expand'"
     >
       <Button
         size="icon"
         @click="
-          editorStore.state.setSidebarState(
-            'show',
-            !editorStore.state.sidebarState.show,
+          editorStore.state.updateState(
+            'showSidebar',
+            !editorStore.state.state.showSidebar,
           )
         "
         class="text-muted-foreground"
@@ -19,7 +19,7 @@
       >
         <component
           :is="
-            editorStore.state.sidebarState.show
+            editorStore.state.state.showSidebar
               ? SidebarLeft01Icon
               : SidebarRight01Icon
           "
@@ -27,33 +27,33 @@
         />
       </Button>
     </TooltipSimple>
-    <template v-if="activeFile">
+    <template v-if="editorStore.activeSnippet">
       <UiEditable
-        :value="activeFile.name ?? ''"
+        ref="name-form"
+        :value="editorStore.activeSnippet.name ?? ''"
         placeholder="Snippet name"
         class="hover:bg-secondary focus:bg-secondary ml-2 inline-block flex-shrink-0 truncate rounded px-1 py-0.5 transition before:pl-1 focus:outline-none"
         @submit="$event.isDirty && updateSnippetName($event.value ?? 'Unnamed')"
       />
       <div class="pointer-events-none grow"></div>
       <TooltipSimple
-        :label="
-          activeFile.isBookmark ? 'Remove from bookmark' : 'Add to bookmark'
-        "
+        :label="isBookmarked ? 'Remove from bookmark' : 'Add to bookmark'"
       >
         <Button
           variant="secondary"
           size="icon"
           class="ml-4"
-          :class="{ 'text-primary bg-primary/10': activeFile.isBookmark }"
+          :class="{ 'text-primary bg-primary/10': isBookmarked }"
           @click="
-            editorStore.data.updateSnippet(activeFile.id, {
-              isBookmark: !activeFile.isBookmark,
-            })
+            editorStore.document.setBookmark(
+              editorStore.activePath,
+              !isBookmarked,
+            )
           "
         >
           <component
-            :is="activeFile.isBookmark ? Bookmark02Icon : BookmarkAdd02Icon"
-            :fill="activeFile.isBookmark ? 'currentColor' : 'none'"
+            :is="isBookmarked ? Bookmark02Icon : BookmarkAdd02Icon"
+            :fill="isBookmarked ? 'currentColor' : 'none'"
             class="size-5"
           />
         </Button>
@@ -64,8 +64,10 @@
 </template>
 <script setup lang="ts">
 import UiEditable from '@/components/ui/UiEditable.vue';
+import { logger } from '@/services/logger.service';
 import { useEditorStore } from '@/stores/editor.store';
-import { Button, TooltipSimple } from '@snippy/ui';
+import { getLogMessage } from '@/utils/helper';
+import { Button, TooltipSimple, useToast } from '@snippy/ui';
 import {
   Bookmark02Icon,
   BookmarkAdd02Icon,
@@ -73,14 +75,40 @@ import {
   SidebarRight01Icon,
 } from 'hugeicons-vue';
 
+const { toast } = useToast();
 const editorStore = useEditorStore();
 
-const activeFile = computed(() => editorStore.data.activeSnippet);
+const nameForm = useTemplateRef('name-form');
 
-function updateSnippetName(name: string) {
-  editorStore.data.updateSnippet(activeFile.value.id, {
-    name,
-  });
+const isBookmarked = computed({
+  get() {
+    return editorStore.document.bookmarks.find(
+      (item) => item.path === editorStore.state.state.activeFileId,
+    );
+  },
+  set() {},
+});
+
+async function updateSnippetName(newName: string) {
+  if (!editorStore.activeSnippet) return;
+
+  try {
+    const { name, isDir } = editorStore.activeSnippet;
+    await editorStore.document.rename({
+      isDir,
+      from: name,
+      to: newName || 'unnamed.txt',
+      path: editorStore.activePath.slice(0, -name.length),
+    });
+  } catch (error) {
+    nameForm.value?.resetValue();
+    logger.error(getLogMessage('rename-snippet', error));
+    toast({
+      variant: 'destructive',
+      title: 'An error occured',
+      description: typeof error === 'string' ? error : (error as Error).message,
+    });
+  }
 }
 
 onUnmounted(() => {});

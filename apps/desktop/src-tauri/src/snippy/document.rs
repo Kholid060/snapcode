@@ -1,11 +1,18 @@
-use std::{collections::HashMap, io, path::PathBuf, sync::Mutex, time::UNIX_EPOCH};
+use std::{collections::HashMap, fs, io, path::PathBuf, sync::Mutex, time::UNIX_EPOCH};
 
+use path_slash::PathExt;
 use serde::{ser::SerializeStruct, Serialize};
 use tauri::{self, Manager};
-use tauri_plugin_store::StoreExt;
 use walkdir::WalkDir;
 
-use crate::common::ensure_dir;
+use crate::{
+    common::{self, ensure_dir},
+    util::PathUtil,
+};
+
+mod document_indexer;
+
+pub use document_indexer::DocumentIndexer;
 
 pub struct DocumentState {
     base_dir: PathBuf,
@@ -41,17 +48,43 @@ impl DocumentState {
     }
 }
 
-#[derive(Serialize)]
 pub struct DocumentTreeItemMetadata {
     mtime: u128,
     name: String,
     is_dir: bool,
 }
+impl Serialize for DocumentTreeItemMetadata {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        let mut s = serializer.serialize_struct("DocumentTreeItemMetadata", 3)?;
+        s.serialize_field("name", &self.name)?;
+        s.serialize_field("mtime", &self.mtime)?;
+        s.serialize_field("isDir", &self.is_dir)?;
+        s.end()
+    }
+}
 
-#[derive(Serialize)]
+pub struct DocumentFlatTreeItem {
+    path: String,
+    is_dir: bool,
+}
+impl Serialize for DocumentFlatTreeItem {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        let mut s = serializer.serialize_struct("DocumentTreeItemMetadata", 3)?;
+        s.serialize_field("path", &self.path)?;
+        s.serialize_field("isDir", &self.is_dir)?;
+        s.end()
+    }
+}
+
 pub struct DocumentFlatTreeData {
-    flat_tree: HashMap<String, Vec<String>>,
     metadata: HashMap<String, DocumentTreeItemMetadata>,
+    flat_tree: HashMap<String, Vec<DocumentFlatTreeItem>>,
 }
 impl DocumentFlatTreeData {
     fn new() -> Self {
@@ -74,22 +107,30 @@ impl DocumentFlatTreeData {
             .and_then(|val| val.to_str())
             .unwrap_or_default()
             .to_owned();
-        if name.is_empty() || (name == "__root" && metadata.is_dir()) {
+        let is_dir = metadata.is_dir();
+        if name.is_empty() || (name == "__root" && is_dir) {
             return;
         }
 
-        let item_key = path.to_str().unwrap_or_default().to_owned();
-        let parent_key = match path.parent().and_then(|val| val.to_str()) {
-            Some(parent) if !parent.is_empty() => parent.to_owned(),
+        let item_key = path.to_slash().unwrap_or_default().to_string();
+        let parent_key = match path.parent().and_then(|val| val.to_slash()) {
+            Some(parent) if !parent.is_empty() => parent.to_string(),
             _ => Self::root_key(),
         };
-
+        let tree_item = DocumentFlatTreeItem {
+            is_dir,
+            path: if is_dir {
+                item_key.clone()
+            } else {
+                name.clone()
+            },
+        };
         match self.flat_tree.get_mut(&parent_key) {
             Some(value) => {
-                (*value).push(name.clone());
+                (*value).push(tree_item);
             }
             None => {
-                self.flat_tree.insert(parent_key, vec![name.clone()]);
+                self.flat_tree.insert(parent_key, vec![tree_item]);
             }
         };
 
@@ -105,9 +146,20 @@ impl DocumentFlatTreeData {
             DocumentTreeItemMetadata {
                 name,
                 mtime,
-                is_dir: metadata.is_dir(),
+                is_dir,
             },
         );
+    }
+}
+impl Serialize for DocumentFlatTreeData {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        let mut s = serializer.serialize_struct("DocumentFlatTreeData", 2)?;
+        s.serialize_field("metadata", &self.metadata)?;
+        s.serialize_field("flatTree", &self.flat_tree)?;
+        s.end()
     }
 }
 
@@ -128,12 +180,31 @@ pub fn get_document_flat_tree(app: &tauri::AppHandle) -> io::Result<DocumentFlat
     Ok(tree_data)
 }
 
+pub fn move_document_items(
+    app: &tauri::AppHandle,
+    items: Vec<(String, String)>,
+) -> io::Result<Vec<String>> {
+    let document_state = app.state::<Mutex<DocumentState>>();
+    let document_state = document_state.lock().unwrap();
+    let snippets_dir = document_state.get_snippets_dir();
+
+    let mut paths = vec![];
+
+    for item in items {
+        let old_path = snippets_dir.safe_join(item.0)?;
+        let mut new_path = snippets_dir.safe_join(item.1)?;
+        let new_path = common::gen_unique_filename(snippets_dir, &mut new_path)?;
+
+        fs::rename(old_path, &new_path)?;
+
+        paths.push(new_path.to_str().unwrap_or_default().to_owned());
+    }
+
+    Ok(paths)
+}
+
 pub fn init_app_document(app: &tauri::App) -> tauri::Result<()> {
     let document_state = DocumentState::new(&app)?;
-    let _ = app
-        .store_builder(document_state.base_dir.join("a.json"))
-        .build();
-
     app.manage(Mutex::new(document_state));
 
     Ok(())

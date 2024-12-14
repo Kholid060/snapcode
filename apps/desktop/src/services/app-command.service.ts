@@ -8,11 +8,17 @@ import { getLogMessage } from '@/utils/helper';
 import { invoke } from '@tauri-apps/api/core';
 import { logger } from './logger.service';
 import { AppDocumentState } from '@/interface/app.interface';
+import {
+  DocumenFlatTreeData,
+  DocumentCreatedFolder,
+  DocumentCretedSnippet,
+} from '@/interface/document.interface';
+import { FolderNewPayload } from '@/interface/folder.interface';
 
 interface SnippetCommands {
   create_snippets: [
     { snippets: Pick<SnippetNewPayload, 'path' | 'contents'>[] },
-    void,
+    DocumentCretedSnippet[],
   ];
   open_snippet: [{ snippetId: string }, void];
   send_snippet_content: [
@@ -28,9 +34,15 @@ interface SnippetCommands {
   get_snippet_with_placeholder: [{ snippetId: string }, SnippetWithPlaceholder];
 }
 
+interface FolderCommands {
+  create_folders: [{ folders: FolderNewPayload[] }, DocumentCreatedFolder[]];
+}
+
 interface DocumentCommands {
   get_document_state: [undefined, AppDocumentState];
-  get_document_flat_tree: [undefined, Record<string, string[]>];
+  get_document_flat_tree: [undefined, DocumenFlatTreeData];
+  rename_document_item: [{ oldPath: string; newPath: string }, string];
+  move_document_items: [{ items: [from: string, to: string][] }, string[]];
 }
 
 interface WindowCommands {
@@ -38,7 +50,10 @@ interface WindowCommands {
   update_popup_window_tray_menu: [{ shortcut: string }, void];
 }
 
-type Commands = SnippetCommands & DocumentCommands & WindowCommands;
+type Commands = SnippetCommands &
+  DocumentCommands &
+  WindowCommands &
+  FolderCommands;
 
 async function invokeCommand<T extends keyof Commands>(
   name: T,

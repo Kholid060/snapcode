@@ -21,7 +21,7 @@
         :value="item.id"
         class="border-border/50 mb-px block"
         @select.prevent="
-          editorStore.state.setSidebarState('activeFileId', item.id)
+          editorStore.state.updateState('activeFileId', item.id)
         "
       >
         <p v-html="sanitizeSnippetHTML(item.name)"></p>

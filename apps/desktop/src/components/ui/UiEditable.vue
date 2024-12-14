@@ -1,5 +1,6 @@
 <template>
   <span
+    ref="el"
     :contenteditable="state.isFocus"
     @pointerdown="handlePointerDown"
     class="ui-editable focus:ring-offset-background focus:ring-ring relative whitespace-pre-wrap focus:outline-none focus:ring-2 focus:ring-offset-2"
@@ -31,6 +32,8 @@ const emit = defineEmits<{
   update: [value: string];
   submit: [event: SubmitEvent];
 }>();
+
+const el = useTemplateRef('el');
 
 const state = shallowReactive({
   isFocus: false,
@@ -85,6 +88,11 @@ function handlePointerDown(event: PointerEvent) {
     }
   });
 }
+function resetValue() {
+  if (el.value) el.value.textContent = props.value;
+}
+
+defineExpose({ resetValue });
 </script>
 <style lang="postcss" scoped>
 .ui-editable {

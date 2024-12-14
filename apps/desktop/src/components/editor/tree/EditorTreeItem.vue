@@ -13,8 +13,7 @@
         : dragState.isDragging
           ? 'bg-primary text-primary-foreground'
           : 'focus-visible:ring-primary',
-      editorStore.state.sidebarState.activeFileId === item._id &&
-      !dragState.isDragging
+      editorStore.state.state.activeFileId === item._id && !dragState.isDragging
         ? 'bg-accent/70 text-foreground'
         : 'hover:bg-accent/70',
     ]"
@@ -30,7 +29,7 @@
       </span>
     </template>
     <component
-      v-if="item.value.isFolder"
+      v-if="item.value.isDir"
       class="size-4 flex-shrink-0"
       :is="isExpanded ? Folder02Icon : Folder01Icon"
     />
@@ -52,7 +51,6 @@
 import { computed, render } from 'vue';
 import type { TreeItemToggleEvent } from 'radix-vue';
 import { type FlattenedItem, TreeItem } from 'radix-vue';
-import { type TreeDataItem } from '@/utils/tree-data-utils';
 import { useEditorStore } from '@/stores/editor.store';
 import { pointerOutsideOfPreview } from '@atlaskit/pragmatic-drag-and-drop/element/pointer-outside-of-preview';
 import { setCustomNativeDragPreview } from '@atlaskit/pragmatic-drag-and-drop/element/set-custom-native-drag-preview';
@@ -64,9 +62,11 @@ import {
 } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
 import { unrefElement } from '@vueuse/core';
 import { Folder01Icon, Folder02Icon, File01Icon } from 'hugeicons-vue';
+import type { DocumentFlatTreeItem } from '@/interface/document.interface';
+import { combineTreeItemPath } from '@/utils/tree-data-utils';
 
 const props = defineProps<{
-  item: FlattenedItem<TreeDataItem>;
+  item: FlattenedItem<DocumentFlatTreeItem>;
 }>();
 
 const AppFileExtIcon = defineAsyncComponent(
@@ -84,26 +84,27 @@ const dragState = shallowReactive({
 });
 
 const itemData = computed(() => {
-  const item = props.item.value;
-  const data = item.isFolder
-    ? editorStore.data.folders[item.id]
-    : editorStore.data.snippets[item.id];
-  if (!data) return { name: '', parentId: null };
+  const path = props.item.value.isDir
+    ? props.item.value.path
+    : combineTreeItemPath(props.item.value, props.item.parentItem);
+  const itemData = editorStore.document.getMetadata(path);
 
-  return 'lang' in data
+  return !itemData
     ? {
-        lang: data.lang,
-        name: data.name,
-        parentId: data.folderId,
+        lang: '',
+        noData: true,
+        parentId: '',
+        name: 'no data',
       }
     : {
-        ext: null,
-        name: data.name || '',
-        parentId: data.parentId,
+        name: itemData.name,
+        noData: itemData === null,
+        lang: itemData.stored?.lang,
+        parentId: props.item.parentItem?.path ?? null,
       };
 });
 
-function handleToggle(event: TreeItemToggleEvent<TreeDataItem>) {
+function handleToggle(event: TreeItemToggleEvent<DocumentFlatTreeItem>) {
   const { originalEvent } = event.detail;
   if (
     originalEvent instanceof PointerEvent &&
@@ -140,7 +141,7 @@ watchEffect((onCleanup) => {
       getInitialData: () => ({
         ...itemData.value,
         id: item.id,
-        isFolder: item.isFolder,
+        isFolder: item.isDir,
       }),
       onDragStart: () => {
         dragState.isDragging = true;
@@ -180,7 +181,7 @@ watchEffect((onCleanup) => {
         return {
           ...itemData.value,
           id: item.id,
-          isFolder: item.isFolder,
+          isFolder: item.isDir,
         };
       },
       onDragEnter: ({ source }) => {

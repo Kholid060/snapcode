@@ -6,7 +6,7 @@ import { AppEditorFonts } from '@/utils/const/app.const';
 export type EditorSidebarItems = 'snippets' | 'bookmarks' | 'search';
 
 export interface EditorSidebarState {
-  show: boolean;
+  showSidebar: boolean;
   activeFileId: SnippetId;
   activeFolderIds: FolderId[];
   activeMenu: EditorSidebarItems;

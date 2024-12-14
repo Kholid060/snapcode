@@ -1,6 +1,7 @@
 use tauri::Manager;
 use tauri_plugin_prevent_default::Flags;
 
+mod util;
 mod commands;
 mod common;
 mod snippy;
@@ -37,6 +38,8 @@ pub fn run() {
             commands::window::open_popup_window,
             commands::window::update_popup_window_tray_menu,
             commands::document::get_document_state,
+            commands::document::move_document_items,
+            commands::document::rename_document_item,
             commands::document::get_document_flat_tree,
             commands::snippet::open_snippet,
             commands::snippet::create_folders,

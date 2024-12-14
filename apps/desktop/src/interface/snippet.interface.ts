@@ -13,8 +13,8 @@ export type SnippetListItem = Omit<
 
 export interface SnippetNewPayload {
   path: string;
-  lang: string;
   contents: string;
+  stored?: SnippetMetadata;
 }
 
 export type SnippetUpdatePayload = Partial<

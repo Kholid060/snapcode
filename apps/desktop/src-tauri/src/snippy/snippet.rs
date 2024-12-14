@@ -1,12 +1,13 @@
-use std::{collections::HashMap, fs, io, path::PathBuf, sync::Mutex, thread};
+use std::{collections::HashMap, fs, io, path::PathBuf, sync::Mutex};
 
+use path_slash::PathBufExt;
 use regex::Regex;
 use serde::{ser::SerializeStruct, Deserialize, Serialize, Serializer};
 use serde_json::json;
 use tauri::Manager;
 use tauri_plugin_store::StoreExt;
 
-use crate::{commands::snippet, common};
+use crate::{common, util::PathUtil};
 
 use super::document::DocumentState;
 
@@ -60,16 +61,33 @@ pub fn replace_snippet_placeholders<'a>(
 }
 
 #[derive(Serialize, Deserialize)]
+pub struct SnippetStoredMetadata {
+    lang: Option<String>,
+}
+
+#[derive(Serialize, Deserialize)]
 pub struct SnippetCreatedItem {
     path: String,
     name: String,
+    stored: Option<SnippetStoredMetadata>,
 }
 
 #[derive(Deserialize, Serialize)]
 pub struct SnippetDoc {
     path: String,
-    lang: String,
     contents: String,
+    stored: Option<SnippetStoredMetadata>,
+}
+
+#[derive(Deserialize, Serialize)]
+pub struct FolderDoc {
+    path: String,
+}
+
+#[derive(Deserialize, Serialize)]
+pub struct FolderCreatedItem {
+    path: String,
+    name: String,
 }
 
 pub fn create_snippets(
@@ -78,35 +96,28 @@ pub fn create_snippets(
 ) -> io::Result<Vec<SnippetCreatedItem>> {
     let document_state = app.state::<Mutex<DocumentState>>();
     let document_state = document_state.lock().unwrap();
+    let snippets_dir = document_state.get_snippets_dir();
 
     let metadata_store = app
         .store(document_state.get_metadata_dir().join("metadata.json"))
         .unwrap();
 
-    let mut last_file_num = 0;
     let mut snippet_paths = vec![];
     for snippet in snippets {
-        let mut snippet_path = PathBuf::from(snippet.path);
-        let (file_path, file_num) = common::gen_unique_filename(
-            &document_state.get_snippets_dir(),
-            &mut snippet_path,
-            Some(last_file_num),
-        )?;
+        let file_path = snippets_dir
+            .safe_join(snippet.path)?
+            .gen_unique_filename()?;
+        fs::write(&file_path, &snippet.contents)?;
 
-        last_file_num = file_num;
-
-        fs::write(
-            &document_state.get_snippets_dir().join(file_path),
-            &snippet.contents,
-        )?;
-
-        if let Some(file_path_str) = file_path.to_str() {
-            if !snippet.lang.is_empty() {
-                metadata_store.set(file_path_str, json!({ "path": snippet.lang }));
+        let file_path = file_path.strip_prefix(snippets_dir).unwrap().to_path_buf();
+        if let Some(file_path_str) = file_path.to_slash().and_then(|val| Some(val.to_string())) {
+            if let Some(metadata) = &snippet.stored {
+                metadata_store.set(&file_path_str, json!(metadata));
             }
 
             snippet_paths.push(SnippetCreatedItem {
-                path: file_path_str.to_owned(),
+                path: file_path_str,
+                stored: snippet.stored,
                 name: file_path
                     .file_name()
                     .and_then(|val| val.to_str())
@@ -121,28 +132,24 @@ pub fn create_snippets(
 
 pub fn create_folders(
     app: &tauri::AppHandle,
-    folders: Vec<String>,
-) -> io::Result<Vec<SnippetCreatedItem>> {
+    folders: Vec<FolderDoc>,
+) -> io::Result<Vec<FolderCreatedItem>> {
     let document_state = app.state::<Mutex<DocumentState>>();
     let document_state = document_state.lock().unwrap();
 
     let snippets_dir = document_state.get_snippets_dir();
-    let mut last_folder_num = 0;
 
     let mut result = vec![];
     for folder in folders {
-        let mut base_folder_path = PathBuf::from(folder);
-        let (folder_path, folder_num) = common::gen_unique_filename(
-            snippets_dir,
-            &mut base_folder_path,
-            Some(last_folder_num),
-        )?;
+        let folder_path = snippets_dir.safe_join(folder.path)?.gen_unique_filename()?;
+        fs::create_dir_all(&folder_path)?;
 
-        last_folder_num = folder_num;
-        fs::create_dir_all(&snippets_dir.join(folder_path))?;
-
+        let folder_path = folder_path
+            .strip_prefix(snippets_dir)
+            .unwrap()
+            .to_path_buf();
         if let Some(folder_path_str) = folder_path.to_str() {
-            result.push(SnippetCreatedItem {
+            result.push(FolderCreatedItem {
                 path: folder_path_str.to_owned(),
                 name: folder_path
                     .file_name()

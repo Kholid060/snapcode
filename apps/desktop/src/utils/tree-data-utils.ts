@@ -1,3 +1,4 @@
+import { DocumentFlatTreeItem } from '@/interface/document.interface';
 import { FolderListItem } from '@/interface/folder.interface';
 import { SnippetListItem } from '@/interface/snippet.interface';
 
@@ -38,4 +39,11 @@ export function buildTreeData({
   }
 
   return groupedChildren;
+}
+
+export function combineTreeItemPath(
+  child: DocumentFlatTreeItem,
+  parent?: DocumentFlatTreeItem | null,
+) {
+  return parent ? `${parent.path}/${child.path}` : child.path;
 }
