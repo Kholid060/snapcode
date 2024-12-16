@@ -5,7 +5,7 @@
   />
   <div class="min-w-0 grow">
     <EditorContentHeader />
-    <!-- <EditorContentCM v-if="editorStore.activeSnippet" /> -->
+    <EditorContentCM v-if="editorStore.activeSnippet" />
   </div>
 </template>
 <script setup lang="ts">

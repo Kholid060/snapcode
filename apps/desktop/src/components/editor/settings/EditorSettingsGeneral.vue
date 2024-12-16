@@ -44,13 +44,44 @@
         @update:checked="toggleAppStartup"
       />
     </EditorSettingsItem>
+    <EditorSettingsItem>
+      <template #content>
+        <p>Deleted snippets</p>
+        <p class="text-muted-foreground text-sm">
+          Select what happened to the snippets after deleted
+        </p>
+      </template>
+      <Select
+        :model-value="appStore.settings.deleteToTrash ? '1' : '0'"
+        @update:model-value="
+          appStore.updateSettings('deleteToTrash', $event === '1')
+        "
+      >
+        <SelectTrigger class="w-auto">
+          <SelectValue class="pr-2" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="1"> Move to system trash </SelectItem>
+          <SelectItem value="0"> Permanently delete </SelectItem>
+        </SelectContent>
+      </Select>
+    </EditorSettingsItem>
   </div>
 </template>
 <script setup lang="ts">
 import { logger } from '@/services/logger.service';
 import { store } from '@/services/store.service';
 import { getLogMessage } from '@/utils/helper';
-import { Button, Switch, useToast } from '@snippy/ui';
+import {
+  Button,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  Switch,
+  useToast,
+} from '@snippy/ui';
 import { getVersion } from '@tauri-apps/api/app';
 import * as autoStart from '@tauri-apps/plugin-autostart';
 import EditorSettingsItem from './EditorSettingsItem.vue';

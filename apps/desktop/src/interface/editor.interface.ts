@@ -1,4 +1,3 @@
-import { TreeDataItem } from '@/utils/tree-data-utils';
 import { SnippetId } from './snippet.interface';
 import { FolderId } from './folder.interface';
 import { AppEditorFonts } from '@/utils/const/app.const';
@@ -21,7 +20,8 @@ export interface EditorSidebarCtxMenuBase<T, D> {
 export type EditorSidebarSnippetsCtxMenu = EditorSidebarCtxMenuBase<
   'snippets',
   {
-    id: SnippetId;
+    name: string;
+    path: string;
     isTopOfSelected: boolean;
     type: 'folder' | 'snippet';
   }
@@ -30,10 +30,11 @@ export type EditorSidebarSnippetsCtxMenu = EditorSidebarCtxMenuBase<
 export type EditorSidebarBookmarksCtxMenu = EditorSidebarCtxMenuBase<
   'bookmarks',
   {
-    id: string;
+    name: string;
+    path: string;
+    selectedItems: string[];
     isTopOfSelected: boolean;
     type: 'folder' | 'snippet';
-    selectedItems: TreeDataItem[];
   }
 >;
 

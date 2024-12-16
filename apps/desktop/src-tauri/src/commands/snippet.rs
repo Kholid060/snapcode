@@ -1,60 +1,42 @@
 use serde::{ser::SerializeStruct, Deserialize, Serialize, Serializer};
-use std::{collections::HashMap, fs};
-use tauri::Emitter;
+use std::{collections::HashMap, sync::Mutex};
+use tauri::{Emitter, Manager};
 use tauri_plugin_clipboard_manager::ClipboardExt;
 use tauri_plugin_dialog::DialogExt;
 use tauri_plugin_sql::DbPool;
 
 use crate::{
     common::stringify,
-    snippy::{self, snippet::SnippetPlaceholderItem},
+    snippy::{
+        self,
+        document::{self},
+        snippet::SnippetPlaceholderItem,
+    },
 };
-
-type ImportedSnippetItem = HashMap<String, String>;
 
 #[tauri::command(async)]
 pub fn import_snippet_from_file(
     app_handle: tauri::AppHandle,
     webview_window: tauri::WebviewWindow,
-) -> Vec<ImportedSnippetItem> {
-    let Some(file_paths) = app_handle
+    dir_path: String,
+) -> Result<Vec<document::SnippetDocCreated>, String> {
+    let app_document = app_handle.state::<Mutex<document::AppDocument>>();
+    let app_document = app_document.lock().unwrap();
+
+    let paths = app_handle
         .dialog()
         .file()
         .set_title("Select file(s) to import")
         .set_parent(&webview_window)
         .blocking_pick_files()
-    else {
-        return vec![];
-    };
-    let mut contents = vec![];
+        .unwrap_or_default();
+    let paths = paths.iter().filter_map(|path| path.as_path()).collect();
 
-    for path in file_paths {
-        let Ok(path) = path.into_path() else { continue };
-        let Ok(file_content) = fs::read_to_string(&path) else {
-            continue;
-        };
+    let snippets = app_document
+        .import_files(&app_handle, dir_path, paths)
+        .map_err(stringify)?;
 
-        let mut snippet = HashMap::new();
-
-        let file_name = path
-            .file_name()
-            .unwrap_or_default()
-            .to_str()
-            .unwrap_or_default();
-        let file_ext = path
-            .extension()
-            .unwrap_or_default()
-            .to_str()
-            .unwrap_or_default();
-
-        snippet.insert("content".to_string(), file_content);
-        snippet.insert("ext".to_string(), file_ext.to_owned());
-        snippet.insert("name".to_string(), file_name.to_owned());
-
-        contents.push(snippet);
-    }
-
-    contents
+    Ok(snippets)
 }
 
 #[derive(sqlx::FromRow, Deserialize)]
@@ -190,24 +172,4 @@ pub fn open_snippet(app: tauri::AppHandle, snippet_id: String) -> Result<(), Str
         .map_err(stringify)?;
 
     Ok(())
-}
-
-#[tauri::command(async)]
-pub fn create_snippets(
-    app: tauri::AppHandle,
-    snippets: Vec<snippy::snippet::SnippetDoc>,
-) -> Result<Vec<snippy::snippet::SnippetCreatedItem>, String> {
-    let snippets = snippy::snippet::create_snippets(&app, snippets).map_err(stringify)?;
-
-    Ok(snippets)
-}
-
-#[tauri::command(async)]
-pub fn create_folders(
-    app: tauri::AppHandle,
-    folders: Vec<snippy::snippet::FolderDoc>,
-) -> Result<Vec<snippy::snippet::FolderCreatedItem>, String> {
-    let folders = snippy::snippet::create_folders(&app, folders).map_err(stringify)?;
-
-    Ok(folders)
 }

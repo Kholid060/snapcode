@@ -32,7 +32,7 @@
         <AlertDialogAction
           class="ml-2"
           :variant="options.okBtnVariant"
-          @click="$emit('close', { isConfirmed: true, dontAskValue })"
+          @click.stop="$emit('close', { isConfirmed: true, dontAskValue })"
         >
           {{ options.okBtnLabel ?? 'Ok' }}
         </AlertDialogAction>

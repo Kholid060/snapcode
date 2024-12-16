@@ -68,9 +68,22 @@ const defaultOptions: BasicExtensionsOptions = {
   highlightSelectionMatches: true,
 };
 
-export const basicExtensions = (options?: Partial<BasicExtensionsOptions>) => {
+export const basicExtensions = (
+  options?: Partial<BasicExtensionsOptions>,
+  extensions: Extension[] = [],
+) => {
   const opts = { ...defaultOptions, ...(options ?? {}) };
   return [
+    keymap.of([
+      ...closeBracketsKeymap,
+      ...defaultKeymap,
+      ...searchKeymap,
+      ...historyKeymap,
+      ...foldKeymap,
+      ...completionKeymap,
+      ...lintKeymap,
+    ]),
+    ...extensions,
     opts.lineNumbers ? lineNumbers() : [],
     opts.highlightActiveLineGutter ? highlightActiveLineGutter() : [],
     opts.highlightSpecialChars ? highlightSpecialChars() : [],
@@ -92,15 +105,6 @@ export const basicExtensions = (options?: Partial<BasicExtensionsOptions>) => {
     opts.crosshairCursor ? crosshairCursor() : [],
     opts.highlightActiveLine ? highlightActiveLine() : [],
     opts.highlightSelectionMatches ? highlightSelectionMatches() : [],
-    keymap.of([
-      ...closeBracketsKeymap,
-      ...defaultKeymap,
-      ...searchKeymap,
-      ...historyKeymap,
-      ...foldKeymap,
-      ...completionKeymap,
-      ...lintKeymap,
-    ]),
   ];
 };
 

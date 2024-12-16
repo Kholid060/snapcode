@@ -19,10 +19,11 @@
       </ContextMenuItem>
       <ContextMenuItem @click="toggleBookmark">
         <component
-          :is="itemData?.isBookmark ? Bookmark02Icon : BookmarkAdd02Icon"
+          :is="isBookmarked ? Bookmark02Icon : BookmarkAdd02Icon"
           class="mr-2 size-4"
+          :class="isBookmarked && 'fill-current'"
         />
-        {{ itemData?.isBookmark ? 'Remove from bookmark' : 'Add to bookmark' }}
+        {{ isBookmarked ? 'Remove from bookmark' : 'Add to bookmark' }}
       </ContextMenuItem>
       <ContextMenuSeparator />
       <ContextMenuItem
@@ -49,10 +50,11 @@
       </ContextMenuItem>
       <ContextMenuItem @click="toggleBookmark">
         <component
-          :is="itemData?.isBookmark ? Bookmark02Icon : BookmarkAdd02Icon"
+          :is="isBookmarked ? Bookmark02Icon : BookmarkAdd02Icon"
           class="mr-2 size-4"
+          :class="isBookmarked && 'fill-current'"
         />
-        {{ itemData?.isBookmark ? 'Remove from bookmark' : 'Add to bookmark' }}
+        {{ isBookmarked ? 'Remove from bookmark' : 'Add to bookmark' }}
       </ContextMenuItem>
       <ContextMenuSeparator />
       <ContextMenuItem
@@ -71,7 +73,12 @@ import { useAppDialog } from '@/providers/app-dialog.provider';
 import { useEditorSidebarProvider } from '@/providers/editor.provider';
 import documentService from '@/services/document.service';
 import { logger } from '@/services/logger.service';
+import { useBookmarksStore } from '@/stores/bookmarks.store';
 import { useEditorStore } from '@/stores/editor.store';
+import {
+  joinDocumentPath,
+  sanitizeDocumentFileName,
+} from '@/utils/document-utils';
 import { getLogMessage } from '@/utils/helper';
 import {
   ContextMenuItem,
@@ -95,18 +102,26 @@ const props = defineProps<{
 const { toast } = useToast();
 const appDialog = useAppDialog();
 const editorStore = useEditorStore();
+const bookmarksStore = useBookmarksStore();
 const sidebarProvider = useEditorSidebarProvider();
 
-const itemData = computed(() =>
-  props.ctxData.type === 'snippet'
-    ? editorStore.data.snippets[props.ctxData.id]
-    : editorStore.data.folders[props.ctxData.id],
+const itemData = computed(() => {
+  console.log(props.ctxData);
+  return {};
+});
+const isBookmarked = computed(() =>
+  bookmarksStore.isBookmarked(props.ctxData.path),
 );
 
 async function createFolderSnippet() {
   try {
     if (props.ctxData.type !== 'folder') return;
-    await editorStore.data.addSnippets([{ folderId: props.ctxData.id }]);
+    await editorStore.document.addSnippets([
+      {
+        contents: '',
+        path: joinDocumentPath(props.ctxData.path, 'unnamed.txt'),
+      },
+    ]);
   } catch (error) {
     logger.error(getLogMessage('sidebar-create-snip-ctx-menu', error));
     toast({
@@ -119,7 +134,9 @@ async function createFolderFolder() {
   try {
     if (props.ctxData.type !== 'folder') return;
 
-    await editorStore.data.addFolders([{ parentId: props.ctxData.id }]);
+    await editorStore.document.addFolders([
+      { path: joinDocumentPath(props.ctxData.path, 'unnamed') },
+    ]);
   } catch (error) {
     console.error(error);
     logger.error(getLogMessage('sidebar-create-folder-ctx-menu', error));
@@ -134,11 +151,8 @@ async function renameItem() {
   try {
     if (!itemData.value) return;
 
-    let name = itemData.value.name ?? '';
-    if ('ext' in itemData.value) name += `.${itemData.value.ext}`;
-
     const result = await appDialog.prompt({
-      defaultValue: name,
+      defaultValue: props.ctxData.name,
       okBtnLabel: 'Rename',
       placeholder: props.ctxData.type === 'folder' ? 'unnamed' : 'unnamed.txt',
       title:
@@ -146,18 +160,21 @@ async function renameItem() {
     });
     if (result.canceled) return;
 
-    await (props.ctxData.type === 'folder'
-      ? editorStore.data.updateFolder(props.ctxData.id, {
-          name: result.value,
-        })
-      : editorStore.data.updateSnippet(props.ctxData.id, {
-          name: result.value,
-        }));
+    const sanitizedNamed =
+      sanitizeDocumentFileName(result.value) || 'unnamed.txt';
+    if (sanitizedNamed === props.ctxData.name) return;
+
+    await editorStore.document.rename({
+      path: props.ctxData.path,
+      newName: sanitizedNamed,
+    });
   } catch (error) {
+    console.error(error);
     logger.error(getLogMessage('sidebar-rename-ctx-menu', error));
     toast({
       variant: 'destructive',
-      title: `Error rename ${props.ctxData.type}`,
+      title: 'An error occured',
+      description: typeof error === 'string' ? error : (error as Error).message,
     });
   }
 }
@@ -165,13 +182,13 @@ async function toggleBookmark() {
   if (!itemData.value) return;
 
   try {
-    await (props.ctxData.type === 'folder'
-      ? editorStore.data.updateFolder(props.ctxData.id, {
-          isBookmark: !itemData.value.isBookmark,
-        })
-      : editorStore.data.updateSnippet(props.ctxData.id, {
-          isBookmark: !itemData.value.isBookmark,
-        }));
+    bookmarksStore.setBookmark(
+      {
+        path: props.ctxData.path,
+        type: props.ctxData.type === 'folder' ? 'folder' : 'file',
+      },
+      !isBookmarked.value,
+    );
   } catch (error) {
     console.error(error);
     logger.error(getLogMessage('sidebar-bookmark-ctx-menu', error));
@@ -183,7 +200,8 @@ async function toggleBookmark() {
 }
 async function deleteItem() {
   try {
-    const dontShowDialog = await documentService.stores.settings.xGet('noPromptDelete');
+    const dontShowDialog =
+      await documentService.stores.settings.xGet('noPromptDelete');
     let dontAskPrompt = false;
 
     if (!dontShowDialog) {
@@ -192,7 +210,7 @@ async function deleteItem() {
           props.ctxData.type === 'folder'
             ? 'Delete folder?'
             : 'Delete snippet?',
-        body: `Are you sure you want to delete "${itemData.value?.name ?? ''}"? This will be permanently deleted and it cannot be undone.`,
+        body: `Are you sure you want to delete "${props.ctxData.name ?? ''}"? This will be permanently deleted and it cannot be undone.`,
         okBtnLabel: 'Delete',
         okBtnVariant: 'destructive',
         showDontAsk: true,
@@ -202,10 +220,7 @@ async function deleteItem() {
       dontAskPrompt = dontAskValue;
     }
 
-    await (props.ctxData.type === 'folder'
-      ? editorStore.data.deleteFolder(props.ctxData.id)
-      : editorStore.data.deleteSnippet(props.ctxData.id));
-
+    await editorStore.document.deleteItems([props.ctxData.path]);
     if (dontAskPrompt) {
       await documentService.stores.settings.xSet('noPromptDelete', true);
     }

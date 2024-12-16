@@ -5,8 +5,8 @@ import {
   GitHubLinkHeaderRel,
 } from '@/interface/github.interface';
 import { SnippetNewPayload } from '@/interface/snippet.interface';
-import { fetch } from '@tauri-apps/plugin-http';
 import { FetchError } from './errors';
+import { joinDocumentPath } from './document-utils';
 
 export const GITHUB_GISTS_BASE_URL = 'https://gist.github.com/';
 
@@ -19,13 +19,14 @@ export function extractGistsIdFromURL(url: string) {
 
 export async function githubGistFileToSnippet(
   file: GitHubGistFile,
-  folderId?: string | null,
+  folderPath?: string | null,
 ): Promise<SnippetNewPayload> {
   const data: SnippetNewPayload = {
-    folderId,
-    name: file.filename,
-    lang: file.language,
-    content: file.content,
+    stored: {
+      lang: file.language,
+    },
+    contents: file.content ?? '',
+    path: joinDocumentPath(folderPath, file.filename),
   };
   if (!file.content) {
     const response = await fetch(file.raw_url);
@@ -38,7 +39,7 @@ export async function githubGistFileToSnippet(
       });
     }
 
-    data.content = await response.text();
+    data.contents = await response.text();
   }
 
   return data;
@@ -46,10 +47,10 @@ export async function githubGistFileToSnippet(
 
 export function githubGistFilesToSnippet(
   files: GitHubGistFile[],
-  folderId?: string | null,
+  folderPath?: string | null,
 ) {
   return Promise.all(
-    files.map((file) => githubGistFileToSnippet(file, folderId)),
+    files.map((file) => githubGistFileToSnippet(file, folderPath)),
   );
 }
 

@@ -19,3 +19,7 @@ export interface AppDocumentState {
   snippetsDir: string;
   metadataDir: string;
 }
+
+export interface AppSettings {
+  deleteToTrash: boolean;
+}

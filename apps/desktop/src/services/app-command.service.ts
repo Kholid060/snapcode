@@ -1,5 +1,4 @@
 import {
-  SnippetImportFileItem,
   SnippetNewPayload,
   SnippetPlaceholder,
   SnippetWithPlaceholder,
@@ -9,16 +8,22 @@ import { invoke } from '@tauri-apps/api/core';
 import { logger } from './logger.service';
 import { AppDocumentState } from '@/interface/app.interface';
 import {
-  DocumenFlatTreeData,
+  DocumentFlatTree,
   DocumentCreatedFolder,
-  DocumentCretedSnippet,
+  DocumentCreatedSnippet,
+  DocumentOldNewVal,
 } from '@/interface/document.interface';
 import { FolderNewPayload } from '@/interface/folder.interface';
+
+interface StoreCommands {
+  store_delete_bulks: [{ path: string; keys: string[] }, void];
+  store_rename_root_keys: [{ path: string; keys: DocumentOldNewVal[] }, void];
+}
 
 interface SnippetCommands {
   create_snippets: [
     { snippets: Pick<SnippetNewPayload, 'path' | 'contents'>[] },
-    DocumentCretedSnippet[],
+    DocumentCreatedSnippet[],
   ];
   open_snippet: [{ snippetId: string }, void];
   send_snippet_content: [
@@ -30,7 +35,7 @@ interface SnippetCommands {
     },
     void,
   ];
-  import_snippet_from_file: [undefined, SnippetImportFileItem[]];
+  import_snippet_from_file: [{ dirPath: string }, DocumentCreatedSnippet[]];
   get_snippet_with_placeholder: [{ snippetId: string }, SnippetWithPlaceholder];
 }
 
@@ -40,7 +45,8 @@ interface FolderCommands {
 
 interface DocumentCommands {
   get_document_state: [undefined, AppDocumentState];
-  get_document_flat_tree: [undefined, DocumenFlatTreeData];
+  get_document_flat_tree: [undefined, DocumentFlatTree];
+  remove_document_items: [{ paths: string[]; toTrash: boolean }, void];
   rename_document_item: [{ oldPath: string; newPath: string }, string];
   move_document_items: [{ items: [from: string, to: string][] }, string[]];
 }
@@ -50,10 +56,11 @@ interface WindowCommands {
   update_popup_window_tray_menu: [{ shortcut: string }, void];
 }
 
-type Commands = SnippetCommands &
-  DocumentCommands &
+type Commands = StoreCommands &
   WindowCommands &
-  FolderCommands;
+  FolderCommands &
+  SnippetCommands &
+  DocumentCommands;
 
 async function invokeCommand<T extends keyof Commands>(
   name: T,

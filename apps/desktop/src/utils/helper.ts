@@ -2,10 +2,16 @@ export function unimplFunc() {
   throw new Error('Function/method is not implemented');
 }
 
-export function getLogMessage<T>(scope: string, value: T): string {
-  let message: T | string = value;
-  if (value instanceof Error) message = `${value.name}: ${value.message}`;
+export function getLogMessage(scope: unknown, value?: unknown): string {
+  let message = value || scope;
+  if (message instanceof Error) message = `${message.name}: ${message.message}`;
 
+  return typeof value === 'undefined'
+    ? `${message}`
+    : formatLogMessage(scope + '', message + '');
+}
+
+export function formatLogMessage(scope: string, message: string) {
   return `[${scope}] ${message}`;
 }
 

@@ -263,6 +263,7 @@ import {
 } from '@/services/github-gists.service';
 import { logger } from '@/services/logger.service';
 import { useEditorStore } from '@/stores/editor.store';
+import { sanitizeDocumentFileName } from '@/utils/document-utils';
 import { FetchError } from '@/utils/errors';
 import {
   extractGistsIdFromURL,
@@ -296,7 +297,6 @@ import {
   Settings01Icon,
   Tick02Icon,
 } from 'hugeicons-vue';
-import { nanoid } from 'nanoid';
 import {
   CollapsibleContent,
   CollapsibleRoot,
@@ -384,7 +384,7 @@ async function importAll() {
 
     while (true) {
       const result = await listGitHubGistsByUsername(username, params);
-      await storeGitHubGists(result.data, selectFolder.folderId);
+      await storeGitHubGists(result.data, selectFolder.path);
 
       listImportState.importCount += result.data.length;
       gistState.ratelimitRemaining = result.ratelimitRemaining ?? '';
@@ -429,7 +429,7 @@ async function importSelectedGists() {
       );
       if (gists.length <= 0) break;
 
-      await storeGitHubGists(gists, selectFolder.folderId);
+      await storeGitHubGists(gists, selectFolder.path);
       listImportState.importCount += gists.length;
 
       page += 1;
@@ -521,25 +521,21 @@ async function storeGitHubGists(
     gists.map(async (gist) => {
       const files = Object.values(gist.files);
       if (files.length > 1) {
-        const snippetFolderId = nanoid();
+        const folderPath = gist.description
+          ? sanitizeDocumentFileName(gist.description.slice(0, 120))
+          : files[0].filename;
         folders.push({
-          parentId: folderId,
-          id: snippetFolderId,
-          name: gist.description
-            ? gist.description.slice(0, 120)
-            : files[0].filename,
+          path: folderPath,
         });
-        snippets.push(
-          ...(await githubGistFilesToSnippet(files, snippetFolderId)),
-        );
+        snippets.push(...(await githubGistFilesToSnippet(files, folderPath)));
       } else if (files[0]) {
         snippets.push(await githubGistFileToSnippet(files[0], folderId));
       }
     }),
   );
 
-  if (folders.length > 0) await editorStore.data.addFolders(folders);
-  if (snippets.length > 0) await editorStore.data.addSnippets(snippets);
+  if (folders.length > 0) await editorStore.document.addFolders(folders);
+  if (snippets.length > 0) await editorStore.document.addSnippets(snippets);
 
   return {
     folders: folders.length,
@@ -585,7 +581,7 @@ async function importById(url: string) {
     });
     if (result.canceled) return;
 
-    const storedData = await storeGitHubGists([gist.data], result.folderId);
+    const storedData = await storeGitHubGists([gist.data], result.path);
 
     toast({
       title: `${storedData.snippets} snippets imported`,

@@ -24,12 +24,12 @@ import {
 import { useEditorStore } from '@/stores/editor.store';
 import { logger } from '@/services/logger.service';
 import { getLogMessage } from '@/utils/helper';
-import { getSnippetContent } from '@/db/services/snippet.db-service';
 import { useDebounceFn } from '@vueuse/core';
 import EditorContentFooter from './EditorContentFooter.vue';
 import { getSnippetLangFromName } from '@/utils/snippet-utils';
 import { APP_EDITOR_FONTS } from '@/utils/const/app.const';
 import { indentUnit } from '@codemirror/language';
+import documentService from '@/services/document.service';
 
 let isReplaceValue = false;
 const compartments = {
@@ -60,12 +60,11 @@ function updateCursorPos(update: ViewUpdate) {
   });
 }
 async function loadLanguage() {
-  if (!cmView.value) return;
-
   const snippet = editorStore.activeSnippet;
+  if (!cmView.value || !snippet) return;
 
-  const language = snippet.lang
-    ? getLanguageByName(editorStore.data.activeSnippet.lang!)
+  const language = snippet.metadata?.lang
+    ? getLanguageByName(snippet.metadata.lang)
     : await getSnippetLangFromName(snippet.name ?? '');
   const langExt = language ? await language.load() : null;
   cmView.value.dispatch({
@@ -112,11 +111,9 @@ function loadSettings() {
 
 const handleContentChange = useDebounceFn(async (value: string) => {
   try {
-    await editorStore.data.updateSnippet(
+    await editorStore.document.setSnippetContents(
       editorStore.state.state.activeFileId,
-      {
-        content: value,
-      },
+      value,
     );
   } catch (error) {
     logger.error(getLogMessage('save-snippet-content', error));
@@ -124,14 +121,14 @@ const handleContentChange = useDebounceFn(async (value: string) => {
 }, 1000);
 
 watchEffect(async () => {
-  const snippetId = editorStore.state.state.activeFileId;
-  if (!snippetId || !cmView.value) return;
+  const activeSnippet = editorStore.state.state.activeFileId;
+  if (!activeSnippet || !cmView.value) return;
 
   try {
-    const result = await getSnippetContent(snippetId);
-    if (result) {
+    const content = await documentService.getFileContent(activeSnippet);
+    if (content) {
       const newState = EditorState.create({
-        doc: result.content ?? '',
+        doc: content ?? '',
       });
       cmView.value.replaceContent(newState);
 
@@ -141,7 +138,7 @@ watchEffect(async () => {
     logger.error(getLogMessage('get-snippet-content', error));
   }
 });
-watch(() => editorStore.data.activeSnippet.lang, loadLanguage);
+watch(() => editorStore.activeSnippet?.metadata?.lang, loadLanguage);
 
 watch(editorStore.settings.data, loadSettings);
 
@@ -155,10 +152,6 @@ onMounted(() => {
   });
 
   const settings = editorStore.settings.data;
-  console.log(
-    settings.indentSize,
-    indentUnit.of(' '.repeat(settings.indentSize)),
-  );
   cmView.value = loadCodemirror(
     {
       doc: '',

@@ -19,11 +19,13 @@ import { useGlobalHotkey } from './composables/hotkey.composable';
 import { appCommand } from './services/app-command.service';
 import documentService from './services/document.service';
 import { useEditorStore } from './stores/editor.store';
+import { useBookmarksStore } from './stores/bookmarks.store';
 
 await Promise.all([
   useAppStore().init().catch(console.error),
   useHotkeysStore().init(),
   useEditorStore().init(),
+  useBookmarksStore().init(),
 ]);
 
 documentService.startWatcher();

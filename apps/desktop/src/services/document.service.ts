@@ -2,6 +2,7 @@ import { AppDocumentState } from '@/interface/app.interface';
 import { appCommand } from './app-command.service';
 import LazyStore from '@/lib/LazyStore';
 import {
+  DocumentOldNewVal,
   DocumentStoreBookmarks,
   DocumentStoreMetadata,
   DocumentStoreSettings,
@@ -12,7 +13,7 @@ import {
   SnippetNewPayload,
 } from '@/interface/snippet.interface';
 import { FolderNewPayload } from '@/interface/folder.interface';
-import { rename } from '@tauri-apps/plugin-fs';
+import { readTextFile, writeTextFile } from '@tauri-apps/plugin-fs';
 import { joinDocumentPath } from '@/utils/document-utils';
 
 interface DocumentStores {
@@ -76,27 +77,68 @@ class DocumentService {
     return items;
   }
 
-  async rename(oldPath: string, newPath: string) {
+  async renameItem(oldPath: string, newPath: string) {
     const path = await appCommand.invoke('rename_document_item', {
       newPath,
       oldPath,
     });
+
     this.#buffer.push(path);
   }
 
+  async moveItems(paths: DocumentOldNewVal[]) {
+    const result = await appCommand.invoke('move_document_items', {
+      items: paths,
+    });
+    this.#buffer.push(...result);
+
+    return result;
+  }
+
   async getFlatTree() {
-    const [data, metadata] = await Promise.all([
-      appCommand.invoke('get_document_flat_tree', undefined),
-      this.#stores.metadata.entries<SnippetMetadata>(),
+    return appCommand.invoke('get_document_flat_tree', undefined);
+  }
+
+  async deleteItems(paths: string[], toTrash: boolean) {
+    await appCommand.invoke('remove_document_items', { paths, toTrash });
+    this.#buffer.push(...paths);
+
+    await this.#stores.metadata.xDelete(paths);
+  }
+
+  async moveMetadata({
+    data,
+    newPath,
+    oldPath,
+  }: {
+    oldPath: string;
+    newPath: string;
+    data: SnippetMetadata;
+  }) {
+    await Promise.allSettled([
+      this.stores.metadata.delete(oldPath),
+      this.stores.metadata.xSet(newPath, data),
     ]);
+  }
 
-    for (const key in metadata) {
-      if (Object.hasOwn(data.metadata, key)) {
-        data.metadata[key].stored = metadata[key][1];
-      }
-    }
+  async renameMetadata(keys: DocumentOldNewVal[]) {
+    await this.#stores.metadata.xRenameRootKeys(keys);
+  }
 
-    return data;
+  async setMetadata(path: string, metadata: SnippetMetadata) {
+    await this.#stores.metadata.xSet(path, metadata);
+  }
+
+  getFileContent(path: string) {
+    return readTextFile(joinDocumentPath(this.appState.snippetsDir, path));
+  }
+
+  async updateFileContent(path: string, content: string) {
+    await writeTextFile(
+      joinDocumentPath(this.appState.snippetsDir, path),
+      content,
+    );
+    this.#buffer.push(path);
   }
 }
 

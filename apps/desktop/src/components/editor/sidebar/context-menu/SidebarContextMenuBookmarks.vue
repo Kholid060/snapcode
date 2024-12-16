@@ -12,9 +12,8 @@
 <script setup lang="ts">
 import type { EditorSidebarBookmarksCtxMenu } from '@/interface/editor.interface';
 import { logger } from '@/services/logger.service';
-import { useEditorStore } from '@/stores/editor.store';
+import { useBookmarksStore } from '@/stores/bookmarks.store';
 import { getLogMessage } from '@/utils/helper';
-import type { TreeDataItem } from '@/utils/tree-data-utils';
 import { ContextMenuItem, ContextMenuContent, useToast } from '@snippy/ui';
 import { Delete02Icon as DeleteIcon } from 'hugeicons-vue';
 
@@ -23,21 +22,16 @@ const props = defineProps<{
 }>();
 
 const { toast } = useToast();
-const editorStore = useEditorStore();
+const bookmarksStore = useBookmarksStore();
 
 async function removeFromBookmark() {
   try {
-    const removeItems: TreeDataItem[] = props.ctxData.isTopOfSelected
+    const removeItems: string[] = props.ctxData.isTopOfSelected
       ? props.ctxData.selectedItems
-      : [
-          {
-            id: props.ctxData.id,
-            isFolder: props.ctxData.type === 'folder',
-          },
-        ];
+      : [props.ctxData.path];
     if (removeItems.length < 1) return;
 
-    await editorStore.data.removeBookmarks(removeItems);
+    await bookmarksStore.removeBookmarks(removeItems);
   } catch (error) {
     logger.error(getLogMessage('sidebar-remove-bookmark-ctx-menu', error));
     toast({

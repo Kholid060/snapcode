@@ -1,13 +1,13 @@
-use std::{collections::HashMap, fs, path, sync::Mutex};
+use std::{collections::HashMap, sync::Mutex};
 
 use crate::{
     common::stringify,
-    snippy::{self, document::DocumentState}, util::PathUtil,
+    snippy::{self, document::AppDocument},
 };
 
 #[tauri::command]
 pub fn get_document_state(
-    document_state: tauri::State<'_, Mutex<DocumentState>>,
+    document_state: tauri::State<'_, Mutex<AppDocument>>,
 ) -> Result<HashMap<String, String>, String> {
     let document_state = document_state.lock().map_err(stringify)?;
 
@@ -42,39 +42,71 @@ pub fn get_document_state(
 
 #[tauri::command(async)]
 pub fn get_document_flat_tree(
-    app: tauri::AppHandle,
-) -> Result<snippy::document::DocumentFlatTreeData, String> {
-    let res = snippy::document::get_document_flat_tree(&app).map_err(stringify)?;
-    Ok(res)
+    app_handle: tauri::AppHandle,
+    app_document: tauri::State<Mutex<AppDocument>>,
+) -> Result<snippy::document::DocumentFlatTree, String> {
+    let app_document = app_document.lock().unwrap();
+    let result = app_document.get_flat_tree(&app_handle).map_err(stringify)?;
+
+    Ok(result)
 }
 
 #[tauri::command]
 pub fn rename_document_item(
-    doc_state: tauri::State<Mutex<DocumentState>>,
+    app_document: tauri::State<Mutex<AppDocument>>,
     old_path: String,
     new_path: String,
-) -> Result<String, String>
- {
-    let document_state = doc_state.lock().unwrap();
-    let snippets_dir = document_state.get_snippets_dir();
+) -> Result<String, String> {
+    let app_document = app_document.lock().unwrap();
+    let result = app_document
+        .rename_item(old_path, new_path)
+        .map_err(stringify)?;
 
-    let old_path = snippets_dir.safe_join(old_path).map_err(|e| e.to_string() )?;
-    let new_path_buf = snippets_dir.safe_join(&new_path).map_err(|e| e.to_string())?;
-
-    if fs::exists(&new_path_buf).map_err(|e| e.to_string())? {
-        Err(String::from("A file with the same name already exists"))
-    } else {
-        fs::rename(old_path, &new_path_buf).map_err(|e| e.to_string())?;
-        Ok(new_path)
-    }
+    Ok(result)
 }
 
 #[tauri::command(async)]
 pub fn move_document_items(
-    app: tauri::AppHandle,
-    items: Vec<(String, String)>
-) -> Result<Vec<String>, String>
- {
-    let result = snippy::document::move_document_items(&app, items).map_err(|e| e.to_string())?;
+    app_document: tauri::State<Mutex<AppDocument>>,
+    items: Vec<(String, String)>,
+) -> Result<Vec<String>, String> {
+    let app_document = app_document.lock().unwrap();
+    let result = app_document.move_document_items(items).map_err(stringify)?;
+
     Ok(result)
+}
+
+#[tauri::command(async)]
+pub fn create_snippets(
+    app_document: tauri::State<Mutex<AppDocument>>,
+    app: tauri::AppHandle,
+    snippets: Vec<snippy::document::SnippetDoc>,
+) -> Result<Vec<snippy::document::SnippetDocCreated>, String> {
+    let app_document = app_document.lock().unwrap();
+    let snippets = app_document.create_snippets(&app, snippets).map_err(stringify)?;
+
+    Ok(snippets)
+}
+
+#[tauri::command(async)]
+pub fn create_folders(
+    app_document: tauri::State<Mutex<AppDocument>>,
+    folders: Vec<snippy::document::FolderDoc>,
+) -> Result<Vec<snippy::document::FolderDocCreated>, String> {
+    let app_document = app_document.lock().unwrap();
+    let folders = app_document.create_folders(folders).map_err(stringify)?;
+
+    Ok(folders)
+}
+
+#[tauri::command(async)]
+pub fn remove_document_items(
+    app_document: tauri::State<Mutex<AppDocument>>,
+    paths: Vec<String>,
+    to_trash: bool,
+) -> Result<(), String> {
+    let app_document = app_document.lock().unwrap();
+    app_document.remove_items(paths, to_trash).map_err(stringify)?;
+
+    Ok(())
 }

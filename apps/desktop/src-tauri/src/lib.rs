@@ -35,15 +35,18 @@ pub fn run() {
         )
         .plugin(tauri_plugin_sql::Builder::default().build())
         .invoke_handler(tauri::generate_handler![
+            commands::store::store_delete_bulks,
+            commands::store::store_rename_root_keys,
             commands::window::open_popup_window,
             commands::window::update_popup_window_tray_menu,
+            commands::document::remove_document_items,
+            commands::document::create_folders,
+            commands::document::create_snippets,
             commands::document::get_document_state,
             commands::document::move_document_items,
             commands::document::rename_document_item,
             commands::document::get_document_flat_tree,
             commands::snippet::open_snippet,
-            commands::snippet::create_folders,
-            commands::snippet::create_snippets,
             commands::snippet::send_snippet_content,
             commands::snippet::import_snippet_from_file,
             commands::snippet::get_snippet_with_placeholder,

@@ -44,12 +44,11 @@ export function loadCodemirror(
 ) {
   return new CMEditorView({
     ...config,
-    extensions: [
-      basicExtensions(extensions),
+    extensions: basicExtensions(extensions, [
       themeExtension,
       keymap.of(vscodeKeymap),
       config.extensions ?? [],
-    ],
+    ]),
   });
 }
 

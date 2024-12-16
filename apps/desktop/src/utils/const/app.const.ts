@@ -54,3 +54,5 @@ export const APP_EDITOR_FONTS = {
   },
 } as const;
 export type AppEditorFonts = keyof typeof APP_EDITOR_FONTS;
+
+export const APP_DOCUMENT_PATH_SEPARATOR = '/';

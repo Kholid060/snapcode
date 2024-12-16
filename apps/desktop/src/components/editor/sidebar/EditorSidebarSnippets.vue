@@ -42,7 +42,8 @@
     @item:context-menu="
       sidebarProvider.handleContextMenu({
         data: {
-          id: $event.item._id,
+          name: $event.item.value.name,
+          path: $event.item.value.path,
           type: $event.item.value.isDir ? 'folder' : 'snippet',
           isTopOfSelected:
             selectedItems.length > 1 &&
@@ -83,11 +84,10 @@ import {
   MoreHorizontalCircle01Icon,
 } from 'hugeicons-vue';
 import { useHotkey } from '@/composables/hotkey.composable';
-import { getLogMessage } from '@/utils/helper';
+import { formatLogMessage, getLogMessage } from '@/utils/helper';
 import { useAppDialog } from '@/providers/app-dialog.provider';
 import { useEditorSidebarProvider } from '@/providers/editor.provider';
 import { appCommand } from '@/services/app-command.service';
-import { getSnippetLang } from '@/utils/snippet-utils';
 import EditorSidebarGitHubGists from './EditorSidebarGitHubGists.vue';
 import type { DocumentFlatTreeItem } from '@/interface/document.interface';
 
@@ -146,27 +146,29 @@ async function createNewFolder() {
 }
 async function importSnippetFromFiles() {
   try {
-    const files = await appCommand.invoke(
-      'import_snippet_from_file',
-      undefined,
-    );
-    if (files.length === 0) return;
-
-    const selectedFolder = await appDialog.selectFolder({
+    const dirPath = await appDialog.selectFolder({
       title: 'Select a folder where to put the snippets',
     });
-    if (selectedFolder.canceled) return;
+    if (dirPath.canceled) return;
 
-    await editorStore.document.addSnippets(
-      files.map((file) => ({
-        name: file.name,
-        contents: file.content,
-        lang: getSnippetLang(file)?.name,
-        path: selectedFolder.folderId ?? '',
-      })),
-    );
+    const snippets = await appCommand.invoke('import_snippet_from_file', {
+      dirPath: dirPath.path ?? '',
+    });
+    if (snippets.length === 0) return;
+
+    editorStore.document.registerItems({ snippets });
+
+    toast({
+      title: `${snippets.length} files imported into "${dirPath.path || 'root'}" folder`,
+    });
   } catch (error) {
-    logger.error(getLogMessage('import-snippet-from-file', error));
+    const message = getLogMessage(error);
+    toast({
+      description: message,
+      variant: 'destructive',
+      title: 'An error occured',
+    });
+    logger.error(formatLogMessage('import-snippet-from-file', message));
   }
 }
 

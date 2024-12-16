@@ -168,7 +168,9 @@ async function deleteSelectedItems() {
       dontAskPrompt = dontAskValue;
     }
 
-    await editorStore.data.deleteItems(selectedItems.value);
+    await editorStore.document.deleteItems(
+      selectedItems.value.map((item) => item.path),
+    );
     selectedItems.value = [];
 
     if (dontAskPrompt) {

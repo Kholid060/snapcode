@@ -4,7 +4,7 @@
     class="text-muted-foreground select-none list-none text-sm"
     multiple
     :items="items"
-    :get-key="(item) => item.path"
+    :get-key="(item) => (item.isDir ? FOLDER_TREE_ITEM_PREFIX : '') + item.path"
     :get-children="getChildren"
     selection-behavior="replace"
     v-model:expanded="editorStore.state.state.activeFolderIds"
@@ -42,9 +42,9 @@ import { getLogMessage } from '@/utils/helper';
 import EditorTreeRootItemPlaceholder from './EditorTreeRootItemPlaceholder.vue';
 import { onClickOutside } from '@vueuse/core';
 import { debounce } from '@snippy/shared';
-import type { FolderId } from '@/interface/folder.interface';
-import type { SnippetId } from '@/interface/snippet.interface';
 import type { DocumentFlatTreeItem } from '@/interface/document.interface';
+import { getDocumentParentDir, joinDocumentPath } from '@/utils/document-utils';
+import { FOLDER_TREE_ITEM_PREFIX } from '@/utils/const/editor.const';
 
 defineProps<
   {
@@ -138,36 +138,35 @@ onClickOutside(
 watchEffect((onCleanup) => {
   const dndFunction = combine(
     monitorForElements({
+      onDragStart() {
+        // only support move one item for now
+        selectedItems.value = [];
+      },
       async onDrop(args) {
-        const previous = args.source;
-        const [target] = args.location.current.dropTargets;
+        const previous = args.source.data as unknown as DocumentFlatTreeItem;
+        const target = args.location.current.dropTargets[0]
+          ?.data as unknown as DocumentFlatTreeItem;
         if (!target || !previous) return;
 
-        let parentOrFolderId: string | null = target.data.isFolder
-          ? (target.data.id as string)
-          : (target.data.parentId as string);
-        if (!parentOrFolderId) parentOrFolderId = null;
-
-        if (previous.data.parentId === parentOrFolderId) return;
-
         try {
-          if (previous.data.isFolder) {
-            await editorStore.data.updateFolder(previous.data.id as FolderId, {
-              parentId: parentOrFolderId,
-            });
-          } else {
-            await editorStore.data.updateSnippet(
-              previous.data.id as SnippetId,
-              {
-                folderId: parentOrFolderId,
-              },
-            );
-          }
+          const prevPath = getDocumentParentDir(previous.path, previous.name);
+          const targetPath = getDocumentParentDir(target.path, target.name);
+          if (
+            (prevPath.parentDir === targetPath.parentDir && !target.isDir) ||
+            prevPath.parentDir === target.path
+          )
+            return;
+
+          const newPath = joinDocumentPath(
+            target.isDir ? target.path : targetPath.parentDir,
+            prevPath.filename,
+          );
+          await editorStore.document.moveItem(previous.path, newPath);
         } catch (error) {
           logger.error(getLogMessage('sidebar-create-folder-ctx-menu', error));
           toast({
             variant: 'destructive',
-            title: `Error moving ${previous.data.isFolder ? 'folder' : 'snippet'}`,
+            title: `Error moving ${previous.isDir ? 'folder' : 'snippet'}`,
           });
         }
       },

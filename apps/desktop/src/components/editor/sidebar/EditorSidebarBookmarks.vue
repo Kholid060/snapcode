@@ -3,7 +3,12 @@
     <p class="text-muted-foreground grow cursor-default text-sm font-semibold">
       Bookmarks
     </p>
-    <Select v-model="state.sortBy">
+    <Select
+      :model-value="bookmarksStore.state.sortBy"
+      @update:model-value="
+        bookmarksStore.updateState('sortBy', $event as AppBookmarkSort)
+      "
+    >
       <SelectTrigger as-child>
         <Button
           variant="ghost"
@@ -26,41 +31,26 @@
     :items="sortedItems"
     :get-children="() => undefined"
     @item:select="handleSelectItem"
-    @item:context-menu="
-      sidebarProvider.handleContextMenu({
-        data: {
-          selectedItems,
-          id: $event.item._id,
-          type: $event.item.value.isFolder ? 'folder' : 'snippet',
-          isTopOfSelected:
-            selectedItems.length > 1 &&
-            selectedItems.includes($event.item.value),
-        },
-        type: 'bookmarks',
-        event: $event.event,
-      })
-    "
+    @item:context-menu="handleContextMenu"
   />
 </template>
 <script lang="ts" setup>
 import { Button, Select, SelectContent, SelectItem } from '@snippy/ui';
-import type { TreeItemSelectEvent } from 'radix-vue';
+import type { FlattenedItem, TreeItemSelectEvent } from 'radix-vue';
 import { SelectTrigger } from 'radix-vue';
-import type {
-  AppBookmarkSort,
-  AppBookmarksState,
-} from '@/interface/app.interface';
+import type { AppBookmarkSort } from '@/interface/app.interface';
 import { useEditorStore } from '@/stores/editor.store';
 import { Sorting05Icon } from 'hugeicons-vue';
-import type { TreeDataItem } from '@/utils/tree-data-utils';
-import type { FolderListItem } from '@/interface/folder.interface';
-import type { SnippetListItem } from '@/interface/snippet.interface';
 import EditorTreeRoot from '../tree/EditorTreeRoot.vue';
 import { useEditorSidebarProvider } from '@/providers/editor.provider';
-import { watchDebounced } from '@vueuse/core';
-import documentService from '@/services/document.service';
+import type { DocumentFlatTreeItem } from '@/interface/document.interface';
+import { useBookmarksStore } from '@/stores/bookmarks.store';
+import { APP_DOCUMENT_PATH_SEPARATOR } from '@/utils/const/app.const';
+import { FOLDER_TREE_ITEM_PREFIX } from '@/utils/const/editor.const';
 
-type Item = SnippetListItem | FolderListItem;
+interface BookmarkItem extends DocumentFlatTreeItem {
+  createdAt: number;
+}
 
 const sortItems: { label: string; id: AppBookmarkSort }[] = [
   { id: 'name-asc', label: 'Name (A-Z)' },
@@ -72,83 +62,81 @@ const sortItems: { label: string; id: AppBookmarkSort }[] = [
 ];
 
 const editorStore = useEditorStore();
+const bookmarksStore = useBookmarksStore();
 const sidebarProvider = useEditorSidebarProvider();
 
-const selectedItems = ref<TreeDataItem[]>([]);
-const state = shallowReactive<AppBookmarksState>({
-  sortBy: 'name-asc',
-});
+const selectedItems = ref<DocumentFlatTreeItem[]>([]);
 
-const items = computed(() => {
-  const folders = Object.values(editorStore.data.folders).filter(
-    (folder) => folder.isBookmark,
-  );
-  const snippets = Object.values(editorStore.data.snippets).filter(
-    (folder) => folder.isBookmark,
-  );
+const mappedItems = computed<BookmarkItem[]>(() =>
+  bookmarksStore.data.reduce<BookmarkItem[]>((acc, bookmark) => {
+    const item = editorStore.document.getItemByPath(bookmark.path);
+    if (item) acc.push({ ...item, createdAt: bookmark.createdAt });
 
-  return { folders, snippets };
-});
+    return acc;
+  }, []),
+);
 const sortedItems = computed(() => {
   const { isDate, sortAsc, sortKey } = getSortData();
-
-  const compareFn = (a: Item, z: Item) => {
-    const aData = a[sortKey] ?? '';
-    const zData = z[sortKey] ?? '';
+  return mappedItems.value.slice().sort((a, z) => {
+    const aData = a[sortKey];
+    const zData = z[sortKey];
 
     const val = isDate
-      ? (aData as Date).getTime() - (zData as Date).getTime()
+      ? (aData as number) - (zData as number)
       : (aData as string).localeCompare(zData as string);
     return sortAsc ? val : val * -1;
-  };
-
-  return ([] as TreeDataItem[]).concat(
-    mapToTreeItem(items.value.folders.slice().sort(compareFn), true),
-    mapToTreeItem(items.value.snippets.slice().sort(compareFn), false),
-  );
+  });
 });
 
-function handleSelectItem(event: TreeItemSelectEvent<TreeDataItem>) {
+function handleContextMenu({
+  event,
+  item,
+}: {
+  event: PointerEvent;
+  item: FlattenedItem<DocumentFlatTreeItem>;
+}) {
+  sidebarProvider.handleContextMenu({
+    data: {
+      selectedItems: mappedItems.value.map((item) => item.path),
+      name: item.value.name,
+      path: item.value.path,
+      type: item.value.isDir ? 'folder' : 'snippet',
+      isTopOfSelected:
+        selectedItems.value.length > 1 &&
+        selectedItems.value.includes(item.value),
+    },
+    event,
+    type: 'bookmarks',
+  });
+}
+function handleSelectItem(event: TreeItemSelectEvent<DocumentFlatTreeItem>) {
   const value = event.detail.value!;
-  if (!value.isFolder) return;
+  console.log(value);
+  if (!value.isDir) return;
 
-  if (!editorStore.state.state.activeFolderIds.includes(value.id)) {
-    const expandedFolders = new Set(
-      editorStore.state.state.activeFolderIds,
-    );
-    expandedFolders.add(value.id);
+  const expandedFolders = new Set(editorStore.state.state.activeFolderIds);
+  expandedFolders.add(value.path);
 
-    let iterCount = 0;
-    let currFolder = editorStore.data.folders[value.id];
-    while (currFolder?.parentId) {
-      if (iterCount >= 200) break;
-
-      expandedFolders.add(currFolder.parentId);
-
-      if (
-        !currFolder.parentId ||
-        !editorStore.data.folders[currFolder.parentId]
-      )
-        break;
-
-      currFolder = editorStore.data.folders[currFolder.parentId];
-      iterCount += 1;
+  for (let index = 0; index < value.path.length; index += 1) {
+    const char = value.path[index];
+    if (char === APP_DOCUMENT_PATH_SEPARATOR) {
+      expandedFolders.add(
+        `${FOLDER_TREE_ITEM_PREFIX}${value.path.slice(0, index)}`,
+      );
     }
-
-    editorStore.state.updateState('activeFolderIds', [...expandedFolders]);
   }
+
+  console.log(expandedFolders);
+  editorStore.state.updateState('activeFolderIds', [...expandedFolders]);
 
   sidebarProvider.setSelectedItems([value]);
   editorStore.state.updateState('activeMenu', 'snippets');
 }
-function mapToTreeItem(items: Item[], isFolder: boolean): TreeDataItem[] {
-  return items.map((item) => ({ id: item.id, isFolder }));
-}
 function getSortData() {
   let sortAsc = false;
-  let sortKey: 'updatedAt' | 'createdAt' | 'name';
+  let sortKey: 'mtime' | 'createdAt' | 'name';
 
-  switch (state.sortBy) {
+  switch (bookmarksStore.state.sortBy) {
     case 'created-asc':
       sortKey = 'createdAt';
       sortAsc = true;
@@ -166,11 +154,11 @@ function getSortData() {
       sortAsc = false;
       break;
     case 'updated-asc':
-      sortKey = 'updatedAt';
+      sortKey = 'mtime';
       sortAsc = true;
       break;
     case 'updated-desc':
-      sortKey = 'updatedAt';
+      sortKey = 'mtime';
       sortAsc = false;
       break;
     default:
@@ -185,19 +173,4 @@ function getSortData() {
     sortKey,
   };
 }
-
-watchDebounced(
-  state,
-  () => {
-    documentService.stores.bookmarks.xSet('state', state);
-  },
-  { debounce: 500, deep: true },
-);
-
-onBeforeMount(async () => {
-  const storedState = await documentService.stores.bookmarks.xGet('state', {
-    sortBy: 'name-asc',
-  });
-  Object.assign(state, storedState);
-});
 </script>

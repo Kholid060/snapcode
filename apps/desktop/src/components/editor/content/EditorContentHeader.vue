@@ -45,8 +45,11 @@
           class="ml-4"
           :class="{ 'text-primary bg-primary/10': isBookmarked }"
           @click="
-            editorStore.document.setBookmark(
-              editorStore.activePath,
+            bookmarksStore.setBookmark(
+              {
+                path: editorStore.activePath,
+                type: editorStore.activeSnippet.isDir ? 'folder' : 'file',
+              },
               !isBookmarked,
             )
           "
@@ -65,7 +68,9 @@
 <script setup lang="ts">
 import UiEditable from '@/components/ui/UiEditable.vue';
 import { logger } from '@/services/logger.service';
+import { useBookmarksStore } from '@/stores/bookmarks.store';
 import { useEditorStore } from '@/stores/editor.store';
+import { sanitizeDocumentFileName } from '@/utils/document-utils';
 import { getLogMessage } from '@/utils/helper';
 import { Button, TooltipSimple, useToast } from '@snippy/ui';
 import {
@@ -77,37 +82,35 @@ import {
 
 const { toast } = useToast();
 const editorStore = useEditorStore();
+const bookmarksStore = useBookmarksStore();
 
 const nameForm = useTemplateRef('name-form');
 
-const isBookmarked = computed({
-  get() {
-    return editorStore.document.bookmarks.find(
-      (item) => item.path === editorStore.state.state.activeFileId,
-    );
-  },
-  set() {},
-});
+const isBookmarked = computed(() =>
+  bookmarksStore.isBookmarked(editorStore.state.state.activeFileId),
+);
 
 async function updateSnippetName(newName: string) {
   if (!editorStore.activeSnippet) return;
 
   try {
-    const { name, isDir } = editorStore.activeSnippet;
+    const { name, path } = editorStore.activeSnippet;
+    const sanitizedNewName = sanitizeDocumentFileName(newName) || 'unnamed.txt';
+    if (name === sanitizedNewName) return;
+
     await editorStore.document.rename({
-      isDir,
-      from: name,
-      to: newName || 'unnamed.txt',
-      path: editorStore.activePath.slice(0, -name.length),
+      path,
+      newName: sanitizedNewName,
     });
   } catch (error) {
-    nameForm.value?.resetValue();
     logger.error(getLogMessage('rename-snippet', error));
     toast({
       variant: 'destructive',
       title: 'An error occured',
       description: typeof error === 'string' ? error : (error as Error).message,
     });
+  } finally {
+    nameForm.value?.resetValue();
   }
 }
 

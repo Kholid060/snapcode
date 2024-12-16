@@ -4,7 +4,7 @@
       Ln {{ cursorPos.line }}, Col {{ cursorPos.col }}
     </p>
     <p class="ml-4 select-none text-xs leading-tight" :key="updatedAtKey">
-      Last updated {{ dayjs(activeSnippet.updatedAt).fromNow() }}
+      Last updated {{ dayjs(editorStore.activeSnippet?.mtime).fromNow() }}
     </p>
     <div class="grow"></div>
     <Popover v-model:open="openLangSelector">
@@ -24,17 +24,21 @@
           <CommandList>
             <CommandGroup>
               <CommandItem
-                value="txt"
-                @select="updateSnippetLang('txt')"
+                :value="PLAIN_TEXT_LABEL"
+                @select="updateSnippetLang(PLAIN_TEXT_LABEL)"
                 :class="{
                   'text-lime-10 hover:!text-lime-10':
-                    activeSnippet.lang === 'txt',
+                    editorStore.activeSnippet?.metadata?.lang ===
+                    PLAIN_TEXT_LABEL,
                 }"
               >
                 <span class="grow">Plain Text</span>
                 <Tick02Icon
                   class="ml-2 size-4"
-                  v-if="activeSnippet.lang === 'txt'"
+                  v-if="
+                    editorStore.activeSnippet?.metadata?.lang ===
+                    PLAIN_TEXT_LABEL
+                  "
                 />
               </CommandItem>
               <CommandItem
@@ -44,13 +48,13 @@
                 @select="updateSnippetLang(language.name)"
                 :class="{
                   'text-lime-10 hover:!text-lime-10':
-                    language.extensions.includes(activeSnippet.lang),
+                    language.name === languageLabel,
                 }"
               >
                 <span class="grow">{{ language.name }}</span>
                 <Tick02Icon
                   class="ml-2 size-4"
-                  v-if="language.extensions.includes(activeSnippet.lang)"
+                  v-if="language.name === languageLabel"
                 />
               </CommandItem>
             </CommandGroup>
@@ -78,9 +82,7 @@ import {
 import { languages } from '@snippy/codemirror';
 import { useEditorStore } from '@/stores/editor.store';
 import { logger } from '@/services/logger.service';
-import { catchAsyncFn, getLogMessage } from '@/utils/helper';
-import { computedAsync } from '@vueuse/core';
-import { extname } from '@tauri-apps/api/path';
+import { getLogMessage } from '@/utils/helper';
 
 defineProps<{
   languageLabel: string;
@@ -91,6 +93,7 @@ defineProps<{
 }>();
 
 let interval = -1;
+const PLAIN_TEXT_LABEL = 'Plain Text';
 
 const { toast } = useToast();
 const editorStore = useEditorStore();
@@ -98,26 +101,20 @@ const editorStore = useEditorStore();
 const updatedAtKey = shallowRef(-10000);
 const openLangSelector = shallowRef(false);
 
-const activeSnippet = computedAsync(
-  async () => ({
-    updatedAt: editorStore.data.activeSnippet.updatedAt,
-    lang: await catchAsyncFn(
-      () => extname(editorStore.data.activeSnippet.name ?? ''),
-      'txt',
-    ),
-  }),
-  { lang: 'txt', updatedAt: new Date() },
-);
-
 const sortedLangs = languages.sort((a, z) => a.name.localeCompare(z.name));
 
 async function updateSnippetLang(lang: string) {
+  if (!editorStore.activeSnippet) return;
+
   try {
     openLangSelector.value = false;
 
-    await editorStore.data.updateSnippet(editorStore.data.activeSnippet.id!, {
-      lang,
-    });
+    await editorStore.document.updateSnippetMetadata(
+      editorStore.activeSnippet.path,
+      {
+        lang,
+      },
+    );
   } catch (error) {
     console.error(error);
     logger.error(getLogMessage('editor-update-lang', error));
@@ -129,10 +126,10 @@ async function updateSnippetLang(lang: string) {
 }
 
 watch(
-  () => activeSnippet.value.updatedAt,
-  (date) => {
+  () => editorStore.activeSnippet?.mtime,
+  (mtime) => {
     clearInterval(interval);
-    if (!date) return;
+    if (typeof mtime !== 'number') return;
 
     interval = setInterval(() => {
       updatedAtKey.value += 1;

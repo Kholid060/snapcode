@@ -3,6 +3,8 @@ import { logger } from '@/services/logger.service';
 import { getLogMessage } from '@/utils/helper';
 import { defineStore } from 'pinia';
 import { store } from '@/services/store.service';
+import { AppSettings } from '@/interface/app.interface';
+import documentService from '@/services/document.service';
 
 interface UpdateState {
   latestVersion: string;
@@ -10,13 +12,24 @@ interface UpdateState {
   status: 'latest' | 'updating' | 'need-restart';
 }
 
+const APP_DEFAULT_SETTINGS: AppSettings = {
+  deleteToTrash: true,
+};
+
 export const useAppStore = defineStore('app-store', () => {
   const updateState = shallowReactive<UpdateState>({
     status: 'latest',
     latestVersion: '',
     downloadProgress: 0,
   });
+  const settings = shallowReactive<AppSettings>({ ...APP_DEFAULT_SETTINGS });
 
+  function updateSettings<T extends keyof AppSettings>(
+    key: T,
+    value: AppSettings[T],
+  ) {
+    settings[key] = value;
+  }
   async function checkUpdate() {
     try {
       const update = await check();
@@ -51,13 +64,20 @@ export const useAppStore = defineStore('app-store', () => {
   }
 
   async function init() {
-    const autoCheckUpdate = await store.xGet('autoUpdate', true);
+    const [autoCheckUpdate, appSettings] = await Promise.all([
+      store.xGet('autoUpdate', true),
+      documentService.stores.settings.xGet('general', APP_DEFAULT_SETTINGS),
+    ]);
     if (autoCheckUpdate) await checkUpdate();
+
+    Object.assign(settings, appSettings);
   }
 
   return {
     init,
+    settings,
     checkUpdate,
     updateState,
+    updateSettings,
   };
 });

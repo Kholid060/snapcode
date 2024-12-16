@@ -42,6 +42,8 @@ walkdir = "2.5.0"
 tantivy = "0.22.0"
 path-slash = "0.2.1"
 normalize-path = "0.2.1"
+trash = "5.2.1"
+natord = "1.0.9"
 
 [target.'cfg(any(target_os = "macos", windows, target_os = "linux"))'.dependencies]
 tauri-plugin-autostart = "2.2.0"

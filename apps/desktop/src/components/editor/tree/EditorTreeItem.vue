@@ -18,7 +18,7 @@
         : 'hover:bg-accent/70',
     ]"
     @toggle="handleToggle"
-    :title="itemData.name"
+    :title="item.value.name"
   >
     <template v-if="item.level > 1">
       <span
@@ -28,27 +28,30 @@
       >
       </span>
     </template>
-    <component
-      v-if="item.value.isDir"
-      class="size-4 flex-shrink-0"
-      :is="isExpanded ? Folder02Icon : Folder01Icon"
-    />
-    <AppFileExtIcon
-      v-else-if="itemData.lang && itemData.lang !== 'lang'"
-      :lang="itemData.lang"
-      class="size-4 flex-shrink-0"
-    >
-      <File01Icon class="size-4 flex-shrink-0" />
-    </AppFileExtIcon>
-    <File01Icon v-else class="size-4 flex-shrink-0" />
+    <div class="size-4 flex-shrink-0">
+      <component
+        v-if="item.value.isDir"
+        class="size-4"
+        :is="isExpanded ? Folder02Icon : Folder01Icon"
+      />
+      <AppFileExtIcon
+        v-else-if="item.value.ext !== 'txt'"
+        :lang="item.value.metadata?.lang"
+        :ext="item.value.ext"
+        class="size-4"
+      >
+        <File01Icon class="size-4" />
+      </AppFileExtIcon>
+      <File01Icon v-else class="size-4 flex-shrink-0" />
+    </div>
     <div class="truncate pl-1">
-      {{ itemData.name }}
+      {{ item.value.name }}
     </div>
   </TreeItem>
 </template>
 
 <script setup lang="ts">
-import { computed, render } from 'vue';
+import { render } from 'vue';
 import type { TreeItemToggleEvent } from 'radix-vue';
 import { type FlattenedItem, TreeItem } from 'radix-vue';
 import { useEditorStore } from '@/stores/editor.store';
@@ -63,7 +66,6 @@ import {
 import { unrefElement } from '@vueuse/core';
 import { Folder01Icon, Folder02Icon, File01Icon } from 'hugeicons-vue';
 import type { DocumentFlatTreeItem } from '@/interface/document.interface';
-import { combineTreeItemPath } from '@/utils/tree-data-utils';
 
 const props = defineProps<{
   item: FlattenedItem<DocumentFlatTreeItem>;
@@ -81,27 +83,6 @@ const dragState = shallowReactive({
   isDragging: false,
   isDragOver: false,
   isInitialExpanded: false,
-});
-
-const itemData = computed(() => {
-  const path = props.item.value.isDir
-    ? props.item.value.path
-    : combineTreeItemPath(props.item.value, props.item.parentItem);
-  const itemData = editorStore.document.getMetadata(path);
-
-  return !itemData
-    ? {
-        lang: '',
-        noData: true,
-        parentId: '',
-        name: 'no data',
-      }
-    : {
-        name: itemData.name,
-        noData: itemData === null,
-        lang: itemData.stored?.lang,
-        parentId: props.item.parentItem?.path ?? null,
-      };
 });
 
 function handleToggle(event: TreeItemToggleEvent<DocumentFlatTreeItem>) {
@@ -138,11 +119,8 @@ watchEffect((onCleanup) => {
   const dndFunction = combine(
     draggable({
       element: currentElement,
-      getInitialData: () => ({
-        ...itemData.value,
-        id: item.id,
-        isFolder: item.isDir,
-      }),
+      getInitialData: () =>
+        props.item.value as unknown as Record<string, unknown>,
       onDragStart: () => {
         dragState.isDragging = true;
         dragState.isInitialExpanded = treeItemEl.value?.isExpanded ?? false;
@@ -162,7 +140,7 @@ watchEffect((onCleanup) => {
                 {
                   class: 'bg-card rounded-md text-sm px-2 py-1.5 border',
                 },
-                itemData.value.name ?? '',
+                props.item.value.name ?? '',
               ),
               container,
             );
@@ -177,13 +155,7 @@ watchEffect((onCleanup) => {
       canDrop: ({ source }) => {
         return source.data.id !== item.id;
       },
-      getData: () => {
-        return {
-          ...itemData.value,
-          id: item.id,
-          isFolder: item.isDir,
-        };
-      },
+      getData: () => props.item.value as unknown as Record<string, unknown>,
       onDragEnter: ({ source }) => {
         if (source.data.id !== item.id) {
           dragState.isDragOver = true;

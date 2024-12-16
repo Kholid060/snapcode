@@ -1,13 +1,11 @@
 <template>
   <Dialog default-open>
-    <DialogContent class="overflow-hidden p-0 shadow-lg">
+    <DialogContent class="max-w-xl overflow-hidden p-0 shadow-lg">
       <Command
         default-open
         v-model:search-term="search"
         class="[&_[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-group]]:px-2 [&_[cmdk-input-wrapper]_svg]:h-5 [&_[cmdk-input-wrapper]_svg]:w-5 [&_[cmdk-input]]:h-12 [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-3 [&_[cmdk-item]_svg]:h-5 [&_[cmdk-item]_svg]:w-5"
-        @update:open="
-          !$event && $emit('close', { canceled: true, folderId: null })
-        "
+        @update:open="!$event && $emit('close', { canceled: true, path: null })"
       >
         <CommandInput
           :placeholder="options.title ?? 'Search folders...'"
@@ -27,18 +25,18 @@
             >" folder
           </CommandEmpty>
           <CommandItem
-            value="__"
-            @click="$emit('close', { canceled: false, folderId: null })"
+            v-for="path in folders"
+            :key="path"
+            :value="path"
+            class="line-clamp-2 block leading-tight"
+            @click="
+              $emit('close', {
+                canceled: false,
+                path: path === TREE_ROOT_KEY ? null : path,
+              })
+            "
           >
-            (root)
-          </CommandItem>
-          <CommandItem
-            v-for="folder in editorStore.data.folders"
-            :key="folder.id"
-            :value="folder.id"
-            @click="$emit('close', { canceled: false, folderId: folder.id })"
-          >
-            {{ folder.name }}
+            {{ path === TREE_ROOT_KEY ? '(root)' : path }}
           </CommandItem>
         </CommandList>
       </Command>
@@ -52,7 +50,9 @@ import type {
 } from '@/providers/app-dialog.provider';
 import { logger } from '@/services/logger.service';
 import { useEditorStore } from '@/stores/editor.store';
+import { sanitizeDocumentFileName } from '@/utils/document-utils';
 import { getLogMessage } from '@/utils/helper';
+import { TREE_ROOT_KEY } from '@/utils/tree-data-utils';
 import {
   Command,
   CommandEmpty,
@@ -76,12 +76,14 @@ const editorStore = useEditorStore();
 
 const search = shallowRef('');
 
+const folders = computed(() => Object.keys(editorStore.document.treeData));
+
 async function createFolder() {
   try {
-    const [folder] = await editorStore.data.addFolders([
-      { name: search.value },
+    const [folder] = await editorStore.document.addFolders([
+      { path: sanitizeDocumentFileName(search.value) },
     ]);
-    emit('close', { canceled: false, folderId: folder.id });
+    emit('close', { canceled: false, path: folder.path });
   } catch (error) {
     logger.error(getLogMessage('dialog-select-folder:create-folder', error));
     toast({
