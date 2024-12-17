@@ -12,6 +12,7 @@ import {
   DocumentCreatedFolder,
   DocumentCreatedSnippet,
   DocumentOldNewVal,
+  DocumentFolderEntry,
 } from '@/interface/document.interface';
 import { FolderNewPayload } from '@/interface/folder.interface';
 
@@ -46,6 +47,7 @@ interface FolderCommands {
 interface DocumentCommands {
   get_document_state: [undefined, AppDocumentState];
   get_document_flat_tree: [undefined, DocumentFlatTree];
+  get_all_document_folders: [undefined, DocumentFolderEntry[]];
   remove_document_items: [{ paths: string[]; toTrash: boolean }, void];
   rename_document_item: [{ oldPath: string; newPath: string }, string];
   move_document_items: [{ items: [from: string, to: string][] }, string[]];

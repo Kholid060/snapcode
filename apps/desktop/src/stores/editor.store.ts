@@ -2,8 +2,6 @@ import { EditorSettings } from '@/interface/editor.interface';
 import { TREE_ROOT_KEY } from '@/utils/tree-data-utils';
 import { watchDebounced } from '@vueuse/core';
 import { defineStore } from 'pinia';
-import { APP_EDITOR_FONTS, AppEditorFonts } from '@/utils/const/app.const';
-import { fontLoader } from '@/utils/helper';
 import documentService from '@/services/document.service';
 import { useEditorState } from './editor/editor-state.store';
 import { useEditorDocument } from './editor/editor-document.store';
@@ -347,7 +345,6 @@ const useEditorSettings = defineStore('editor:settings', () => {
     showLineNumbers: true,
     fontFamily: 'jetbrains-mono',
   };
-  const loadedFonts: Set<AppEditorFonts> = new Set(['jetbrains-mono']);
 
   const data = shallowReactive<EditorSettings>({ ...EDITOR_DEFAULT_SETTINGS });
 
@@ -357,21 +354,6 @@ const useEditorSettings = defineStore('editor:settings', () => {
     const settings = await documentService.stores.settings.xGet('editor');
     if (settings) {
       Object.assign(data, { ...EDITOR_DEFAULT_SETTINGS, ...settings });
-    }
-
-    if (data.fontFamily !== 'custom') {
-      const fontData = APP_EDITOR_FONTS[data.fontFamily];
-      await fontLoader(
-        fontData.name,
-        fontData.fonts.map((font) => ({
-          url: `url("/fonts/${fontData.id}/${font.name}")`,
-          descriptors: {
-            display: 'swap',
-            style: 'normal',
-            weight: font.weight.toString(),
-          },
-        })),
-      );
     }
 
     initiated = true;
@@ -393,7 +375,7 @@ const useEditorSettings = defineStore('editor:settings', () => {
     { debounce: 500, deep: true },
   );
 
-  return { init, loadedFonts, data, updateSetting };
+  return { init, data, updateSetting };
 });
 
 export const useEditorStore = defineStore('editor', () => {

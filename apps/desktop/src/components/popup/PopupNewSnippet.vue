@@ -8,8 +8,13 @@
     />
   </div>
   <div
+    class="codemirror grow cursor-auto overflow-auto px-3 pt-1"
     ref="editor-container"
-    class="codemirror grow overflow-auto px-2 pt-1"
+    style="
+      height: calc(100vh - 5rem);
+      --editor-font-size: 14px;
+      --editor-font-family: 'JetBrains Mono';
+    "
   ></div>
   <div class="flex items-center gap-2 px-4 py-2">
     <Popover v-slot="{ open }">
@@ -18,9 +23,9 @@
           variant="outline"
           :role="!open ? 'button' : 'combobox'"
           size="sm"
-          class="grow justify-between bg-inherit text-sm"
+          class="grow justify-between overflow-hidden bg-inherit text-sm"
         >
-          {{ newSnippet.folder.name }}
+          <p class="truncate">{{ newSnippet.folder.name }}</p>
           <ArrowDown01Icon class="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
@@ -32,18 +37,18 @@
             <CommandGroup>
               <CommandItem
                 v-for="folder in folders"
-                :key="folder.id"
+                :key="folder.path"
                 :value="folder"
               >
                 <Tick02Icon
                   :class="[
                     'mr-2 h-4 w-4',
-                    newSnippet.folder.id === folder.id
+                    newSnippet.folder.path === folder.path
                       ? 'opacity-100'
                       : 'opacity-0',
                   ]"
                 />
-                {{ folder.name }}
+                {{ folder.path || '(root)' }}
               </CommandItem>
             </CommandGroup>
           </CommandList>
@@ -60,8 +65,6 @@
   </div>
 </template>
 <script setup lang="ts">
-import { getAllFolders } from '@/db/services/folder.db-service';
-import type { FolderListItem } from '@/interface/folder.interface';
 import { getSnippetLangFromName } from '@/utils/snippet-utils';
 import type { CMEditorView } from '@snippy/codemirror';
 import { Compartment } from '@codemirror/state';
@@ -88,10 +91,25 @@ import { getHotkeyLabel, useHotkey } from '@/composables/hotkey.composable';
 import type { SnippetNewPayload } from '@/interface/snippet.interface';
 import { logger } from '@/services/logger.service';
 import { getLogMessage } from '@/utils/helper';
-import { createNewSnippets } from '@/db/services/snippet.db-service';
 import { useTauriUtils } from '@/composables/tauri.composable';
 import { getCurrentWindow } from '@tauri-apps/api/window';
+import {
+  joinDocumentPath,
+  sanitizeDocumentFileName,
+} from '@/utils/document-utils';
+import { appCommand } from '@/services/app-command.service';
+import type { DocumentFolderEntry } from '@/interface/document.interface';
+import type { EditorSettings } from '@/interface/editor.interface';
+import documentService from '@/services/document.service';
+import { EDITOR_DEFAULT_SETTINGS } from '@/utils/const/editor.const';
 
+let lastFetch = 0;
+
+const MAX_CACHE_TTL_MS = 2.5 * 60 * 1000;
+const ROOT_FOLDER: DocumentFolderEntry = {
+  path: '',
+  name: '(root)',
+};
 const languageComp = new Compartment();
 
 const { toast } = useToast();
@@ -100,40 +118,34 @@ const { emitEventTo } = useTauriUtils();
 const nameInput = useTemplateRef<HTMLInputElement>('name-input');
 const editorContainer = useTemplateRef<HTMLDivElement>('editor-container');
 
-const rootFolder: FolderListItem = {
-  id: '',
-  name: '(root)',
-  parentId: null,
-  isBookmark: false,
-  updatedAt: new Date(),
-  createdAt: new Date(),
-};
-
+const editorSettings = shallowReactive<EditorSettings>({
+  ...EDITOR_DEFAULT_SETTINGS,
+});
 const newSnippet = shallowReactive<{
   name: string;
-  folder: FolderListItem;
+  folder: DocumentFolderEntry;
 }>({
   name: '',
-  folder: rootFolder,
+  folder: { ...ROOT_FOLDER },
 });
-const folders = shallowRef<FolderListItem[]>([]);
+const folders = shallowRef<DocumentFolderEntry[]>([]);
 const editorView = shallowRef<CMEditorView | null>(null);
 
 function clearState() {
   newSnippet.name = '';
-  newSnippet.folder = rootFolder;
+  newSnippet.folder = ROOT_FOLDER;
 
   editorView.value?.replaceContent({});
 }
 async function createSnippet() {
   try {
+    const name = sanitizeDocumentFileName(newSnippet.name) || 'unnamed.txt';
     const payload: SnippetNewPayload = {
-      name: newSnippet.name || 'unnamed.txt',
-      folderId: newSnippet.folder.id || null,
-      content: editorView.value?.state.doc.toString() ?? '',
+      contents: editorView.value?.state.doc.toString() ?? '',
+      path: joinDocumentPath(newSnippet.folder.path, name),
     };
 
-    const [snippet] = await createNewSnippets([payload]);
+    const [snippet] = await documentService.createSnippets([payload]);
     if (!snippet) return;
 
     await emitEventTo('main', 'snippet:created', snippet);
@@ -146,6 +158,16 @@ async function createSnippet() {
     });
     logger.error(getLogMessage('quick-access:new-snippet', error));
   }
+}
+function fetchData() {
+  appCommand.invoke('get_all_document_folders', undefined).then((entries) => {
+    folders.value = [ROOT_FOLDER, ...entries];
+    lastFetch = Date.now();
+  });
+  documentService.stores.state.xGet('editor').then((value) => {
+    if (!value) return;
+    Object.assign(editorSettings, value);
+  });
 }
 
 watch(
@@ -166,10 +188,14 @@ useHotkey(['mod+enter', 'alt+enter'], () => {
   createSnippet();
 });
 
+onActivated(() => {
+  if (Date.now() - lastFetch < MAX_CACHE_TTL_MS) return;
+  fetchData();
+});
 onMounted(() => {
   unrefElement(nameInput)?.focus();
 
-  getAllFolders().then((value) => (folders.value = [rootFolder, ...value]));
+  fetchData();
   editorView.value = loadCodemirrorMinimal({
     parent: editorContainer.value!,
     extensions: [placeholder('Text here...'), languageComp.of([])],

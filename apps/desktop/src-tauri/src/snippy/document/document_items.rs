@@ -30,3 +30,9 @@ pub struct FolderDocCreated {
     pub path: String,
     pub name: String,
 }
+
+#[derive(Deserialize, Serialize)]
+pub struct FolderEntry {
+    pub path: String,
+    pub name: String,
+}

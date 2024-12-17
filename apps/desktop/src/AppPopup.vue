@@ -16,7 +16,9 @@
         </Button>
       </div>
       <PopupMenu v-model="activeMenu" class="mt-2" />
-      <component :is="popupComponentsMap[activeMenu]" />
+      <KeepAlive include="PopupNewSnippet">
+        <component :is="popupComponentsMap[activeMenu]" />
+      </KeepAlive>
     </div>
   </TooltipProvider>
   <Toaster />

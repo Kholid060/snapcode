@@ -60,3 +60,8 @@ export interface DocumentCreatedSnippet extends DocumentCreatedFolder {
 }
 
 export type DocumentOldNewVal = [oldValue: string, newValue: string];
+
+export interface DocumentFolderEntry {
+  path: string;
+  name: string;
+}

@@ -18,7 +18,7 @@ pub fn run() {
         .plugin(tauri_plugin_decorum::init())
         .plugin(
             tauri_plugin_prevent_default::Builder::new()
-                .with_flags(Flags::all().difference(Flags::CONTEXT_MENU))
+                .with_flags(Flags::all().difference(Flags::CONTEXT_MENU | Flags::FOCUS_MOVE))
                 .build(),
         )
         .plugin(tauri_plugin_store::Builder::new().build())
@@ -39,13 +39,14 @@ pub fn run() {
             commands::store::store_rename_root_keys,
             commands::window::open_popup_window,
             commands::window::update_popup_window_tray_menu,
-            commands::document::remove_document_items,
             commands::document::create_folders,
             commands::document::create_snippets,
             commands::document::get_document_state,
             commands::document::move_document_items,
             commands::document::rename_document_item,
+            commands::document::remove_document_items,
             commands::document::get_document_flat_tree,
+            commands::document::get_all_document_folders,
             commands::snippet::open_snippet,
             commands::snippet::send_snippet_content,
             commands::snippet::import_snippet_from_file,

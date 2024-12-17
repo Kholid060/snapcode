@@ -12,7 +12,7 @@
     v-else
     v-bind="forwarded"
     @update:selected-value="
-      actionState = { actionIndex: -1, itemId: $event as string }
+      actionState = { actionIndex: -1, path: $event as string }
     "
   >
     <div class="search-input relative px-4 pb-3 pt-1.5">
@@ -31,8 +31,8 @@
       <CommandGroup :heading="groupHeading" class="p-0">
         <CommandItem
           v-for="item in items"
-          :key="item.id"
-          :value="item.id"
+          :key="item.path"
+          :value="item.path"
           class="border-border/50 mb-px block"
           @select.prevent="handleSelectItem(item)"
         >
@@ -53,10 +53,10 @@
               >
                 <button
                   class="hover:bg-secondary hover:text-foreground size-6 flex-shrink-0 content-center rounded-sm text-center transition-colors"
-                  :id="item.id + index"
+                  :id="item.path + index"
                   @click.stop="actionHandlerMap[action.id]"
                   :class="
-                    item.id === actionState.itemId &&
+                    item.path === actionState.path &&
                     index === actionState.actionIndex
                       ? 'bg-secondary text-foreground'
                       : 'text-muted-foreground'
@@ -77,11 +77,7 @@
     </CommandList>
   </Command>
 </template>
-<script
-  setup
-  lang="ts"
-  generic="T extends SnippetSearchListItem | SnippetListItem"
->
+<script setup lang="ts">
 import {
   Command,
   CommandEmpty,
@@ -95,24 +91,26 @@ import UiComboboxSearch from '../ui/UiComboboxSearch.vue';
 import type { ComboboxRootProps } from 'radix-vue';
 import { useForwardPropsEmits, type ComboboxRootEmits } from 'radix-vue';
 import { Copy02Icon, FileEditIcon } from 'hugeicons-vue';
-import type {
-  SnippetListItem,
-  SnippetSearchListItem,
-  SnippetWithPlaceholder,
-} from '@/interface/snippet.interface';
-import { getSnippetContent } from '@/db/services/snippet.db-service';
+import type { SnippetWithPlaceholder } from '@/interface/snippet.interface';
 import { appCommand } from '@/services/app-command.service';
 import { getCurrentWindow } from '@tauri-apps/api/window';
 import { sanitizeSnippetHTML } from '@/utils/snippet-utils';
 import { useTauriWindowEvent } from '@/composables/tauri.composable';
 import PopupInputPlaceholder from './PopupInputPlaceholder.vue';
+import documentService from '@/services/document.service';
+
+interface ComboboxItem {
+  path: string;
+  name: string;
+  content?: string;
+}
 
 defineOptions({
   inheritAttrs: false,
 });
 const props = defineProps<
   ComboboxRootProps & {
-    items: T[];
+    items: ComboboxItem[];
     groupHeading?: string;
     itemContainsHtml?: boolean;
   }
@@ -139,12 +137,12 @@ const searchInput = useTemplateRef('search-input');
 
 const inputSnippet = shallowRef<SnippetWithPlaceholder | null>(null);
 const actionState = ref({
-  itemId: '',
+  path: '',
   actionIndex: -1,
 });
 
 function handleInputKeydown(event: KeyboardEvent) {
-  if (!actionState.value.itemId) return;
+  if (!actionState.value.path) return;
 
   const { key } = event;
   const inputEl = event.target as HTMLInputElement;
@@ -168,8 +166,8 @@ function handleInputKeydown(event: KeyboardEvent) {
 
   event.preventDefault();
 }
-async function handleSelectItem(item: T) {
-  const action = actionState.value.itemId
+async function handleSelectItem(item: ComboboxItem) {
+  const action = actionState.value.path
     ? itemActions[actionState.value.actionIndex]
     : null;
   if (action) {
@@ -181,7 +179,7 @@ async function handleSelectItem(item: T) {
 
   try {
     const result = await appCommand.invoke('get_snippet_with_placeholder', {
-      snippetId: item.id,
+      snippetId: item.path,
     });
     if (result.placeholders.length === 0) {
       await appCommand.invoke('send_snippet_content', {
@@ -190,7 +188,7 @@ async function handleSelectItem(item: T) {
         plaholdersValue: {},
         content: result.content,
       });
-      emit('snippet:sended', item.id);
+      emit('snippet:sended', item.path);
       return;
     }
 
@@ -206,7 +204,7 @@ async function handleSelectItem(item: T) {
 async function editSnippet() {
   try {
     await appCommand.invoke('open_snippet', {
-      snippetId: actionState.value.itemId,
+      snippetId: actionState.value.path,
     });
     await currentWindow.hide();
   } catch {
@@ -218,14 +216,16 @@ async function editSnippet() {
 }
 async function copyContent() {
   try {
-    const result = await getSnippetContent(actionState.value.itemId);
-    if (!result) return;
+    const content = await documentService.getFileContent(
+      actionState.value.path,
+    );
+    if (!content) return;
 
     await appCommand.invoke('send_snippet_content', {
+      content,
       action: 'copy',
       placeholders: [],
       plaholdersValue: {},
-      content: result.content,
     });
 
     toast({
@@ -257,9 +257,9 @@ watch(
       prevActiveAction.dispatchEvent(new Event('blur', { bubbles: true }));
     }
 
-    if (!value.itemId || value.actionIndex < 0) return;
+    if (!value.path || value.actionIndex < 0) return;
 
-    const btn = document.getElementById(value.itemId + value.actionIndex);
+    const btn = document.getElementById(value.path + value.actionIndex);
     prevActiveAction = btn;
 
     btn?.dispatchEvent(new FocusEvent('focus', { bubbles: true }));

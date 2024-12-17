@@ -6,8 +6,7 @@ use std::{
     time::UNIX_EPOCH,
 };
 
-use document_items::SnippetStoredMetadata;
-pub use document_items::{FolderDoc, FolderDocCreated, SnippetDoc, SnippetDocCreated};
+pub use document_items::*;
 use normalize_path::NormalizePath;
 use path_slash::PathExt;
 use serde::{ser::SerializeStruct, Serialize};
@@ -68,6 +67,31 @@ impl AppDocument {
             other => io::Error::new(io::ErrorKind::Other, other.to_string()),
         })?;
         Ok(store)
+    }
+
+    pub fn get_all_folders(&self) -> Vec<FolderEntry> {
+        let mut folders = vec![];
+        for entry in WalkDir::new(&self.snippets_dir)
+            .into_iter()
+            .filter_map(|e| e.ok())
+        {
+            if entry.file_type().is_dir() {
+                let relative_path = entry.path().strip_prefix(&self.snippets_dir).unwrap();
+                let name = relative_path
+                    .file_name()
+                    .and_then(|val| val.to_str())
+                    .unwrap_or_default()
+                    .to_owned();
+                if !name.is_empty() {
+                    folders.push(FolderEntry {
+                        name,
+                        path: relative_path.to_slash().unwrap_or_default().to_string(),
+                    });
+                }
+            }
+        }
+
+        folders
     }
 
     pub fn get_flat_tree(&self, app: &tauri::AppHandle) -> io::Result<DocumentFlatTree> {

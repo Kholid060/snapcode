@@ -73,6 +73,7 @@ import { useAppDialog } from '@/providers/app-dialog.provider';
 import { useEditorSidebarProvider } from '@/providers/editor.provider';
 import documentService from '@/services/document.service';
 import { logger } from '@/services/logger.service';
+import { useAppStore } from '@/stores/app.store';
 import { useBookmarksStore } from '@/stores/bookmarks.store';
 import { useEditorStore } from '@/stores/editor.store';
 import {
@@ -100,15 +101,12 @@ const props = defineProps<{
 }>();
 
 const { toast } = useToast();
+const appStore = useAppStore();
 const appDialog = useAppDialog();
 const editorStore = useEditorStore();
 const bookmarksStore = useBookmarksStore();
 const sidebarProvider = useEditorSidebarProvider();
 
-const itemData = computed(() => {
-  console.log(props.ctxData);
-  return {};
-});
 const isBookmarked = computed(() =>
   bookmarksStore.isBookmarked(props.ctxData.path),
 );
@@ -149,8 +147,6 @@ async function createFolderFolder() {
 
 async function renameItem() {
   try {
-    if (!itemData.value) return;
-
     const result = await appDialog.prompt({
       defaultValue: props.ctxData.name,
       okBtnLabel: 'Rename',
@@ -179,8 +175,6 @@ async function renameItem() {
   }
 }
 async function toggleBookmark() {
-  if (!itemData.value) return;
-
   try {
     bookmarksStore.setBookmark(
       {
@@ -205,12 +199,15 @@ async function deleteItem() {
     let dontAskPrompt = false;
 
     if (!dontShowDialog) {
+      const bodyMessage = appStore.settings.deleteToTrash
+        ? ''
+        : 'This will be permanently deleted and it cannot be undone';
       const { isConfirmed, dontAskValue } = await appDialog.confirm({
         title:
           props.ctxData.type === 'folder'
             ? 'Delete folder?'
             : 'Delete snippet?',
-        body: `Are you sure you want to delete "${props.ctxData.name ?? ''}"? This will be permanently deleted and it cannot be undone.`,
+        body: `Are you sure you want to delete "${props.ctxData.name ?? ''}"? ${bodyMessage}.`,
         okBtnLabel: 'Delete',
         okBtnVariant: 'destructive',
         showDontAsk: true,

@@ -1,11 +1,11 @@
 import { AppWindowLabel } from '@/interface/app.interface';
-import { SnippetListItem } from '@/interface/snippet.interface';
+import { DocumentCreatedSnippet } from '@/interface/document.interface';
 import { EventCallback, EventName } from '@tauri-apps/api/event';
 import { getCurrentWindow } from '@tauri-apps/api/window';
 
 interface CustomWindowEvent {
   'snippet:open': string;
-  'snippet:created': SnippetListItem;
+  'snippet:created': DocumentCreatedSnippet;
 }
 
 const currentWindow = getCurrentWindow();

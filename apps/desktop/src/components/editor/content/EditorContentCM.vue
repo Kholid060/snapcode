@@ -27,9 +27,9 @@ import { getLogMessage } from '@/utils/helper';
 import { useDebounceFn } from '@vueuse/core';
 import EditorContentFooter from './EditorContentFooter.vue';
 import { getSnippetLangFromName } from '@/utils/snippet-utils';
-import { APP_EDITOR_FONTS } from '@/utils/const/app.const';
 import { indentUnit } from '@codemirror/language';
 import documentService from '@/services/document.service';
+import { loadEditorFontSettings } from '@/utils/editor-util';
 
 let isReplaceValue = false;
 const compartments = {
@@ -77,24 +77,7 @@ function loadSettings() {
   const containerEl = containerRef.value;
 
   if (containerEl) {
-    containerEl.style.setProperty(
-      '--editor-font-family',
-      settings.fontFamily === 'custom'
-        ? settings.customFont
-        : APP_EDITOR_FONTS[settings.fontFamily].name,
-    );
-    containerEl.style.setProperty(
-      '--editor-font-size',
-      `${settings.fontSize}px`,
-    );
-
-    if (settings.fontLigatures) {
-      containerEl.style.fontVariantLigatures = '"liga", "calt"';
-      containerEl.style.removeProperty('font-variant-ligatures');
-    } else {
-      containerEl.style.setProperty('font-feature-settings', 'normal');
-      containerEl.style.setProperty('font-variant-ligatures', 'none');
-    }
+    loadEditorFontSettings(containerEl, settings);
   }
 
   cmView.value?.dispatch({

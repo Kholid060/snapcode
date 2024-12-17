@@ -43,23 +43,23 @@ import { useEditorStore } from '@/stores/editor.store';
 import { Sorting05Icon } from 'hugeicons-vue';
 import EditorTreeRoot from '../tree/EditorTreeRoot.vue';
 import { useEditorSidebarProvider } from '@/providers/editor.provider';
-import type { DocumentFlatTreeItem } from '@/interface/document.interface';
+import type {
+  DocumentFlatTreeItem,
+  DocumentStoreBookmarksItem,
+} from '@/interface/document.interface';
 import { useBookmarksStore } from '@/stores/bookmarks.store';
 import { APP_DOCUMENT_PATH_SEPARATOR } from '@/utils/const/app.const';
 import { FOLDER_TREE_ITEM_PREFIX } from '@/utils/const/editor.const';
-
-interface BookmarkItem extends DocumentFlatTreeItem {
-  createdAt: number;
-}
+import { bookmarksSorter } from '@/utils/bookmarks-util';
 
 const sortItems: { label: string; id: AppBookmarkSort }[] = [
   { id: 'name-asc', label: 'Name (A-Z)' },
   { id: 'name-desc', label: 'Name (Z-A)' },
   { id: 'created-desc', label: 'Created date (new to old)' },
   { id: 'created-asc', label: 'Created date (old to new)' },
-  { id: 'updated-desc', label: 'Updated date (new to old)' },
-  { id: 'updated-asc', label: 'Updated date (old to new)' },
 ];
+
+type BookmarkItem = DocumentFlatTreeItem & DocumentStoreBookmarksItem;
 
 const editorStore = useEditorStore();
 const bookmarksStore = useBookmarksStore();
@@ -70,23 +70,23 @@ const selectedItems = ref<DocumentFlatTreeItem[]>([]);
 const mappedItems = computed<BookmarkItem[]>(() =>
   bookmarksStore.data.reduce<BookmarkItem[]>((acc, bookmark) => {
     const item = editorStore.document.getItemByPath(bookmark.path);
-    if (item) acc.push({ ...item, createdAt: bookmark.createdAt });
+    if (item)
+      acc.push({
+        ...item,
+        createdAt: bookmark.createdAt,
+        type: item.isDir ? 'folder' : 'file',
+      });
 
     return acc;
   }, []),
 );
-const sortedItems = computed(() => {
-  const { isDate, sortAsc, sortKey } = getSortData();
-  return mappedItems.value.slice().sort((a, z) => {
-    const aData = a[sortKey];
-    const zData = z[sortKey];
-
-    const val = isDate
-      ? (aData as number) - (zData as number)
-      : (aData as string).localeCompare(zData as string);
-    return sortAsc ? val : val * -1;
-  });
-});
+const sortedItems = computed(
+  () =>
+    bookmarksSorter(
+      mappedItems.value.slice(),
+      bookmarksStore.state,
+    ) as BookmarkItem[],
+);
 
 function handleContextMenu({
   event,
@@ -97,7 +97,7 @@ function handleContextMenu({
 }) {
   sidebarProvider.handleContextMenu({
     data: {
-      selectedItems: mappedItems.value.map((item) => item.path),
+      selectedItems: sortedItems.value.map((item) => item.path),
       name: item.value.name,
       path: item.value.path,
       type: item.value.isDir ? 'folder' : 'snippet',
@@ -126,51 +126,9 @@ function handleSelectItem(event: TreeItemSelectEvent<DocumentFlatTreeItem>) {
     }
   }
 
-  console.log(expandedFolders);
   editorStore.state.updateState('activeFolderIds', [...expandedFolders]);
 
   sidebarProvider.setSelectedItems([value]);
   editorStore.state.updateState('activeMenu', 'snippets');
-}
-function getSortData() {
-  let sortAsc = false;
-  let sortKey: 'mtime' | 'createdAt' | 'name';
-
-  switch (bookmarksStore.state.sortBy) {
-    case 'created-asc':
-      sortKey = 'createdAt';
-      sortAsc = true;
-      break;
-    case 'created-desc':
-      sortKey = 'createdAt';
-      sortAsc = false;
-      break;
-    case 'name-asc':
-      sortKey = 'name';
-      sortAsc = true;
-      break;
-    case 'name-desc':
-      sortKey = 'name';
-      sortAsc = false;
-      break;
-    case 'updated-asc':
-      sortKey = 'mtime';
-      sortAsc = true;
-      break;
-    case 'updated-desc':
-      sortKey = 'mtime';
-      sortAsc = false;
-      break;
-    default:
-      throw new Error('Invalid sort key');
-  }
-
-  const isDate = !sortKey.startsWith('name');
-
-  return {
-    isDate,
-    sortAsc,
-    sortKey,
-  };
 }
 </script>

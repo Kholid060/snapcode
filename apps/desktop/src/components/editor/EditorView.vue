@@ -20,4 +20,9 @@ const editorStore = useEditorStore();
 useTauriWindowEvent('snippet:open', (event) => {
   editorStore.state.updateState('activeFileId', event.payload);
 });
+useTauriWindowEvent('snippet:created', (event) => {
+  editorStore.document.registerItems({
+    snippets: [event.payload],
+  });
+});
 </script>

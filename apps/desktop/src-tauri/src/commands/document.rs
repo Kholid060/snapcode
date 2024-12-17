@@ -83,7 +83,9 @@ pub fn create_snippets(
     snippets: Vec<snippy::document::SnippetDoc>,
 ) -> Result<Vec<snippy::document::SnippetDocCreated>, String> {
     let app_document = app_document.lock().unwrap();
-    let snippets = app_document.create_snippets(&app, snippets).map_err(stringify)?;
+    let snippets = app_document
+        .create_snippets(&app, snippets)
+        .map_err(stringify)?;
 
     Ok(snippets)
 }
@@ -106,7 +108,17 @@ pub fn remove_document_items(
     to_trash: bool,
 ) -> Result<(), String> {
     let app_document = app_document.lock().unwrap();
-    app_document.remove_items(paths, to_trash).map_err(stringify)?;
+    app_document
+        .remove_items(paths, to_trash)
+        .map_err(stringify)?;
 
     Ok(())
+}
+
+#[tauri::command(async)]
+pub fn get_all_document_folders(
+    app_document: tauri::State<Mutex<AppDocument>>,
+) -> Vec<snippy::document::FolderEntry> {
+    let app_document = app_document.lock().unwrap();
+    app_document.get_all_folders()
 }

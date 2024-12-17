@@ -10,7 +10,6 @@
     "preview": "vite preview",
     "typecheck": "vue-tsc --noEmit",
     "lint": "eslint . --max-warnings 0",
-    "db:generate": "drizzle-kit generate",
     "build": "pnpm lint && vite build",
     "build:prod": "tauri build"
   },

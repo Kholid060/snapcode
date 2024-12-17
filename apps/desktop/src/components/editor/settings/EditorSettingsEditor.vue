@@ -114,7 +114,7 @@ import { useDebounceFn } from '@vueuse/core';
 import type { AppEditorFonts } from '@/utils/const/app.const';
 import { APP_EDITOR_FONTS } from '@/utils/const/app.const';
 import { logger } from '@/services/logger.service';
-import { fontLoader, getLogMessage } from '@/utils/helper';
+import { getLogMessage } from '@/utils/helper';
 
 const editorStore = useEditorStore();
 
@@ -123,26 +123,6 @@ async function updateFonts(font: string) {
     const fontName = font as AppEditorFonts;
 
     editorStore.settings.updateSetting('fontFamily', fontName);
-
-    if (
-      font !== 'custom' &&
-      APP_EDITOR_FONTS[fontName] &&
-      !editorStore.settings.loadedFonts.has(fontName)
-    ) {
-      const fontData = APP_EDITOR_FONTS[fontName];
-      await fontLoader(
-        fontData.name,
-        fontData.fonts.map((font) => ({
-          url: `url("/fonts/${fontData.id}/${font.name}")`,
-          descriptors: {
-            display: 'swap',
-            style: 'normal',
-            weight: font.weight.toString(),
-          },
-        })),
-      );
-      editorStore.settings.loadedFonts.add(fontName);
-    }
   } catch (error) {
     logger.error(getLogMessage('settings:toggle-app-startup', error));
   }
