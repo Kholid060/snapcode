@@ -4,7 +4,7 @@
     class="text-muted-foreground select-none list-none text-sm"
     multiple
     :items="items"
-    :get-key="(item) => (item.isDir ? FOLDER_TREE_ITEM_PREFIX : '') + item.path"
+    :get-key="(item) => item.id"
     :get-children="getChildren"
     selection-behavior="replace"
     v-model:expanded="editorStore.state.state.activeFolderIds"
@@ -43,8 +43,7 @@ import EditorTreeRootItemPlaceholder from './EditorTreeRootItemPlaceholder.vue';
 import { onClickOutside } from '@vueuse/core';
 import { debounce } from '@snippy/shared';
 import type { DocumentFlatTreeItem } from '@/interface/document.interface';
-import { getDocumentParentDir, joinDocumentPath } from '@/utils/document-utils';
-import { FOLDER_TREE_ITEM_PREFIX } from '@/utils/const/editor.const';
+import { selectTreeItemsByMouse } from '@/utils/tree-data-utils';
 
 defineProps<
   {
@@ -72,48 +71,18 @@ const selectedItems = defineModel<DocumentFlatTreeItem[]>({
   default: () => [],
 });
 
-function selectItemsByMouse(
-  event: TreeItemSelectEvent<DocumentFlatTreeItem>,
-  item: FlattenedItem<DocumentFlatTreeItem>,
-  items: FlattenedItem<DocumentFlatTreeItem>[],
-) {
-  const { originalEvent } = event.detail;
-  if (originalEvent.ctrlKey || originalEvent.metaKey) {
-    const itemIndex = selectedItems.value.indexOf(item.value);
-    if (itemIndex === -1) selectedItems.value.push(item.value);
-    else selectedItems.value.splice(itemIndex, 1);
-    event.preventDefault();
-  }
-
-  const [firstValue] = selectedItems.value;
-  if (!originalEvent.shiftKey || !firstValue) return;
-
-  const firstIndex = items.findIndex(
-    (treeItem) => treeItem.value === firstValue,
-  );
-  const itemIndex = items.indexOf(item);
-  if (firstIndex === -1 || itemIndex === -1 || firstIndex === itemIndex) return;
-
-  const isAfter = firstIndex > itemIndex;
-
-  const newSelectedItems = items
-    .slice(
-      Math.min(firstIndex, itemIndex),
-      Math.max(firstIndex, itemIndex) + (isAfter ? 0 : 1),
-    )
-    .map((treeItem) => treeItem.value);
-  if (isAfter) newSelectedItems.unshift(items[firstIndex].value);
-
-  selectedItems.value = newSelectedItems;
-  event.preventDefault();
-}
 function handleSelect(
   event: TreeItemSelectEvent<DocumentFlatTreeItem>,
   item: FlattenedItem<DocumentFlatTreeItem>,
   items: FlattenedItem<DocumentFlatTreeItem>[],
 ) {
   if (event.detail.originalEvent instanceof PointerEvent) {
-    selectItemsByMouse(event, item, items);
+    selectedItems.value = selectTreeItemsByMouse({
+      item,
+      event,
+      items,
+      selectedItems: selectedItems.value,
+    });
   }
 
   if (!event.defaultPrevented) {
@@ -149,19 +118,14 @@ watchEffect((onCleanup) => {
         if (!target || !previous) return;
 
         try {
-          const prevPath = getDocumentParentDir(previous.path, previous.name);
-          const targetPath = getDocumentParentDir(target.path, target.name);
-          if (
-            (prevPath.parentDir === targetPath.parentDir && !target.isDir) ||
-            prevPath.parentDir === target.path
-          )
-            return;
-
-          const newPath = joinDocumentPath(
-            target.isDir ? target.path : targetPath.parentDir,
-            prevPath.filename,
-          );
-          await editorStore.document.moveItem(previous.path, newPath);
+          const newParentId = target.isDir ? target.id : target.parentId;
+          console.log(newParentId, previous);
+          if (newParentId === previous.parentId) return;
+          await editorStore.document.moveItem({
+            newParentId,
+            id: previous.id,
+            oldParentId: previous.parentId,
+          });
         } catch (error) {
           logger.error(getLogMessage('sidebar-create-folder-ctx-menu', error));
           toast({

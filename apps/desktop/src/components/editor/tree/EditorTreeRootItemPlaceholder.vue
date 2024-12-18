@@ -7,6 +7,7 @@
 </template>
 
 <script setup lang="ts">
+import { TREE_ROOT_KEY } from '@/utils/tree-data-utils';
 import { combine } from '@atlaskit/pragmatic-drag-and-drop/combine';
 import {
   dropTargetForElements,
@@ -31,10 +32,8 @@ watchEffect((onCleanup) => {
       getData: () => {
         return {
           id: '',
-          name: '',
-          isRoot: true,
-          parentId: null,
-          isFolder: false,
+          isDir: false,
+          parentId: TREE_ROOT_KEY,
         };
       },
       onDragEnter: () => {

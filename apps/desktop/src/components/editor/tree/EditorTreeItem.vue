@@ -18,7 +18,7 @@
         : 'hover:bg-accent/70',
     ]"
     @toggle="handleToggle"
-    :title="item.value.name"
+    :title="itemMetadata?.name"
   >
     <template v-if="item.level > 1">
       <span
@@ -35,9 +35,9 @@
         :is="isExpanded ? Folder02Icon : Folder01Icon"
       />
       <AppFileExtIcon
-        v-else-if="item.value.ext !== 'txt'"
-        :lang="item.value.metadata?.lang"
-        :ext="item.value.ext"
+        v-else-if="itemMetadata?.ext !== 'txt'"
+        :lang="itemMetadata?.metadata?.lang"
+        :ext="itemMetadata?.ext"
         class="size-4"
       >
         <File01Icon class="size-4" />
@@ -45,7 +45,7 @@
       <File01Icon v-else class="size-4 flex-shrink-0" />
     </div>
     <div class="truncate pl-1">
-      {{ item.value.name }}
+      {{ itemMetadata?.name }}
     </div>
   </TreeItem>
 </template>
@@ -76,7 +76,6 @@ const AppFileExtIcon = defineAsyncComponent(
 );
 
 const editorStore = useEditorStore();
-
 const treeItemEl = useTemplateRef('tree-item');
 
 const dragState = shallowReactive({
@@ -84,6 +83,10 @@ const dragState = shallowReactive({
   isDragOver: false,
   isInitialExpanded: false,
 });
+
+const itemMetadata = computed(
+  () => editorStore.document.treeMetadata[props.item._id] ?? null,
+);
 
 function handleToggle(event: TreeItemToggleEvent<DocumentFlatTreeItem>) {
   const { originalEvent } = event.detail;
@@ -140,7 +143,7 @@ watchEffect((onCleanup) => {
                 {
                   class: 'bg-card rounded-md text-sm px-2 py-1.5 border',
                 },
-                props.item.value.name ?? '',
+                itemMetadata.value.name ?? '',
               ),
               container,
             );

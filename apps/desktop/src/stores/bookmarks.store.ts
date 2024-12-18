@@ -7,7 +7,7 @@ import { AppBookmarksState } from '@/interface/app.interface';
 export const useBookmarksStore = defineStore('bookmarks', () => {
   const data = ref<DocumentStoreBookmarksItem[]>([]);
   const state = shallowReactive<AppBookmarksState>({
-    sortBy: 'name-asc',
+    sortBy: 'created-desc',
   });
 
   async function setBookmark(
@@ -32,9 +32,9 @@ export const useBookmarksStore = defineStore('bookmarks', () => {
     await documentService.stores.bookmarks.xSet('items', data.value);
   }
   async function removeBookmarks(paths: string[]) {
-    const patshSet = new Set(paths);
+    const pathsSet = new Set(paths);
     const filteredBookmars = data.value.filter(
-      (bookmark) => !patshSet.has(bookmark.path),
+      (bookmark) => !pathsSet.has(bookmark.path),
     );
     if (filteredBookmars.length === data.value.length) return;
 

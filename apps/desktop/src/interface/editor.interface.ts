@@ -1,4 +1,5 @@
 import { AppEditorFonts } from '@/utils/const/app.const';
+import { DocumentFlatTreeItem } from './document.interface';
 
 export type EditorSidebarItems = 'snippets' | 'bookmarks' | 'search';
 
@@ -18,10 +19,9 @@ export interface EditorSidebarCtxMenuBase<T, D> {
 export type EditorSidebarSnippetsCtxMenu = EditorSidebarCtxMenuBase<
   'snippets',
   {
-    name: string;
-    path: string;
     isTopOfSelected: boolean;
     type: 'folder' | 'snippet';
+    item: DocumentFlatTreeItem;
   }
 >;
 

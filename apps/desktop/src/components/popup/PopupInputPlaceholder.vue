@@ -84,7 +84,7 @@ async function sendContent(action: 'paste' | 'copy') {
     actionState.value = action;
     await appCommand.invoke('send_snippet_content', {
       action,
-      content: props.snippet.content,
+      path: props.snippet.path,
       plaholdersValue: placeholders.value,
       placeholders: props.snippet.placeholders,
     });

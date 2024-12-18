@@ -48,11 +48,15 @@ pub async fn get_snippet_with_placeholder(
 #[tauri::command]
 pub fn send_snippet_content(
     app_handle: tauri::AppHandle,
+    app_document: tauri::State<Mutex<AppDocument>>,
+    path: String,
     action: String,
-    mut content: String,
     plaholders_value: HashMap<String, String>,
     placeholders: Vec<snippy::document::SnippetPlaceholderItem>,
 ) -> Result<(), String> {
+    let app_document = app_document.lock().unwrap();
+
+    let mut content = app_document.get_snippet_content(path).map_err(stringify)?;
     let content = if placeholders.len() > 0 {
         snippy::snippet::replace_snippet_placeholders(
             &mut content,

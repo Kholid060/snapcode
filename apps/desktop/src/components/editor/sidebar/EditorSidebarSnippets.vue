@@ -42,8 +42,7 @@
     @item:context-menu="
       sidebarProvider.handleContextMenu({
         data: {
-          name: $event.item.value.name,
-          path: $event.item.value.path,
+          item: $event.item.value,
           type: $event.item.value.isDir ? 'folder' : 'snippet',
           isTopOfSelected:
             selectedItems.length > 1 &&
@@ -112,7 +111,7 @@ const selectedItems = computed({
 
 function getChildren(item: DocumentFlatTreeItem) {
   return item.isDir
-    ? (editorStore.document.treeData[item.path] ?? [])
+    ? (editorStore.document.treeData[item.id] ?? [])
     : undefined;
 }
 async function createNewSnippet() {
@@ -146,20 +145,25 @@ async function createNewFolder() {
 }
 async function importSnippetFromFiles() {
   try {
-    const dirPath = await appDialog.selectFolder({
+    const { canceled, folder } = await appDialog.selectFolder({
       title: 'Select a folder where to put the snippets',
     });
-    if (dirPath.canceled) return;
+    if (canceled || !folder) return;
 
     const snippets = await appCommand.invoke('import_snippet_from_file', {
-      dirPath: dirPath.path ?? '',
+      dirPath: folder.path ?? '',
     });
     if (snippets.length === 0) return;
 
-    editorStore.document.registerItems({ snippets });
+    editorStore.document.registerItems({
+      snippets: snippets.map((item) => ({
+        ...item,
+        metadata: { parentId: folder.id },
+      })),
+    });
 
     toast({
-      title: `${snippets.length} files imported into "${dirPath.path || 'root'}" folder`,
+      title: `${snippets.length} files imported into "${folder?.path || 'root'}" folder`,
     });
   } catch (error) {
     const message = getLogMessage(error);

@@ -26,7 +26,7 @@ export function getBookmarksSortData(state: AppBookmarksState) {
       throw new Error('Invalid sort key');
   }
 
-  const isDate = !sortKey.startsWith('name');
+  const isDate = !sortKey.startsWith('path');
 
   return {
     isDate,
@@ -47,7 +47,10 @@ export function bookmarksSorter<T extends DocumentStoreBookmarksItem>(
 
     const val = isDate
       ? (aData as number) - (zData as number)
-      : (aData as string).localeCompare(zData as string);
+      : (aData as string).localeCompare(zData as string, undefined, {
+          numeric: true,
+          sensitivity: 'base',
+        });
     return sortAsc ? val : val * -1;
   });
 }

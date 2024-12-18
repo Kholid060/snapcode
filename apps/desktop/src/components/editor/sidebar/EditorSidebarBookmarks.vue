@@ -25,32 +25,77 @@
       </SelectContent>
     </Select>
   </div>
-  <EditorTreeRoot
+  <TreeRoot
     v-model="selectedItems"
-    class="mt-3 grow overflow-auto px-2 pb-4"
+    :get-key="(item) => item.path"
+    selection-behavior="replace"
+    multiple
+    class="mt-3 grow overflow-auto px-2 pb-4 pt-0.5"
     :items="sortedItems"
-    :get-children="() => undefined"
-    @item:select="handleSelectItem"
-    @item:context-menu="handleContextMenu"
-  />
+    v-slot="{ flattenItems }"
+  >
+    <div ref="items-container" class="space-y-px">
+      <TreeItem
+        v-for="item in flattenItems"
+        :key="item._id"
+        v-bind="item.bind"
+        @contextmenu.stop.prevent="handleContextMenu({ event: $event, item })"
+        class="data-[selected]:bg-primary/20 data-[selected]:text-foreground focus-visible:ring-primary relative z-10 min-h-7 w-full overflow-hidden rounded border-none py-1.5 pl-2 text-sm outline-none focus-visible:ring-2"
+        @select="handleSelect($event, item, flattenItems)"
+        :class="
+          editorStore.activeSnippet?.path === item.value.path
+            ? 'bg-accent/70 text-foreground'
+            : 'hover:bg-accent/70'
+        "
+        :title="item.value.path"
+      >
+        <div class="flex items-center gap-1">
+          <component
+            :is="item.value.type === 'folder' ? Folder01Icon : File01Icon"
+            class="text-muted-foreground size-4 flex-shrink-0"
+          />
+          <p class="truncate">{{ item.value.name }}</p>
+        </div>
+        <p
+          v-if="item.value.path !== item.value.name"
+          class="text-muted-foreground line-clamp-2 pl-5 text-xs leading-tight"
+        >
+          {{ item.value.path }}
+        </p>
+      </TreeItem>
+    </div>
+  </TreeRoot>
 </template>
 <script lang="ts" setup>
-import { Button, Select, SelectContent, SelectItem } from '@snippy/ui';
+import { TreeRoot, TreeItem } from 'radix-vue';
+import {
+  Button,
+  Select,
+  SelectContent,
+  SelectItem,
+  useToast,
+} from '@snippy/ui';
 import type { FlattenedItem, TreeItemSelectEvent } from 'radix-vue';
 import { SelectTrigger } from 'radix-vue';
 import type { AppBookmarkSort } from '@/interface/app.interface';
 import { useEditorStore } from '@/stores/editor.store';
 import { Sorting05Icon } from 'hugeicons-vue';
-import EditorTreeRoot from '../tree/EditorTreeRoot.vue';
 import { useEditorSidebarProvider } from '@/providers/editor.provider';
 import type {
   DocumentFlatTreeItem,
   DocumentStoreBookmarksItem,
 } from '@/interface/document.interface';
+import { Folder01Icon, File01Icon } from 'hugeicons-vue';
 import { useBookmarksStore } from '@/stores/bookmarks.store';
-import { APP_DOCUMENT_PATH_SEPARATOR } from '@/utils/const/app.const';
-import { FOLDER_TREE_ITEM_PREFIX } from '@/utils/const/editor.const';
 import { bookmarksSorter } from '@/utils/bookmarks-util';
+import { getNameFromPath } from '@/utils/document-utils';
+import { selectTreeItemsByMouse, TREE_ROOT_KEY } from '@/utils/tree-data-utils';
+import { debounce } from '@snippy/shared';
+import { onClickOutside } from '@vueuse/core';
+
+interface BookmarkItem extends DocumentStoreBookmarksItem {
+  name: string;
+}
 
 const sortItems: { label: string; id: AppBookmarkSort }[] = [
   { id: 'name-asc', label: 'Name (A-Z)' },
@@ -59,48 +104,107 @@ const sortItems: { label: string; id: AppBookmarkSort }[] = [
   { id: 'created-asc', label: 'Created date (old to new)' },
 ];
 
-type BookmarkItem = DocumentFlatTreeItem & DocumentStoreBookmarksItem;
+const itemsContainerRef = useTemplateRef('items-container');
 
+const { toast } = useToast();
 const editorStore = useEditorStore();
 const bookmarksStore = useBookmarksStore();
 const sidebarProvider = useEditorSidebarProvider();
 
-const selectedItems = ref<DocumentFlatTreeItem[]>([]);
+const selectedItems = ref<DocumentStoreBookmarksItem[]>([]);
 
 const mappedItems = computed<BookmarkItem[]>(() =>
-  bookmarksStore.data.reduce<BookmarkItem[]>((acc, bookmark) => {
-    const item = editorStore.document.getItemByPath(bookmark.path);
-    if (item)
-      acc.push({
-        ...item,
-        createdAt: bookmark.createdAt,
-        type: item.isDir ? 'folder' : 'file',
+  bookmarksStore.data.map((item) => ({
+    ...item,
+    name: getNameFromPath(item.path),
+  })),
+);
+const sortedItems = computed(() =>
+  bookmarksSorter(mappedItems.value.slice(), bookmarksStore.state),
+);
+
+function handleSelect(
+  event: TreeItemSelectEvent<BookmarkItem>,
+  item: FlattenedItem<BookmarkItem>,
+  items: FlattenedItem<BookmarkItem>[],
+) {
+  if (event.detail.originalEvent instanceof PointerEvent) {
+    selectedItems.value = selectTreeItemsByMouse({
+      item,
+      event,
+      items,
+      selectedItems: selectedItems.value,
+    });
+    if (event.defaultPrevented) return;
+  }
+
+  const value = event.detail.value!;
+
+  if (value.type === 'file') {
+    const treeItem = editorStore.document.findSnippetByPath(value.path);
+    if (!treeItem) {
+      toast({
+        variant: 'destructive',
+        title: 'Item not found',
       });
+      return;
+    }
 
-    return acc;
-  }, []),
-);
-const sortedItems = computed(
-  () =>
-    bookmarksSorter(
-      mappedItems.value.slice(),
-      bookmarksStore.state,
-    ) as BookmarkItem[],
-);
+    editorStore.state.updateState('activeFileId', treeItem.id);
+  }
 
+  const findFolderPath = (
+    id: string,
+    ids: string[] = [],
+  ): null | { paths: string[]; item: DocumentFlatTreeItem } => {
+    const childs = editorStore.document.treeData[id];
+    if (!childs) return null;
+
+    for (const child of childs) {
+      if (!child.isDir) continue;
+
+      const metadata = editorStore.document.treeMetadata[child.id];
+      if (!metadata) continue;
+
+      const result =
+        metadata.path === value.path
+          ? { item: child, paths: [...ids, child.id] }
+          : findFolderPath(child.id, [...ids, child.id]);
+      if (result) return result;
+    }
+
+    return null;
+  };
+  const folder = findFolderPath(TREE_ROOT_KEY);
+
+  if (!folder) {
+    toast({
+      variant: 'destructive',
+      title: 'Item not found',
+    });
+    return;
+  }
+
+  editorStore.state.updateState('activeFolderIds', [
+    ...new Set([...editorStore.state.state.activeFolderIds, ...folder.paths]),
+  ]);
+
+  sidebarProvider.setSelectedItems([folder.item]);
+  editorStore.state.updateState('activeMenu', 'snippets');
+}
 function handleContextMenu({
   event,
   item,
 }: {
   event: PointerEvent;
-  item: FlattenedItem<DocumentFlatTreeItem>;
+  item: FlattenedItem<BookmarkItem>;
 }) {
   sidebarProvider.handleContextMenu({
     data: {
-      selectedItems: sortedItems.value.map((item) => item.path),
+      selectedItems: selectedItems.value.map((item) => item.path),
       name: item.value.name,
       path: item.value.path,
-      type: item.value.isDir ? 'folder' : 'snippet',
+      type: item.value.type === 'folder' ? 'folder' : 'snippet',
       isTopOfSelected:
         selectedItems.value.length > 1 &&
         selectedItems.value.includes(item.value),
@@ -109,25 +213,12 @@ function handleContextMenu({
     type: 'bookmarks',
   });
 }
-function handleSelectItem(event: TreeItemSelectEvent<DocumentFlatTreeItem>) {
-  const value = event.detail.value!;
-  if (!value.isDir) return;
 
-  const expandedFolders = new Set(editorStore.state.state.activeFolderIds);
-  expandedFolders.add(value.path);
-
-  for (let index = 0; index < value.path.length; index += 1) {
-    const char = value.path[index];
-    if (char === APP_DOCUMENT_PATH_SEPARATOR) {
-      expandedFolders.add(
-        `${FOLDER_TREE_ITEM_PREFIX}${value.path.slice(0, index)}`,
-      );
-    }
-  }
-
-  editorStore.state.updateState('activeFolderIds', [...expandedFolders]);
-
-  sidebarProvider.setSelectedItems([value]);
-  editorStore.state.updateState('activeMenu', 'snippets');
-}
+onClickOutside(
+  itemsContainerRef,
+  // race when click delete in context menu
+  debounce(() => {
+    selectedItems.value = [];
+  }, 50),
+);
 </script>

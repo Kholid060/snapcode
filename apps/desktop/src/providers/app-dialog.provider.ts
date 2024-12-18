@@ -5,10 +5,16 @@ export const APP_SELECT_FOLDER_PROVIDER_KEY = Symbol('app-select-folder');
 export interface AppDialogSelectFolderOptions {
   title?: string;
 }
-export interface AppDialogSelectFolderResult {
-  canceled: boolean;
-  path: string | null;
-}
+
+export type AppDialogSelectFolderResult =
+  | {
+      folder: null;
+      canceled: true;
+    }
+  | {
+      canceled: false;
+      folder: { id: string; path: string };
+    };
 export interface AppDialogSelectFolder {
   type: 'select-folder';
   options?: AppDialogSelectFolderOptions;

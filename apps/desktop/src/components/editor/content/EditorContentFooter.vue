@@ -112,7 +112,7 @@ async function updateSnippetLang(lang: string) {
     await editorStore.document.updateSnippetMetadata(
       editorStore.activeSnippet.path,
       {
-        lang,
+        metadata: { lang },
       },
     );
   } catch (error) {

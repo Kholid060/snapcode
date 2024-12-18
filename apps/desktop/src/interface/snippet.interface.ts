@@ -3,10 +3,14 @@ export interface SnippetPlaceholder {
   name: string;
   start: number;
 }
+export interface SnippetNewPayloadMetadata {
+  parentId: string;
+}
 export interface SnippetNewPayload {
   path: string;
   contents: string;
   stored?: SnippetMetadata;
+  metadata?: SnippetNewPayloadMetadata;
 }
 export interface SnippetImportFileItem {
   ext: string;
@@ -27,6 +31,5 @@ export interface SnippetMetadata {
 export interface SnippetWithPlaceholder {
   name: string;
   path: string;
-  content: string;
   placeholders: SnippetPlaceholder[];
 }

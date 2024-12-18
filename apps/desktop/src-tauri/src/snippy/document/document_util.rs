@@ -11,14 +11,21 @@ use ignore::{WalkBuilder, WalkState};
 
 use crate::snippy::document::SearchItemEntry;
 
-use super::{DocumentFlatTree, DocumentFlatTreeItem, SnippetStoredMetadata};
+use super::{
+    DocumentFlatTree, DocumentFlatTreeItem, DocumentFlatTreeMetadataItem, SnippetStoredMetadata,
+};
 
 pub fn get_document_flat_tree<P: AsRef<Path>>(
     base_dir: P,
     metadata_store: &Arc<tauri_plugin_store::Store<tauri::Wry>>,
 ) -> DocumentFlatTree {
-    let mut flat_tree: DocumentFlatTree = HashMap::new();
+    let mut flat_tree: HashMap<String, Vec<DocumentFlatTreeItem>> = HashMap::new();
     flat_tree.insert(String::from("__root"), vec![]);
+
+    let mut tree_metadata: HashMap<String, DocumentFlatTreeMetadataItem> = HashMap::new();
+
+    let mut ids: HashMap<String, String> = HashMap::new();
+    let mut id: u32 = 0;
 
     for entry in WalkDir::new(&base_dir).into_iter() {
         if entry.is_err() {
@@ -27,22 +34,37 @@ pub fn get_document_flat_tree<P: AsRef<Path>>(
 
         let entry = entry.unwrap();
         let name = entry.file_name().to_string_lossy().to_string();
-        if name.is_empty() {
-            continue;
-        }
-
         let Ok(metadata) = entry.metadata() else {
             continue;
         };
 
         let relative_path = entry.path().strip_prefix(&base_dir).unwrap();
-
         let item_key = relative_path.to_slash_lossy().to_string();
+        if item_key.is_empty() {
+            continue;
+        }
+
+        let item_id = match ids.get(&item_key) {
+            Some(value) => value.clone(),
+            None => {
+                id += 1;
+                let item_id = format!("item-{id}");
+                ids.insert(item_key.clone(), item_id.clone());
+
+                item_id
+            }
+        };
         let parent_key = match Path::new(&item_key)
             .parent()
             .and_then(|v| Some(v.to_string_lossy().to_string()))
         {
-            Some(parent) if !parent.is_empty() => parent,
+            Some(parent) if !parent.is_empty() => ids
+                .entry(parent)
+                .or_insert_with(|| {
+                    id += 1;
+                    format!("item-{id}")
+                })
+                .clone(),
             _ => String::from("__root"),
         };
 
@@ -67,26 +89,39 @@ pub fn get_document_flat_tree<P: AsRef<Path>>(
             Some(value) => serde_json::from_value(value).unwrap_or(None),
             None => None,
         };
-        let item = DocumentFlatTreeItem {
-            ext,
-            name,
-            mtime,
-            path: item_key,
-            is_dir: metadata.is_dir(),
-            metadata: stored_metadata,
-        };
 
+        tree_metadata.insert(
+            item_id.clone(),
+            DocumentFlatTreeMetadataItem {
+                ext,
+                name,
+                mtime,
+                path: item_key,
+                id: item_id.clone(),
+                is_dir: metadata.is_dir(),
+                metadata: stored_metadata,
+            },
+        );
+
+        let tree_item = DocumentFlatTreeItem {
+            id: item_id,
+            is_dir: metadata.is_dir(),
+            parent_id: parent_key.clone(),
+        };
         match flat_tree.get_mut(&parent_key) {
             Some(value) => {
-                (*value).push(item);
+                (*value).push(tree_item);
             }
             None => {
-                flat_tree.insert(parent_key, vec![item]);
+                flat_tree.insert(parent_key, vec![tree_item]);
             }
         };
     }
 
-    flat_tree
+    DocumentFlatTree {
+        flat_tree,
+        metadata: tree_metadata,
+    }
 }
 
 pub fn search_document<P: AsRef<Path>>(
@@ -130,10 +165,12 @@ pub fn search_document<P: AsRef<Path>>(
                         match_range.clone(),
                         &format!("<span search-result>{}</span>", (&file_name[match_range])),
                     );
-                    result
-                        .lock()
-                        .unwrap()
-                        .push((entry.path().to_slash_lossy().to_string(), file_name));
+                    let mut result = result.lock().unwrap();
+                    result.push((entry.path().to_slash_lossy().to_string(), file_name));
+                    
+                    if result.len() >= 25 {
+                        return WalkState::Quit;
+                    }
                 }
 
                 WalkState::Continue

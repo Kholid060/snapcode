@@ -94,7 +94,7 @@ function loadSettings() {
 
 const handleContentChange = useDebounceFn(async (value: string) => {
   try {
-    await editorStore.document.setSnippetContents(
+    await editorStore.document.updateSnippetContents(
       editorStore.state.state.activeFileId,
       value,
     );
@@ -104,19 +104,18 @@ const handleContentChange = useDebounceFn(async (value: string) => {
 }, 1000);
 
 watchEffect(async () => {
-  const activeSnippet = editorStore.state.state.activeFileId;
+  const activeSnippet = editorStore.activeSnippet;
   if (!activeSnippet || !cmView.value) return;
 
   try {
-    const content = await documentService.getFileContent(activeSnippet);
-    if (content) {
-      const newState = EditorState.create({
-        doc: content ?? '',
-      });
-      cmView.value.replaceContent(newState);
+    const content = await documentService.getFileContent(activeSnippet.path);
 
-      await loadLanguage();
-    }
+    const newState = EditorState.create({
+      doc: content ?? '',
+    });
+    cmView.value.replaceContent(newState);
+
+    await loadLanguage();
   } catch (error) {
     logger.error(getLogMessage('get-snippet-content', error));
   }

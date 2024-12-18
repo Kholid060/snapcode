@@ -1,7 +1,11 @@
 import { AppHotkeys } from '@/utils/const/app.const';
 import { EditorSettings, EditorSidebarState } from './editor.interface';
 import { AppBookmarksState, AppSettings } from './app.interface';
-import { SnippetMetadata } from './snippet.interface';
+import {
+  SnippetMetadata,
+  SnippetNewPayloadMetadata,
+} from './snippet.interface';
+import { FolderNewPayloadMetadata } from './folder.interface';
 
 export interface DocumentStoreBookmarksItem {
   path: string;
@@ -36,6 +40,12 @@ export type DocumentFlatTree = Record<
 >;
 
 export interface DocumentFlatTreeItem {
+  id: string;
+  isDir: boolean;
+  parentId: string;
+}
+export interface DocumentFlatTreeMetadataItem {
+  id: string;
   ext: string;
   path: string;
   name: string;
@@ -43,20 +53,28 @@ export interface DocumentFlatTreeItem {
   isDir: boolean;
   metadata?: SnippetMetadata;
 }
+export type DocumentFlatTreeMetadata = Record<
+  string,
+  DocumentFlatTreeMetadataItem
+>;
 
 export interface DocumenFlatTreeData {
   flatTree: DocumentFlatTree;
-  metadata: Record<string, DocumentFlatTreeItem>;
+  metadata: DocumentFlatTreeMetadata;
 }
 
 export interface DocumentCreatedFolder {
   name: string;
   path: string;
+  metadata?: FolderNewPayloadMetadata;
 }
 
-export interface DocumentCreatedSnippet extends DocumentCreatedFolder {
+export interface DocumentCreatedSnippet {
   ext: string;
+  name: string;
+  path: string;
   stored?: SnippetMetadata;
+  metadata?: SnippetNewPayloadMetadata;
 }
 
 export type DocumentOldNewVal = [oldValue: string, newValue: string];

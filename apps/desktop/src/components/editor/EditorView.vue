@@ -18,7 +18,10 @@ import { useTauriWindowEvent } from '@/composables/tauri.composable';
 const editorStore = useEditorStore();
 
 useTauriWindowEvent('snippet:open', (event) => {
-  editorStore.state.updateState('activeFileId', event.payload);
+  const item = editorStore.document.findSnippetByPath(event.payload);
+  if (!item) return;
+
+  editorStore.state.updateState('activeFileId', item.id);
 });
 useTauriWindowEvent('snippet:created', (event) => {
   editorStore.document.registerItems({

@@ -13,14 +13,26 @@ import {
   SnippetNewPayload,
 } from '@/interface/snippet.interface';
 import { FolderNewPayload } from '@/interface/folder.interface';
-import { writeTextFile } from '@tauri-apps/plugin-fs';
+import { writeTextFile, watch, WatchEvent } from '@tauri-apps/plugin-fs';
 import { joinDocumentPath } from '@/utils/document-utils';
+import { createDebounce } from '@snippy/shared';
 
 interface DocumentStores {
   state: Readonly<LazyStore<DocumentStoreState>>;
   settings: Readonly<LazyStore<DocumentStoreSettings>>;
   metadata: Readonly<LazyStore<DocumentStoreMetadata>>;
   bookmarks: Readonly<LazyStore<DocumentStoreBookmarks>>;
+}
+
+const watcherDebounce = createDebounce();
+function createDocumentWatcher() {
+  const events: WatchEvent[] = [];
+  return (event: WatchEvent) => {
+    events.push(event);
+    watcherDebounce(() => {
+      console.log(events);
+    }, 1000);
+  };
 }
 
 class DocumentService {
@@ -47,16 +59,14 @@ class DocumentService {
   }
 
   async startWatcher() {
-    // const unwatch = await watch(
-    //   this.appState.snippetsDir,
-    //   (event) => {
-    //     console.log(event);
-    //   },
-    //   { recursive: true },
-    // );
-    // window.onbeforeunload = () => {
-    //   unwatch();
-    // };
+    return;
+    const watcher = createDocumentWatcher(this.appState.snippetsDir);
+    const unwatch = await watch(this.appState.snippetsDir, watcher, {
+      recursive: true,
+    });
+    window.onbeforeunload = () => {
+      unwatch();
+    };
   }
 
   async createSnippets(snippets: SnippetNewPayload[]) {
@@ -96,7 +106,12 @@ class DocumentService {
   }
 
   async getFlatTree() {
-    return appCommand.invoke('get_document_flat_tree', undefined);
+    return appCommand
+      .invoke('get_document_flat_tree', undefined)
+      .then((value) => {
+        console.log(value);
+        return value;
+      });
   }
 
   async deleteItems(paths: string[], toTrash: boolean) {
@@ -142,7 +157,9 @@ class DocumentService {
   }
 
   search(searchTerm: string) {
-    return appCommand.invoke('document_search', { searchTerm });
+    return appCommand.invoke('document_search', {
+      searchTerm: searchTerm.slice(0, 120),
+    });
   }
 }
 

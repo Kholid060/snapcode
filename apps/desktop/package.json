@@ -49,6 +49,7 @@
     "radix-vue": "^1.9.10",
     "sanitize-html": "^2.13.1",
     "style-mod": "^4.1.2",
+    "type-fest": "^4.30.2",
     "unplugin-auto-import": "^0.18.2",
     "vue": "^3.3.4",
     "vue-router": "4"

@@ -107,9 +107,14 @@ const editorStore = useEditorStore();
 const bookmarksStore = useBookmarksStore();
 const sidebarProvider = useEditorSidebarProvider();
 
-const isBookmarked = computed(() =>
-  bookmarksStore.isBookmarked(props.ctxData.path),
+const metadata = computed(
+  () => editorStore.document.treeMetadata[props.ctxData.item.id],
 );
+const isBookmarked = computed(() => {
+  return metadata.value
+    ? bookmarksStore.isBookmarked(metadata.value.path)
+    : false;
+});
 
 async function createFolderSnippet() {
   try {
@@ -117,7 +122,10 @@ async function createFolderSnippet() {
     await editorStore.document.addSnippets([
       {
         contents: '',
-        path: joinDocumentPath(props.ctxData.path, 'unnamed.txt'),
+        metadata: {
+          parentId: props.ctxData.item.id,
+        },
+        path: joinDocumentPath(metadata.value.path, 'unnamed.txt'),
       },
     ]);
   } catch (error) {
@@ -133,7 +141,12 @@ async function createFolderFolder() {
     if (props.ctxData.type !== 'folder') return;
 
     await editorStore.document.addFolders([
-      { path: joinDocumentPath(props.ctxData.path, 'unnamed') },
+      {
+        path: joinDocumentPath(metadata.value.path, 'unnamed'),
+        metadata: {
+          parentId: props.ctxData.item.id,
+        },
+      },
     ]);
   } catch (error) {
     console.error(error);
@@ -148,7 +161,7 @@ async function createFolderFolder() {
 async function renameItem() {
   try {
     const result = await appDialog.prompt({
-      defaultValue: props.ctxData.name,
+      defaultValue: metadata.value.name,
       okBtnLabel: 'Rename',
       placeholder: props.ctxData.type === 'folder' ? 'unnamed' : 'unnamed.txt',
       title:
@@ -158,11 +171,11 @@ async function renameItem() {
 
     const sanitizedNamed =
       sanitizeDocumentFileName(result.value) || 'unnamed.txt';
-    if (sanitizedNamed === props.ctxData.name) return;
+    if (sanitizedNamed === metadata.value.name) return;
 
     await editorStore.document.rename({
-      path: props.ctxData.path,
       newName: sanitizedNamed,
+      id: props.ctxData.item.id,
     });
   } catch (error) {
     console.error(error);
@@ -178,7 +191,7 @@ async function toggleBookmark() {
   try {
     bookmarksStore.setBookmark(
       {
-        path: props.ctxData.path,
+        path: metadata.value.path,
         type: props.ctxData.type === 'folder' ? 'folder' : 'file',
       },
       !isBookmarked.value,
@@ -207,7 +220,7 @@ async function deleteItem() {
           props.ctxData.type === 'folder'
             ? 'Delete folder?'
             : 'Delete snippet?',
-        body: `Are you sure you want to delete "${props.ctxData.name ?? ''}"? ${bodyMessage}.`,
+        body: `Are you sure you want to delete "${metadata.value.name ?? ''}"? ${bodyMessage}.`,
         okBtnLabel: 'Delete',
         okBtnVariant: 'destructive',
         showDontAsk: true,
@@ -217,7 +230,7 @@ async function deleteItem() {
       dontAskPrompt = dontAskValue;
     }
 
-    await editorStore.document.deleteItems([props.ctxData.path]);
+    await editorStore.document.deleteItems([props.ctxData.item]);
     if (dontAskPrompt) {
       await documentService.stores.settings.xSet('noPromptDelete', true);
     }

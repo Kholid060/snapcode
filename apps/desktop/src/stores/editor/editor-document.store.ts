@@ -1,13 +1,12 @@
-import {
-  SnippetMetadata,
-  SnippetNewPayload,
-} from '@/interface/snippet.interface';
+import { SnippetNewPayload } from '@/interface/snippet.interface';
 import documentService from '@/services/document.service';
 import {
   DocumentCreatedFolder,
   DocumentCreatedSnippet,
   DocumentFlatTree,
   DocumentFlatTreeItem,
+  DocumentFlatTreeMetadata,
+  DocumentFlatTreeMetadataItem,
   DocumentOldNewVal,
 } from '@/interface/document.interface';
 import { defineStore } from 'pinia';
@@ -16,15 +15,18 @@ import { useEditorState } from './editor-state.store';
 import {
   documentItemsSorter,
   getDocumentParentDir,
-  getNameFromPath,
   joinDocumentPath,
 } from '@/utils/document-utils';
-import { getSnippetLangFromName } from '@/utils/snippet-utils';
 import { TREE_ROOT_KEY } from '@/utils/tree-data-utils';
-import { useAppStore } from '../app.store';
-import { FOLDER_TREE_ITEM_PREFIX } from '@/utils/const/editor.const';
-import { extname } from '@tauri-apps/api/path';
 import { useBookmarksStore } from '../bookmarks.store';
+import type { SetOptional } from 'type-fest';
+import { nanoid } from 'nanoid/non-secure';
+import { updateObject } from '@/utils/helper';
+import { isString } from '@/utils/data-type';
+import { useAppStore } from '../app.store';
+
+type NewFlatTreeItem = SetOptional<DocumentFlatTreeItem, 'id' | 'parentId'>;
+type NewFlatTreeMetadataItem = SetOptional<DocumentFlatTreeMetadataItem, 'id'>;
 
 export const useEditorDocument = defineStore('editor:document', () => {
   let initiated = false;
@@ -33,32 +35,46 @@ export const useEditorDocument = defineStore('editor:document', () => {
   const editorState = useEditorState();
   const bookmarksStore = useBookmarksStore();
 
+  const treeMetadata = reactive<DocumentFlatTreeMetadata>({
+    [TREE_ROOT_KEY]: {
+      ext: '',
+      mtime: 0,
+      name: '',
+      path: '',
+      isDir: true,
+      id: TREE_ROOT_KEY,
+    },
+  });
   const treeData = reactive<DocumentFlatTree>({ [TREE_ROOT_KEY]: [] });
 
   function sortTree(dir?: string) {
     const dirPath = dir || TREE_ROOT_KEY;
     if (!treeData[dirPath]) return;
 
-    documentItemsSorter(treeData[dirPath]);
+    documentItemsSorter(treeData[dirPath], treeMetadata);
   }
 
-  function getItemByPath(path: string) {
-    const parsedPath = getDocumentParentDir(path);
-    return (
-      treeData[parsedPath.parentDir || TREE_ROOT_KEY]?.find(
-        (item) => item.name === parsedPath.filename,
-      ) ?? null
-    );
-  }
-  function addItem(item: DocumentFlatTreeItem, dirPath?: string, sort = false) {
-    const key = dirPath || TREE_ROOT_KEY;
+  function addItem({
+    item,
+    metadata,
+    sort = true,
+  }: {
+    sort?: boolean;
+    item: NewFlatTreeItem;
+    metadata?: NewFlatTreeMetadataItem;
+  }) {
+    const key = item.parentId || TREE_ROOT_KEY;
+    const id = item.id || nanoid(5);
     if (!treeData[key]) {
-      treeData[key] = [item];
+      treeData[key] = [{ ...item, id, parentId: key }];
     } else {
-      treeData[key].push(item);
+      treeData[key].push({ ...item, id, parentId: key });
+      if (sort) sortTree(key);
     }
 
-    if (sort) sortTree(key);
+    if (metadata) treeMetadata[id] = { ...metadata, id };
+
+    return id;
   }
   function registerItems({
     folders,
@@ -67,170 +83,222 @@ export const useEditorDocument = defineStore('editor:document', () => {
     folders?: DocumentCreatedFolder[];
     snippets?: DocumentCreatedSnippet[];
   }) {
-    const dirs = new Set<string>();
+    const folderIds: string[] = [];
+    const snippetIds: string[] = [];
+    const parentIds = new Set<string>();
 
     if (snippets) {
       snippets.forEach((snippet) => {
-        const parentDir =
-          getDocumentParentDir(snippet.path, snippet.name).parentDir ||
-          TREE_ROOT_KEY;
-        dirs.add(parentDir);
-        addItem(
-          {
-            isDir: false,
-            ext: snippet.ext,
-            path: snippet.path,
-            mtime: Date.now(),
-            name: snippet.name,
-            metadata: snippet.stored,
-          },
-          parentDir,
-          false,
+        const parentId = snippet.metadata?.parentId || TREE_ROOT_KEY;
+        parentIds.add(parentId);
+
+        const metadata: NewFlatTreeMetadataItem = {
+          isDir: false,
+          ext: snippet.ext,
+          path: snippet.path,
+          mtime: Date.now(),
+          name: snippet.name,
+          metadata: snippet.stored,
+        };
+        snippetIds.push(
+          addItem({
+            metadata,
+            sort: false,
+            item: { isDir: metadata.isDir, parentId },
+          }),
         );
       });
     }
 
     if (folders) {
       folders.forEach((folder) => {
-        const parentDir =
-          getDocumentParentDir(folder.path, folder.name).parentDir ??
-          TREE_ROOT_KEY;
-        dirs.add(parentDir);
-        addItem(
-          {
-            ext: '',
-            isDir: true,
-            path: folder.name,
-            mtime: Date.now(),
-            name: folder.name,
-          },
-          parentDir,
-          false,
+        const parentId = folder.metadata?.parentId || TREE_ROOT_KEY;
+        parentIds.add(parentId);
+
+        const metadata: NewFlatTreeMetadataItem = {
+          ext: '',
+          isDir: true,
+          path: folder.path,
+          mtime: Date.now(),
+          name: folder.name,
+          id: folder.metadata?.id,
+        };
+        folderIds.push(
+          addItem({
+            metadata,
+            sort: false,
+            item: { isDir: metadata.isDir, parentId, id: metadata.id },
+          }),
         );
       });
     }
 
-    dirs.forEach((dir) => sortTree(dir));
+    parentIds.forEach((parentId) => {
+      sortTree(parentId);
+    });
+
+    return {
+      folders: folderIds,
+      snippets: snippetIds,
+    };
   }
-  async function deleteItems(paths: string[]) {
-    const splittedPaths: Record<string, string[]> = {};
+  async function deleteItems(items: DocumentFlatTreeItem[]) {
+    const itemPaths: string[] = [];
+    const metadataPaths: string[] = [];
 
-    if (paths.length === 1) {
-      splittedPaths[paths[0]] = paths[0].split('/');
-    } else {
-      paths.sort((a, z) => {
-        const aPaths = splittedPaths[a] ?? (splittedPaths[a] = a.split('/'));
-        const zPaths = splittedPaths[z] ?? (splittedPaths[z] = z.split('/'));
+    items.sort((a, z) => {
+      if (a.isDir && z.isDir) return 1;
 
-        return aPaths.length - zPaths.length;
-      });
-    }
+      return a.isDir ? 1 : -1;
+    });
 
-    const rootItems: string[] = [];
-    for (const path of paths) {
-      const isRoot =
-        !splittedPaths[path] ||
-        splittedPaths[path].length === 1 ||
-        !rootItems.some((root) => path.startsWith(root));
-      if (isRoot) {
-        rootItems.push(path);
-        continue;
+    const walkFolder = (folderId: string) => {
+      if (!treeData[folderId]) return;
+
+      if (treeMetadata[folderId]) {
+        const itemPath = treeMetadata[folderId].path;
+        itemPaths.push(itemPath);
+        metadataPaths.push(itemPath);
       }
-    }
+
+      treeData[folderId].forEach((item) => {
+        if (treeMetadata[item.id]) {
+          metadataPaths.push(treeMetadata[item.id].path);
+        }
+
+        if (item.isDir) walkFolder(item.id);
+      });
+
+      delete treeData[folderId];
+    };
+    items.forEach((item) => {
+      const itemIndex =
+        treeData[item.parentId]?.findIndex(
+          (treeItem) => treeItem.id === item.id,
+        ) ?? -1;
+      if (itemIndex === -1) return;
+
+      treeData[item.parentId].splice(itemIndex, 1);
+
+      if (item.isDir && treeData[item.id]) {
+        walkFolder(item.id);
+      } else if (treeData[item.parentId] && treeMetadata[item.id]) {
+        const itemPath = treeMetadata[item.id].path;
+        itemPaths.push(itemPath);
+        metadataPaths.push(itemPath);
+        delete treeMetadata[item.id];
+      }
+    });
 
     await documentService.deleteItems(
-      rootItems,
+      itemPaths,
       appStore.settings.deleteToTrash,
     );
-
-    for (const path of paths) {
-      if (Object.hasOwn(treeData, path)) {
-        Object.keys(treeData).forEach((folderPath) => {
-          if (folderPath.startsWith(path)) delete treeData[folderPath];
-        });
-      }
-
-      const parentDir = splittedPaths[path]
-        ? splittedPaths[path].slice(0, -1).join('/') || TREE_ROOT_KEY
-        : TREE_ROOT_KEY;
-      const itemIndex = (treeData[parentDir] ?? []).findIndex(
-        (item) => item.path === path,
-      );
-      if (itemIndex !== -1) {
-        treeData[parentDir].splice(itemIndex, 1);
-      }
-    }
+    await documentService.stores.metadata.xDelete(metadataPaths);
   }
-  async function moveItem(oldPath: string, newPath: string) {
-    const oldParentDir =
-      getDocumentParentDir(oldPath).parentDir || TREE_ROOT_KEY;
+  async function moveItem({
+    id,
+    newParentId,
+    oldParentId,
+  }: {
+    id: string;
+    oldParentId: string;
+    newParentId: string;
+  }) {
+    if (oldParentId === newParentId) return;
+
+    const oldParentTree = treeData[oldParentId || TREE_ROOT_KEY];
     const oldItemIndex =
-      treeData[oldParentDir]?.findIndex((item) => item.path === oldPath) ?? -1;
+      oldParentTree.findIndex((item) => item.id === id) ?? -1;
+    console.log({ oldParentTree, oldItemIndex });
     if (oldItemIndex === -1) return;
 
-    const newParentDir =
-      getDocumentParentDir(newPath).parentDir || TREE_ROOT_KEY;
-    if (!treeData[newParentDir] || oldParentDir === newParentDir) return;
+    const metadata = treeMetadata[id];
+    const oldParentPath = treeMetadata[oldParentId]?.path;
+    const newParentPath = treeMetadata[newParentId]?.path;
+    if (!metadata || !isString(oldParentPath) || !isString(newParentPath))
+      return;
 
-    const [movedPath] = await documentService.moveItems([[oldPath, newPath]]);
-    await documentService.renameMetadata([[oldPath, movedPath]]);
-
-    addItem(
-      {
-        ...treeData[oldParentDir][oldItemIndex],
-        mtime: Date.now(),
-        path: movedPath,
-        name: getNameFromPath(movedPath),
-      },
-      newParentDir,
+    console.log(
+      'before:',
+      { oldPath: oldParentPath, id, newPath: newParentPath },
+      JSON.parse(JSON.stringify(treeMetadata)),
     );
 
-    if (oldParentDir === editorState.state.activeFileId) {
-      editorState.updateState('activeFileId', movedPath);
+    const newPath = joinDocumentPath(newParentPath, metadata.name);
+    const [movedPath] = await documentService.moveItems([
+      [metadata.path, newPath],
+    ]);
+    await documentService.renameMetadata([[oldParentPath, movedPath]]);
+
+    addItem({
+      item: {
+        id: metadata.id,
+        parentId: newParentId,
+        isDir: metadata.isDir,
+      },
+    });
+    oldParentTree.splice(oldItemIndex, 1);
+
+    if (metadata.isDir) {
+      await renameFolderMetadata({
+        id,
+        newPath: movedPath,
+      });
+    }
+  }
+  function findSnippetByPath(path: string) {
+    for (const key in treeData) {
+      for (const item of treeData[key]) {
+        if (treeMetadata[item.id]?.path === path && !item.isDir) {
+          return treeMetadata[key];
+        }
+      }
     }
 
-    treeData[oldParentDir].splice(oldItemIndex, 1);
+    return null;
   }
 
   async function addSnippets(payload: SnippetNewPayload[]) {
-    const snippets = await documentService.createSnippets(payload);
-    registerItems({ snippets });
+    const { snippets } = registerItems({
+      snippets: await documentService.createSnippets(payload),
+    });
 
     const lastSnippet = snippets.at(-1);
     if (lastSnippet) {
-      editorState.updateState('activeFileId', lastSnippet.path);
+      editorState.updateState('activeFileId', lastSnippet);
     }
 
     return snippets;
   }
-  async function setSnippetContents(path: string, content: string) {
-    const snippetPath = getDocumentParentDir(path);
-    const item = treeData[snippetPath.parentDir]?.find(
-      (item) => item.path === path,
-    );
-    if (!item) return;
+  async function updateSnippetContents(id: string, content: string) {
+    const itemPath = treeMetadata[id]?.path;
+    if (!itemPath) return;
 
-    await documentService.updateFileContent(path, content);
+    await documentService.updateFileContent(itemPath, content);
 
-    item.mtime = Date.now();
+    treeMetadata[id].mtime = Date.now();
   }
   async function updateSnippetMetadata(
-    path: string,
-    data: Partial<SnippetMetadata>,
+    id: string,
+    payload: Partial<DocumentFlatTreeMetadataItem>,
   ) {
-    const parentDir = getDocumentParentDir(path);
-    const item = (treeData[parentDir.parentDir] ?? []).find(
-      (item) => item.path === path,
-    );
-    if (!item) return;
+    const currMetadata = treeMetadata[id];
+    if (!currMetadata) return;
 
-    const updatedData = {
-      ...(item.metadata ?? {}),
-      ...data,
-    } as SnippetMetadata;
-    await documentService.setMetadata(path, updatedData);
+    let metadata = currMetadata.metadata;
+    if (payload.metadata) {
+      metadata = {
+        ...(currMetadata.metadata ?? {}),
+        ...payload.metadata,
+      };
+      await documentService.setMetadata(currMetadata.path, metadata);
+    }
 
-    item.metadata = updatedData;
+    treeMetadata[id] = {
+      ...treeMetadata[id],
+      metadata,
+    };
   }
 
   async function addFolders(payload: FolderNewPayload[]) {
@@ -239,112 +307,87 @@ export const useEditorDocument = defineStore('editor:document', () => {
 
     return folders;
   }
-  async function renameFolder(oldPath: string, newPath: string) {
-    if (!treeData[oldPath]) return;
 
+  interface RenameFolderPayload {
+    id: string;
+    newPath: string;
+  }
+  async function renameFolderMetadata(basePayload: RenameFolderPayload) {
     const newMetadatKeys: DocumentOldNewVal[] = [];
-    Object.keys(treeData).forEach((dirPath) => {
-      if (!dirPath.startsWith(oldPath)) return;
 
-      const newDirPath = joinDocumentPath(
-        newPath,
-        dirPath.slice(oldPath.length + 1),
-      );
-      treeData[newDirPath] = treeData[dirPath].map((item) => {
-        const newItemPath = joinDocumentPath(newDirPath, item.name);
-        if (!item.isDir) newMetadatKeys.push([item.path, newItemPath]);
+    const walkFolder = ({ id, newPath }: RenameFolderPayload) => {
+      const childs = treeData[id];
+      const metadata = treeMetadata[id];
+      if (!childs || !metadata) return;
 
-        item.path = newItemPath;
+      metadata.path = newPath;
 
-        return item;
-      });
+      for (const child of childs) {
+        const childMetadata = treeMetadata[child.id];
+        if (!childMetadata) continue;
 
-      delete treeData[dirPath];
-    });
+        const newChildPath = joinDocumentPath(
+          metadata.path,
+          childMetadata.name,
+        );
+        newMetadatKeys.push([childMetadata.path, newChildPath]);
+        childMetadata.path = newChildPath;
 
-    await documentService.renameMetadata(newMetadatKeys);
-
-    let isChanged = false;
-    const oldFolderTreeKey = `${FOLDER_TREE_ITEM_PREFIX}${oldPath}`;
-    const updatedActiveFolders = editorState.state.activeFolderIds.map(
-      (currPath) => {
-        if (currPath.startsWith(oldFolderTreeKey)) {
-          isChanged = true;
-          const updatedPath = joinDocumentPath(
-            newPath,
-            currPath.slice(oldPath.length + FOLDER_TREE_ITEM_PREFIX.length + 1),
-          );
-          return `${FOLDER_TREE_ITEM_PREFIX}${updatedPath}`;
+        if (childMetadata.isDir) {
+          walkFolder({
+            id: child.id,
+            newPath: newChildPath,
+          });
         }
+      }
+    };
+    walkFolder(basePayload);
 
-        return currPath;
-      },
-    );
-    if (isChanged) {
-      editorState.updateState('activeFolderIds', updatedActiveFolders);
+    if (newMetadatKeys.length > 0) {
+      await documentService.renameMetadata(newMetadatKeys);
     }
   }
+  function getItemMetadata(itemId: string) {
+    return treeMetadata[itemId] ?? null;
+  }
 
-  async function rename({ path, newName }: { path: string; newName: string }) {
-    const oldPath = getDocumentParentDir(path);
-    const oldPathParent = oldPath.parentDir || TREE_ROOT_KEY;
-    const items = treeData[oldPathParent] ?? [];
-    const itemIndex = items.findIndex((item) => item.path === path);
-    if (oldPath.filename === newName || itemIndex === -1) return;
+  async function rename({ id, newName }: { id: string; newName: string }) {
+    const itemMetadata = treeMetadata[id];
+    if (!itemMetadata) return;
 
-    const newPath = joinDocumentPath(oldPath.parentDir, newName);
-    await documentService.renameItem(path, newPath);
+    const parsedPath = getDocumentParentDir(itemMetadata.path);
+    const newPath = joinDocumentPath(parsedPath.parentDir, newName);
 
-    const updatedItemData: DocumentFlatTreeItem = {
-      ...items[itemIndex],
-      name: newName,
-      path: newPath,
-      mtime: Date.now(),
-    };
+    await documentService.renameItem(itemMetadata.path, newPath);
 
-    if (!items[itemIndex].isDir) {
-      const lang = await getSnippetLangFromName(newName);
-      updatedItemData.metadata = {
-        ...(updatedItemData.metadata ?? {}),
-        lang: lang?.name ?? '',
-      };
-      updatedItemData.ext = await extname(newName);
-      await documentService.moveMetadata({
-        newPath,
-        oldPath: path,
-        data: updatedItemData.metadata,
-      });
+    if (itemMetadata.isDir) {
+      treeMetadata[id].name = newName;
+      await renameFolderMetadata({ id, newPath });
     } else {
-      await renameFolder(path, newPath);
+      updateObject(treeMetadata[id], {
+        path: newPath,
+        name: newName,
+      });
     }
-
-    treeData[oldPathParent][itemIndex] = updatedItemData;
 
     await bookmarksStore.renameBookmark({
       newPath,
-      oldPath: path,
-      isDir: items[itemIndex].isDir,
+      oldPath: itemMetadata.path,
+      isDir: itemMetadata.isDir,
     });
-
-    const activePath = editorState.state.activeFileId;
-    if (activePath.startsWith(path)) {
-      editorState.updateState(
-        'activeFileId',
-        editorState.state.activeFileId === path
-          ? newPath
-          : joinDocumentPath(newPath, activePath.slice(path.length + 1)),
-      );
-    }
   }
 
   async function init() {
     if (initiated) return;
 
-    const flatTree = await documentService.getFlatTree();
-    Object.keys(flatTree).forEach((key) => {
-      documentItemsSorter(flatTree[key]);
+    const data = await documentService.getFlatTree();
+    Object.keys(data.flatTree).forEach((key) => {
+      // treeFolderIds.set(data.metadata[key].path, key);
+      documentItemsSorter(data.flatTree[key], data.metadata);
     });
-    Object.assign(treeData, flatTree);
+    Object.assign(treeData, data.flatTree);
+    Object.assign(treeMetadata, data.metadata);
+    console.log(treeMetadata);
 
     initiated = true;
   }
@@ -357,9 +400,11 @@ export const useEditorDocument = defineStore('editor:document', () => {
     addFolders,
     deleteItems,
     addSnippets,
+    treeMetadata,
     registerItems,
-    getItemByPath,
-    setSnippetContents,
+    getItemMetadata,
+    findSnippetByPath,
+    updateSnippetContents,
     updateSnippetMetadata,
   };
 });

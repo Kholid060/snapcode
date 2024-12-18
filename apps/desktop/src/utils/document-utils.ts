@@ -1,18 +1,22 @@
-import { DocumentFlatTreeItem } from '@/interface/document.interface';
+import {
+  DocumentFlatTreeItem,
+  DocumentFlatTreeMetadata,
+} from '@/interface/document.interface';
 
 export function joinDocumentPath(...paths: (string | undefined | null)[]) {
   return paths.filter(Boolean).join('/');
 }
 
-export function documentItemsSorter(items: DocumentFlatTreeItem[]) {
+export function documentItemsSorter(
+  items: DocumentFlatTreeItem[],
+  metadata: DocumentFlatTreeMetadata,
+) {
   return items.sort((a, z) => {
     let value =
-      a.path
-        .toLowerCase()
-        .localeCompare(z.path?.toLowerCase() ?? '', undefined, {
-          numeric: true,
-          sensitivity: 'base',
-        }) ?? 0;
+      metadata[a.id].name.localeCompare(metadata[z.id].name ?? '', undefined, {
+        numeric: true,
+        sensitivity: 'base',
+      }) ?? 0;
     if (z.isDir && !a.isDir) value = 2;
     else if (a.isDir && !z.isDir) value = -2;
 

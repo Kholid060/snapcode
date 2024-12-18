@@ -94,12 +94,12 @@ async function updateSnippetName(newName: string) {
   if (!editorStore.activeSnippet) return;
 
   try {
-    const { name, path } = editorStore.activeSnippet;
+    const { name, id } = editorStore.activeSnippet;
     const sanitizedNewName = sanitizeDocumentFileName(newName) || 'unnamed.txt';
     if (name === sanitizedNewName) return;
 
     await editorStore.document.rename({
-      path,
+      id,
       newName: sanitizedNewName,
     });
   } catch (error) {

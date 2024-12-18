@@ -42,3 +42,21 @@ export async function fontLoader(
 
   await Promise.all(promises);
 }
+
+export function createDebounce() {
+  let timeout: null | ReturnType<typeof setTimeout> = null;
+
+  return (callback: () => void, timeoutMs: number) => {
+    if (timeout !== null) {
+      clearTimeout(timeout);
+      timeout = setTimeout(callback, timeoutMs);
+      return;
+    }
+
+    timeout = setTimeout(callback, timeoutMs);
+  };
+}
+
+export function updateObject<T extends object>(target: T, source: Partial<T>) {
+  Object.assign(target, source);
+}

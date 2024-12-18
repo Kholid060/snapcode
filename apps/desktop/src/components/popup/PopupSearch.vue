@@ -3,6 +3,7 @@
     :items="searchEmpty ? recentSnippets : snippets"
     model-value=""
     :is-loading="isLoading"
+    class="pb-4"
     :group-heading="searchEmpty ? 'Recent snippets' : ''"
     @snippet:sended="addToRecent"
     @update:search-term="fetchSnippets"
@@ -34,7 +35,7 @@ import { Cancel01Icon } from 'hugeicons-vue';
 
 const { toast } = useToast();
 
-const isLoading = shallowRef(true);
+const isLoading = shallowRef(false);
 const searchEmpty = shallowRef(true);
 const snippets = shallowRef<DocumentSearchEntry[]>([]);
 const recentSnippets = shallowRef<DocumentSearchEntry[]>([]);
@@ -45,6 +46,7 @@ const fetchSnippets = useDebounceFn((search: string) => {
     searchEmpty.value = true;
     return;
   }
+  if (isLoading.value) return;
 
   isLoading.value = true;
   searchEmpty.value = false;

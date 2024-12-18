@@ -7,12 +7,12 @@ import { invoke } from '@tauri-apps/api/core';
 import { logger } from './logger.service';
 import { AppDocumentState } from '@/interface/app.interface';
 import {
-  DocumentFlatTree,
   DocumentCreatedFolder,
   DocumentCreatedSnippet,
   DocumentOldNewVal,
   DocumentFolderEntry,
   DocumentSearchEntry,
+  DocumenFlatTreeData,
 } from '@/interface/document.interface';
 import { FolderNewPayload } from '@/interface/folder.interface';
 
@@ -30,7 +30,7 @@ interface SnippetCommands {
   open_snippet: [{ snippetId: string }, void];
   send_snippet_content: [
     {
-      content: string;
+      path: string;
       action: 'copy' | 'paste';
       placeholders: SnippetPlaceholder[];
       plaholdersValue: Record<string, string>;
@@ -47,7 +47,7 @@ interface FolderCommands {
 
 interface DocumentCommands {
   get_document_state: [undefined, AppDocumentState];
-  get_document_flat_tree: [undefined, DocumentFlatTree];
+  get_document_flat_tree: [undefined, DocumenFlatTreeData];
   get_all_document_folders: [undefined, DocumentFolderEntry[]];
   document_search: [{ searchTerm: string }, DocumentSearchEntry[]];
   remove_document_items: [{ paths: string[]; toTrash: boolean }, void];

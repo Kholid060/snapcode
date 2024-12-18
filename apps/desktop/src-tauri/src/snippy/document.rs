@@ -19,8 +19,6 @@ use crate::{
     util::PathUtil,
 };
 
-pub type DocumentFlatTree = HashMap<String, Vec<DocumentFlatTreeItem>>;
-
 mod document_items;
 mod document_util;
 
@@ -141,6 +139,7 @@ impl AppDocument {
             let snippet = self.create_snippet(
                 SnippetDoc {
                     stored: None,
+                    metadata: None,
                     contents: file_content,
                     path: target_path.join(file_name).to_str().unwrap().to_string(),
                 },
@@ -180,6 +179,7 @@ impl AppDocument {
         Ok(SnippetDocCreated {
             path: file_path_str,
             stored: snippet.stored,
+            metadata: snippet.metadata,
             ext: file_path
                 .extension()
                 .and_then(|val| val.to_str())
@@ -219,6 +219,7 @@ impl AppDocument {
                 .unwrap()
                 .to_path_buf();
             Ok(FolderDocCreated {
+                metadata: folder.metadata,
                 path: folder_path
                     .to_slash()
                     .and_then(|v| Some(v.to_string()))
@@ -284,6 +285,10 @@ impl AppDocument {
 
     pub fn get_snippet_content<P: AsRef<Path>>(&self, path: P) -> io::Result<String> {
         let path = self.snippets_dir.safe_join(path)?;
+        if let Ok(false) = fs::exists(&path) {
+            return Err(io::Error::new(io::ErrorKind::NotFound, "File not found"));
+        }
+
         fs::read_to_string(path)
     }
 
@@ -335,31 +340,6 @@ where
         Err(error.unwrap())
     } else {
         Ok(result)
-    }
-}
-
-pub struct DocumentFlatTreeItem {
-    mtime: u128,
-    ext: String,
-    path: String,
-    is_dir: bool,
-    name: String,
-    metadata: Option<SnippetStoredMetadata>,
-}
-impl Serialize for DocumentFlatTreeItem {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        let mut s = serializer.serialize_struct("DocumentTreeItemMetadata", 3)?;
-        s.serialize_field("ext", &self.ext)?;
-        s.serialize_field("path", &self.path)?;
-        s.serialize_field("isDir", &self.is_dir)?;
-        s.serialize_field("name", &self.name)?;
-        s.serialize_field("mtime", &self.mtime)?;
-        s.serialize_field("isDir", &self.is_dir)?;
-        s.serialize_field("metadata", &self.metadata)?;
-        s.end()
     }
 }
 

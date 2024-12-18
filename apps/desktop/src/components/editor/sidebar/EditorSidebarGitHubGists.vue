@@ -263,7 +263,10 @@ import {
 } from '@/services/github-gists.service';
 import { logger } from '@/services/logger.service';
 import { useEditorStore } from '@/stores/editor.store';
-import { sanitizeDocumentFileName } from '@/utils/document-utils';
+import {
+  joinDocumentPath,
+  sanitizeDocumentFileName,
+} from '@/utils/document-utils';
 import { FetchError } from '@/utils/errors';
 import {
   extractGistsIdFromURL,
@@ -273,6 +276,7 @@ import {
   githubGistFileToSnippet,
 } from '@/utils/github-utils';
 import { getLogMessage } from '@/utils/helper';
+import { TREE_ROOT_KEY } from '@/utils/tree-data-utils';
 import {
   Button,
   Checkbox,
@@ -297,6 +301,7 @@ import {
   Settings01Icon,
   Tick02Icon,
 } from 'hugeicons-vue';
+import { nanoid } from 'nanoid/non-secure';
 import {
   CollapsibleContent,
   CollapsibleRoot,
@@ -384,7 +389,7 @@ async function importAll() {
 
     while (true) {
       const result = await listGitHubGistsByUsername(username, params);
-      await storeGitHubGists(result.data, selectFolder.path);
+      await storeGitHubGists(result.data, selectFolder.folder.id);
 
       listImportState.importCount += result.data.length;
       gistState.ratelimitRemaining = result.ratelimitRemaining ?? '';
@@ -429,7 +434,7 @@ async function importSelectedGists() {
       );
       if (gists.length <= 0) break;
 
-      await storeGitHubGists(gists, selectFolder.path);
+      await storeGitHubGists(gists, selectFolder.folder.id);
       listImportState.importCount += gists.length;
 
       page += 1;
@@ -516,22 +521,49 @@ async function storeGitHubGists(
   const folders: FolderNewPayload[] = [];
   const snippets: SnippetNewPayload[] = [];
 
+  const folderMetadata =
+    editorStore.document.treeMetadata[folderId || TREE_ROOT_KEY];
+
   await Promise.all(
     gists.map(async (gist) => {
       const files = Object.values(gist.files);
       if (files.length > 1) {
-        const folderPath = gist.description
+        const gistFolderId = nanoid(5);
+        const folderName = gist.description
           ? sanitizeDocumentFileName(gist.description.slice(0, 120))
           : files[0].filename;
+        const folderPath = joinDocumentPath(
+          folderMetadata.path,
+          folderName + `-${nanoid(4)}`,
+        );
         folders.push({
           path: folderPath,
+          metadata: { id: gistFolderId, parentId: folderMetadata.id },
         });
-        snippets.push(...(await githubGistFilesToSnippet(files, folderPath)));
+        snippets.push(
+          ...(await githubGistFilesToSnippet({
+            files,
+            folderPath,
+            metadata: { parentId: gistFolderId },
+          })),
+        );
       } else if (files[0]) {
-        snippets.push(await githubGistFileToSnippet(files[0], folderId));
+        snippets.push(
+          await githubGistFileToSnippet({
+            file: files[0],
+            folderPath: folderMetadata.path,
+            metadata: folderId
+              ? {
+                  parentId: folderId,
+                }
+              : undefined,
+          }),
+        );
       }
     }),
   );
+
+  console.log({ folders, snippets });
 
   if (folders.length > 0) await editorStore.document.addFolders(folders);
   if (snippets.length > 0) await editorStore.document.addSnippets(snippets);
@@ -580,7 +612,7 @@ async function importById(url: string) {
     });
     if (result.canceled) return;
 
-    const storedData = await storeGitHubGists([gist.data], result.path);
+    const storedData = await storeGitHubGists([gist.data], result.folder.id);
 
     toast({
       title: `${storedData.snippets} snippets imported`,
@@ -652,9 +684,11 @@ onMounted(() => {
 .CollapsibleContent {
   overflow: hidden;
 }
+
 .CollapsibleContent[data-state='open'] {
   animation: slideDown 300ms ease-out;
 }
+
 .CollapsibleContent[data-state='closed'] {
   animation: slideUp 300ms ease-out;
 }
@@ -663,6 +697,7 @@ onMounted(() => {
   from {
     height: 0;
   }
+
   to {
     height: var(--radix-collapsible-content-height);
   }
@@ -672,6 +707,7 @@ onMounted(() => {
   from {
     height: var(--radix-collapsible-content-height);
   }
+
   to {
     height: 0;
   }

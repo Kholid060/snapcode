@@ -5,7 +5,9 @@
         default-open
         v-model:search-term="search"
         class="[&_[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-group]]:px-2 [&_[cmdk-input-wrapper]_svg]:h-5 [&_[cmdk-input-wrapper]_svg]:w-5 [&_[cmdk-input]]:h-12 [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-3 [&_[cmdk-item]_svg]:h-5 [&_[cmdk-item]_svg]:w-5"
-        @update:open="!$event && $emit('close', { canceled: true, path: null })"
+        @update:open="
+          !$event && $emit('close', { canceled: true, folder: null })
+        "
       >
         <CommandInput
           :placeholder="options.title ?? 'Search folders...'"
@@ -25,18 +27,18 @@
             >" folder
           </CommandEmpty>
           <CommandItem
-            v-for="path in folders"
-            :key="path"
-            :value="path"
+            v-for="folder in folders"
+            :key="folder.id"
+            :value="folder.id"
             class="line-clamp-2 block leading-tight"
             @click="
               $emit('close', {
                 canceled: false,
-                path: path === TREE_ROOT_KEY ? null : path,
+                folder: { id: folder.id, path: folder.path },
               })
             "
           >
-            {{ path === TREE_ROOT_KEY ? '(root)' : path }}
+            {{ folder.id === TREE_ROOT_KEY ? '(root)' : folder.path }}
           </CommandItem>
         </CommandList>
       </Command>
@@ -63,6 +65,7 @@ import {
   DialogContent,
   useToast,
 } from '@snippy/ui';
+import { nanoid } from 'nanoid/non-secure';
 
 withDefaults(defineProps<{ options?: AppDialogSelectFolderOptions }>(), {
   options: () => ({}),
@@ -76,14 +79,23 @@ const editorStore = useEditorStore();
 
 const search = shallowRef('');
 
-const folders = computed(() => Object.keys(editorStore.document.treeData));
+const folders = computed(() =>
+  Object.values(editorStore.document.treeMetadata).filter((item) => item.isDir),
+);
 
 async function createFolder() {
   try {
+    const folderId = nanoid(5);
     const [folder] = await editorStore.document.addFolders([
-      { path: sanitizeDocumentFileName(search.value) },
+      {
+        metadata: { id: folderId },
+        path: sanitizeDocumentFileName(search.value),
+      },
     ]);
-    emit('close', { canceled: false, path: folder.path });
+    emit('close', {
+      canceled: false,
+      folder: { id: folderId, path: folder.path },
+    });
   } catch (error) {
     logger.error(getLogMessage('dialog-select-folder:create-folder', error));
     toast({

@@ -22,7 +22,7 @@
         @keydown="handleInputKeydown"
       />
     </div>
-    <CommandList class="max-h-none px-4 pt-1">
+    <CommandList class="max-h-none px-4 pb-4 pt-1">
       <CommandEmpty>
         <slot name="empty">
           <span class="text-muted-foreground">No results found.</span>
@@ -100,7 +100,6 @@ import { getCurrentWindow } from '@tauri-apps/api/window';
 import { sanitizeSnippetHTML } from '@/utils/snippet-utils';
 import { useTauriWindowEvent } from '@/composables/tauri.composable';
 import PopupInputPlaceholder from './PopupInputPlaceholder.vue';
-import documentService from '@/services/document.service';
 import type { DocumentSearchEntry } from '@/interface/document.interface';
 import { logger } from '@/services/logger.service';
 import { getLogMessage } from '@/utils/helper';
@@ -186,11 +185,10 @@ async function handleSelectItem(item: DocumentSearchEntry) {
         path: item.path,
       },
     );
-    const content = await documentService.getFileContent(item.path);
 
     if (placeholders.length === 0) {
       await appCommand.invoke('send_snippet_content', {
-        content,
+        path: item.path,
         action: 'paste',
         placeholders: [],
         plaholdersValue: {},
@@ -200,7 +198,6 @@ async function handleSelectItem(item: DocumentSearchEntry) {
     }
 
     inputSnippet.value = {
-      content,
       placeholders,
       path: item.path,
       name: getNameFromPath(item.path),
@@ -231,16 +228,11 @@ async function editSnippet() {
 }
 async function copyContent() {
   try {
-    const content = await documentService.getFileContent(
-      actionState.value.path,
-    );
-    if (!content) return;
-
     await appCommand.invoke('send_snippet_content', {
-      content,
       action: 'copy',
       placeholders: [],
       plaholdersValue: {},
+      path: actionState.value.path,
     });
 
     toast({

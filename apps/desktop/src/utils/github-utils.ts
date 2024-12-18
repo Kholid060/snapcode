@@ -4,7 +4,10 @@ import {
   GitHubGistListItem,
   GitHubLinkHeaderRel,
 } from '@/interface/github.interface';
-import { SnippetNewPayload } from '@/interface/snippet.interface';
+import {
+  SnippetNewPayload,
+  SnippetNewPayloadMetadata,
+} from '@/interface/snippet.interface';
 import { FetchError } from './errors';
 import { joinDocumentPath } from './document-utils';
 
@@ -17,11 +20,17 @@ export function extractGistsIdFromURL(url: string) {
   return gistId ?? null;
 }
 
-export async function githubGistFileToSnippet(
-  file: GitHubGistFile,
-  folderPath?: string | null,
-): Promise<SnippetNewPayload> {
+export async function githubGistFileToSnippet({
+  file,
+  metadata,
+  folderPath,
+}: {
+  file: GitHubGistFile;
+  folderPath?: string | null;
+  metadata?: SnippetNewPayloadMetadata;
+}): Promise<SnippetNewPayload> {
   const data: SnippetNewPayload = {
+    metadata,
     stored: {
       lang: file.language,
     },
@@ -45,12 +54,19 @@ export async function githubGistFileToSnippet(
   return data;
 }
 
-export function githubGistFilesToSnippet(
-  files: GitHubGistFile[],
-  folderPath?: string | null,
-) {
+export function githubGistFilesToSnippet({
+  files,
+  metadata,
+  folderPath,
+}: {
+  files: GitHubGistFile[];
+  folderPath?: string | null;
+  metadata?: SnippetNewPayloadMetadata;
+}) {
   return Promise.all(
-    files.map((file) => githubGistFileToSnippet(file, folderPath)),
+    files.map((file) =>
+      githubGistFileToSnippet({ file, metadata, folderPath }),
+    ),
   );
 }
 
