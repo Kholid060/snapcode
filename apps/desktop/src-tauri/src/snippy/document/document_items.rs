@@ -36,3 +36,16 @@ pub struct FolderEntry {
     pub path: String,
     pub name: String,
 }
+
+#[derive(Deserialize, Serialize)]
+pub struct SearchItemEntry {
+    pub path: String,
+    pub name: String,
+}
+
+#[derive(Deserialize, Serialize)]
+pub struct SnippetPlaceholderItem {
+    pub end: usize,
+    pub start: usize,
+    pub name: String,
+}

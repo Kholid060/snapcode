@@ -65,3 +65,9 @@ export interface DocumentFolderEntry {
   path: string;
   name: string;
 }
+
+export interface DocumentSearchEntry {
+  path: string;
+  name: string;
+  content?: string;
+}

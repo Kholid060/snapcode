@@ -10,7 +10,6 @@
     "frontendDist": "../dist"
   },
   "bundle": {
-    "resources": ["./db"],
     "active": true,
     "createUpdaterArtifacts": true,
     "targets": "all",

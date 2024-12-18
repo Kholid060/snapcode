@@ -1,4 +1,4 @@
-use std::{collections::HashMap, sync::Mutex};
+use std::{collections::HashMap, sync::Mutex, time::Instant};
 
 use crate::{
     common::stringify,
@@ -121,4 +121,22 @@ pub fn get_all_document_folders(
 ) -> Vec<snippy::document::FolderEntry> {
     let app_document = app_document.lock().unwrap();
     app_document.get_all_folders()
+}
+
+#[tauri::command(async)]
+pub fn document_search(
+    app_document: tauri::State<Mutex<AppDocument>>,
+    search_term: String,
+) -> Result<Vec<snippy::document::SearchItemEntry>, String> {
+    let app_document = app_document.lock().unwrap();
+    app_document.search(&search_term).map_err(stringify)
+}
+
+#[tauri::command(async)]
+pub fn get_snippet_content(
+    app_document: tauri::State<Mutex<AppDocument>>,
+    path: String,
+) -> Result<String, String> {
+    let app_document = app_document.lock().unwrap();
+    app_document.get_snippet_content(&path).map_err(stringify)
 }

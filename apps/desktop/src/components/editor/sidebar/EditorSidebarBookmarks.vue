@@ -111,7 +111,6 @@ function handleContextMenu({
 }
 function handleSelectItem(event: TreeItemSelectEvent<DocumentFlatTreeItem>) {
   const value = event.detail.value!;
-  console.log(value);
   if (!value.isDir) return;
 
   const expandedFolders = new Set(editorStore.state.state.activeFolderIds);

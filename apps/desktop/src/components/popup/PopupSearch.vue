@@ -1,8 +1,6 @@
 <template>
   <PopupSnippetCombobox
-    :items="
-      (searchEmpty ? recentSnippets : snippets) as SnippetSearchListItem[]
-    "
+    :items="searchEmpty ? recentSnippets : snippets"
     model-value=""
     :is-loading="isLoading"
     :group-heading="searchEmpty ? 'Recent snippets' : ''"
@@ -11,35 +9,35 @@
     :item-contains-html="!searchEmpty"
     :filter-function="(value) => value"
   >
-    <template #empty>
-      <AppSearchOptionsDescription v-if="searchEmpty" class="text-left" />
-      <span v-else>No results found.</span>
+    <template v-if="searchEmpty" #actions:suffix="{ item }">
+      <TooltipSimple label="Remove from recent">
+        <button
+          class="text-muted-foreground ml-0.5"
+          @click.stop="removeFromRecent(item.path)"
+        >
+          <Cancel01Icon class="size-4" />
+        </button>
+      </TooltipSimple>
     </template>
   </PopupSnippetCombobox>
 </template>
 <script setup lang="ts">
 import { useDebounceFn } from '@vueuse/core';
-import type {
-  SnippetListItem,
-  SnippetSearchListItem,
-} from '@/interface/snippet.interface';
-import { useToast } from '@snippy/ui';
-import {
-  getAllSnippets,
-  querySnippets,
-} from '@/db/services/snippet.db-service';
+import { TooltipSimple, useToast } from '@snippy/ui';
 import { logger } from '@/services/logger.service';
 import { getLogMessage } from '@/utils/helper';
 import PopupSnippetCombobox from './PopupSnippetCombobox.vue';
-import AppSearchOptionsDescription from '../app/AppSearchOptionsDescription.vue';
 import documentService from '@/services/document.service';
+import type { DocumentSearchEntry } from '@/interface/document.interface';
+import { getNameFromPath } from '@/utils/document-utils';
+import { Cancel01Icon } from 'hugeicons-vue';
 
 const { toast } = useToast();
 
 const isLoading = shallowRef(true);
 const searchEmpty = shallowRef(true);
-const recentSnippets = shallowRef<SnippetListItem[]>([]);
-const snippets = shallowRef<SnippetSearchListItem[]>([]);
+const snippets = shallowRef<DocumentSearchEntry[]>([]);
+const recentSnippets = shallowRef<DocumentSearchEntry[]>([]);
 
 const fetchSnippets = useDebounceFn((search: string) => {
   if (!search) {
@@ -51,7 +49,8 @@ const fetchSnippets = useDebounceFn((search: string) => {
   isLoading.value = true;
   searchEmpty.value = false;
 
-  querySnippets(search)
+  documentService
+    .search(search)
     .then((value) => {
       snippets.value = value;
     })
@@ -59,6 +58,7 @@ const fetchSnippets = useDebounceFn((search: string) => {
       toast({
         variant: 'destructive',
         title: 'An error occured',
+        description: typeof error === 'string' ? error : '',
       });
       logger.error(getLogMessage('search-snippets', error));
     })
@@ -67,17 +67,10 @@ const fetchSnippets = useDebounceFn((search: string) => {
     });
 }, 200);
 
-function getSnippetByIds(ids: string[]) {
-  return getAllSnippets({
-    filter(fields, operators) {
-      return operators.inArray(fields.id, ids);
-    },
-  });
-}
-async function addToRecent(snippetId: string) {
+async function addToRecent(snippetPath: string) {
   try {
     const recentIndex = recentSnippets.value.findIndex(
-      (snippet) => snippet.id === snippetId,
+      (snippet) => snippet.path === snippetPath,
     );
     if (recentIndex !== -1) {
       if (recentSnippets.value.length === 1) return;
@@ -85,10 +78,10 @@ async function addToRecent(snippetId: string) {
       const snippet = recentSnippets.value.splice(recentIndex, 1);
       recentSnippets.value.unshift(...snippet);
     } else {
-      const [snippet] = await getSnippetByIds([snippetId]);
-      if (!snippet) return;
-
-      recentSnippets.value.unshift(snippet);
+      recentSnippets.value.unshift({
+        path: snippetPath,
+        name: getNameFromPath(snippetPath),
+      });
     }
 
     if (recentSnippets.value.length > 6) {
@@ -97,33 +90,35 @@ async function addToRecent(snippetId: string) {
 
     await documentService.stores.state.xSet(
       'recentSnippets',
-      recentSnippets.value.map((item) => item.id),
+      recentSnippets.value.map((item) => item.path),
     );
     triggerRef(recentSnippets);
   } catch (error) {
     logger.error(getLogMessage('quick-access:add-recent', error));
   }
 }
+function removeFromRecent(path: string) {
+  const items = recentSnippets.value.filter((item) => item.path !== path);
+  if (items.length === recentSnippets.value.length) return;
+
+  recentSnippets.value = items;
+  documentService.stores.state.xSet(
+    'recentSnippets',
+    items.map((item) => item.path),
+  );
+}
 async function fetchRecentSnippets() {
   try {
-    const snippetIds = await documentService.stores.state.xGet(
+    const snippetPaths = await documentService.stores.state.xGet(
       'recentSnippets',
       [],
     );
-    if (snippetIds.length === 0) return;
+    if (snippetPaths.length === 0) return;
 
-    const snippets = await getSnippetByIds(snippetIds);
-    if (snippets.length !== snippetIds.length) {
-      const filteredSnippetIds = snippetIds.filter((id) =>
-        snippets.some((snippet) => snippet.id === id),
-      );
-      await documentService.stores.state.xSet(
-        'recentSnippets',
-        filteredSnippetIds,
-      );
-    }
-
-    recentSnippets.value = snippets;
+    recentSnippets.value = snippetPaths.map((path) => ({
+      path,
+      name: getNameFromPath(path),
+    }));
   } catch (error) {
     logger.error(getLogMessage('quick-access:recent-snippets', error));
   }

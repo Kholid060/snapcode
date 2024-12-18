@@ -1,13 +1,11 @@
-import { SnippetId } from './snippet.interface';
-import { FolderId } from './folder.interface';
 import { AppEditorFonts } from '@/utils/const/app.const';
 
 export type EditorSidebarItems = 'snippets' | 'bookmarks' | 'search';
 
 export interface EditorSidebarState {
   showSidebar: boolean;
-  activeFileId: SnippetId;
-  activeFolderIds: FolderId[];
+  activeFileId: string;
+  activeFolderIds: string[];
   activeMenu: EditorSidebarItems;
 }
 

@@ -4,7 +4,7 @@
     :snippet="inputSnippet"
     @close="inputSnippet = null"
     @sended="
-      emit('snippet:sended', inputSnippet.id);
+      emit('snippet:sended', inputSnippet.path);
       inputSnippet = null;
     "
   />
@@ -33,39 +33,43 @@
           v-for="item in items"
           :key="item.path"
           :value="item.path"
-          class="border-border/50 mb-px block"
+          class="border-border/50 relative mb-px block overflow-hidden"
           @select.prevent="handleSelectItem(item)"
         >
-          <div class="flex items-center">
-            <p
-              v-if="itemContainsHtml"
-              v-html="sanitizeSnippetHTML(item.name ?? '')"
-              class="grow truncate pr-2"
-            ></p>
-            <p v-else v-text="item.name" class="grow truncate pr-2"></p>
-            <div class="action invisible flex items-center gap-0.5">
-              <TooltipSimple
-                v-for="(action, index) in itemActions"
-                :key="action.id"
-                :label="action.label"
-                side="bottom"
-                align="end"
+          <p
+            v-if="itemContainsHtml"
+            v-html="sanitizeSnippetHTML(item.name ?? '')"
+            class="truncate pr-2"
+          ></p>
+          <p v-else v-text="item.name" class="grow truncate pr-2"></p>
+          <p class="text-muted-foreground truncate text-xs leading-tight">
+            /{{ item.path }}
+          </p>
+          <div
+            class="action from-accent invisible absolute right-0 top-0 flex h-full items-center gap-0.5 bg-gradient-to-l from-70% to-transparent pl-4 pr-2"
+          >
+            <TooltipSimple
+              v-for="(action, index) in itemActions"
+              :key="action.id"
+              :label="action.label"
+              side="bottom"
+              align="end"
+            >
+              <button
+                class="hover:bg-secondary hover:text-foreground size-6 flex-shrink-0 content-center rounded-sm text-center transition-colors"
+                :id="item.path + index"
+                @click.stop="actionHandlerMap[action.id]"
+                :class="
+                  item.path === actionState.path &&
+                  index === actionState.actionIndex
+                    ? 'bg-secondary text-foreground'
+                    : 'text-muted-foreground'
+                "
               >
-                <button
-                  class="hover:bg-secondary hover:text-foreground size-6 flex-shrink-0 content-center rounded-sm text-center transition-colors"
-                  :id="item.path + index"
-                  @click.stop="actionHandlerMap[action.id]"
-                  :class="
-                    item.path === actionState.path &&
-                    index === actionState.actionIndex
-                      ? 'bg-secondary text-foreground'
-                      : 'text-muted-foreground'
-                  "
-                >
-                  <component :is="action.icon" class="inline size-[18px]" />
-                </button>
-              </TooltipSimple>
-            </div>
+                <component :is="action.icon" class="inline size-[18px]" />
+              </button>
+            </TooltipSimple>
+            <slot name="actions:suffix" :item="item"></slot>
           </div>
           <p
             v-if="'content' in item"
@@ -91,28 +95,26 @@ import UiComboboxSearch from '../ui/UiComboboxSearch.vue';
 import type { ComboboxRootProps } from 'radix-vue';
 import { useForwardPropsEmits, type ComboboxRootEmits } from 'radix-vue';
 import { Copy02Icon, FileEditIcon } from 'hugeicons-vue';
-import type { SnippetWithPlaceholder } from '@/interface/snippet.interface';
 import { appCommand } from '@/services/app-command.service';
 import { getCurrentWindow } from '@tauri-apps/api/window';
 import { sanitizeSnippetHTML } from '@/utils/snippet-utils';
 import { useTauriWindowEvent } from '@/composables/tauri.composable';
 import PopupInputPlaceholder from './PopupInputPlaceholder.vue';
 import documentService from '@/services/document.service';
-
-interface ComboboxItem {
-  path: string;
-  name: string;
-  content?: string;
-}
+import type { DocumentSearchEntry } from '@/interface/document.interface';
+import { logger } from '@/services/logger.service';
+import { getLogMessage } from '@/utils/helper';
+import { getNameFromPath } from '@/utils/document-utils';
+import type { SnippetWithPlaceholder } from '@/interface/snippet.interface';
 
 defineOptions({
   inheritAttrs: false,
 });
 const props = defineProps<
   ComboboxRootProps & {
-    items: ComboboxItem[];
     groupHeading?: string;
     itemContainsHtml?: boolean;
+    items: DocumentSearchEntry[];
   }
 >();
 const emit = defineEmits<ComboboxRootEmits & { 'snippet:sended': [string] }>();
@@ -166,7 +168,7 @@ function handleInputKeydown(event: KeyboardEvent) {
 
   event.preventDefault();
 }
-async function handleSelectItem(item: ComboboxItem) {
+async function handleSelectItem(item: DocumentSearchEntry) {
   const action = actionState.value.path
     ? itemActions[actionState.value.actionIndex]
     : null;
@@ -178,25 +180,38 @@ async function handleSelectItem(item: ComboboxItem) {
   }
 
   try {
-    const result = await appCommand.invoke('get_snippet_with_placeholder', {
-      snippetId: item.path,
-    });
-    if (result.placeholders.length === 0) {
+    const placeholders = await appCommand.invoke(
+      'get_snippet_with_placeholder',
+      {
+        path: item.path,
+      },
+    );
+    const content = await documentService.getFileContent(item.path);
+
+    if (placeholders.length === 0) {
       await appCommand.invoke('send_snippet_content', {
+        content,
         action: 'paste',
         placeholders: [],
         plaholdersValue: {},
-        content: result.content,
       });
       emit('snippet:sended', item.path);
       return;
     }
 
-    inputSnippet.value = result;
-  } catch {
+    inputSnippet.value = {
+      content,
+      placeholders,
+      path: item.path,
+      name: getNameFromPath(item.path),
+    };
+  } catch (error) {
+    console.error(error);
+    logger.error(getLogMessage('popup-placeholder', error));
     toast({
       variant: 'destructive',
       title: 'An error occured',
+      description: typeof error === 'string' ? error : '',
     });
   }
 }
@@ -231,10 +246,12 @@ async function copyContent() {
     toast({
       title: 'Copied',
     });
-  } catch {
+  } catch (error) {
+    logger.error(getLogMessage('popup-combobox:copy', error));
     toast({
       variant: 'destructive',
       title: 'An error occured',
+      description: typeof error === 'string' ? error : '',
     });
   }
 }

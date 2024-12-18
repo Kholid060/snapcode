@@ -13,7 +13,7 @@ import {
   SnippetNewPayload,
 } from '@/interface/snippet.interface';
 import { FolderNewPayload } from '@/interface/folder.interface';
-import { readTextFile, writeTextFile } from '@tauri-apps/plugin-fs';
+import { writeTextFile } from '@tauri-apps/plugin-fs';
 import { joinDocumentPath } from '@/utils/document-utils';
 
 interface DocumentStores {
@@ -130,7 +130,7 @@ class DocumentService {
   }
 
   getFileContent(path: string) {
-    return readTextFile(joinDocumentPath(this.appState.snippetsDir, path));
+    return appCommand.invoke('get_snippet_content', { path });
   }
 
   async updateFileContent(path: string, content: string) {
@@ -139,6 +139,10 @@ class DocumentService {
       content,
     );
     this.#buffer.push(path);
+  }
+
+  search(searchTerm: string) {
+    return appCommand.invoke('document_search', { searchTerm });
   }
 }
 

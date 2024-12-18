@@ -198,7 +198,6 @@ provide<EditorSidebarProvider>(EDITOR_SIDEBAR_PROVIDER_KEY, {
 useHotkey(
   ['searchMenu', 'snippetsMenu', 'openSettings', 'bookmarksMenu'],
   (_, handler) => {
-    console.log(handler);
     switch (handler.hotkeyId) {
       case 'bookmarksMenu':
         editorStore.state.updateState('activeMenu', 'bookmarks');

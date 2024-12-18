@@ -29,24 +29,13 @@
     "autostart:default",
     "shell:allow-open",
     "updater:default",
-    {
-      "identifier": "fs:allow-read-dir",
-      "allow": [{ "path": "$RESOURCE/db/**/*" }]
-    },
+    "dialog:allow-open",
     {
       "identifier": "fs:allow-watch",
       "allow": [{ "path": "$DOCUMENT/Snippy/snippets" }]
     },
     {
-      "identifier": "fs:allow-read-text-file",
-      "allow": [{ "path": "$RESOURCE/db/**/*" }, "$DOCUMENT/Snippy/snippets/**"]
-    },
-    {
       "identifier": "fs:allow-write-text-file",
-      "allow": ["$DOCUMENT/Snippy/snippets/**"]
-    },
-    {
-      "identifier": "fs:allow-rename",
       "allow": ["$DOCUMENT/Snippy/snippets/**"]
     },
     {

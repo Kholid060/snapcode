@@ -1,7 +1,6 @@
 import {
   SnippetNewPayload,
   SnippetPlaceholder,
-  SnippetWithPlaceholder,
 } from '@/interface/snippet.interface';
 import { getLogMessage } from '@/utils/helper';
 import { invoke } from '@tauri-apps/api/core';
@@ -13,6 +12,7 @@ import {
   DocumentCreatedSnippet,
   DocumentOldNewVal,
   DocumentFolderEntry,
+  DocumentSearchEntry,
 } from '@/interface/document.interface';
 import { FolderNewPayload } from '@/interface/folder.interface';
 
@@ -22,6 +22,7 @@ interface StoreCommands {
 }
 
 interface SnippetCommands {
+  get_snippet_content: [{ path: string }, string];
   create_snippets: [
     { snippets: Pick<SnippetNewPayload, 'path' | 'contents'>[] },
     DocumentCreatedSnippet[],
@@ -36,8 +37,8 @@ interface SnippetCommands {
     },
     void,
   ];
+  get_snippet_with_placeholder: [{ path: string }, SnippetPlaceholder[]];
   import_snippet_from_file: [{ dirPath: string }, DocumentCreatedSnippet[]];
-  get_snippet_with_placeholder: [{ snippetId: string }, SnippetWithPlaceholder];
 }
 
 interface FolderCommands {
@@ -48,6 +49,7 @@ interface DocumentCommands {
   get_document_state: [undefined, AppDocumentState];
   get_document_flat_tree: [undefined, DocumentFlatTree];
   get_all_document_folders: [undefined, DocumentFolderEntry[]];
+  document_search: [{ searchTerm: string }, DocumentSearchEntry[]];
   remove_document_items: [{ paths: string[]; toTrash: boolean }, void];
   rename_document_item: [{ oldPath: string; newPath: string }, string];
   move_document_items: [{ items: [from: string, to: string][] }, string[]];

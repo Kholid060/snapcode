@@ -11,16 +11,13 @@
     <div class="ml-2">
       <p class="text-muted-foreground text-xs leading-tight">Placeholders</p>
       <p class="gap-1 truncate text-sm leading-tight">
-        <AppFileExtIcon :lang="snippet.lang ?? ''" class="inline size-4">
-          <File01Icon class="inline size-4 flex-shrink-0" />
-        </AppFileExtIcon>
         {{ snippet.name ?? 'unnamed.txt' }}
       </p>
     </div>
   </div>
   <div ref="placeholder-container" class="grow overflow-auto px-4 pt-1">
     <div v-for="(_value, key) in placeholders" :key="key">
-      <label :for="key" class="truncate">
+      <label :for="key" class="truncate text-sm">
         {{ key.slice(2, -2) }}
       </label>
       <Textarea
@@ -62,8 +59,7 @@
   </div>
 </template>
 <script lang="ts" setup>
-import AppFileExtIcon from '../app/AppFileExtIcon.vue';
-import { ArrowLeft01Icon, File01Icon } from 'hugeicons-vue';
+import { ArrowLeft01Icon } from 'hugeicons-vue';
 import { Button, Kbd, Textarea, useToast } from '@snippy/ui';
 import { getHotkeyLabel, useHotkey } from '@/composables/hotkey.composable';
 import { appCommand } from '@/services/app-command.service';

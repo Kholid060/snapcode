@@ -27,7 +27,7 @@ tauri-plugin-log = "2.0.2"
 tauri-plugin-store = { "path" = "../../../packages/tauri-plugin-store" }
 tauri-plugin-decorum = { "path" = "../../../packages/tauri-plugin-decorum" }
 tauri-plugin-os = "2.0.1"
-tauri-plugin-dialog = "2.0.3"
+tauri-plugin-dialog = "2.2.0"
 sqlx = "0.8.2"
 regex = "1.11.1"
 enigo = "0.3.0"
@@ -44,6 +44,8 @@ path-slash = "0.2.1"
 normalize-path = "0.2.1"
 trash = "5.2.1"
 natord = "1.0.9"
+ignore = "0.4.23"
+anyhow = "1.0.94"
 
 [target.'cfg(any(target_os = "macos", windows, target_os = "linux"))'.dependencies]
 tauri-plugin-autostart = "2.2.0"

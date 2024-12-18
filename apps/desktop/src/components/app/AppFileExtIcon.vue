@@ -21,8 +21,9 @@ const props = defineProps<{
 type IconKeys = keyof typeof iconData;
 type IconExtKeys = keyof typeof iconExtData;
 
-const iconName = computed(
-  () =>
-    iconData[props.lang as IconKeys] || iconExtData[props.ext as IconExtKeys],
+const iconName = computed(() =>
+  typeof props.lang === 'string'
+    ? iconData[props.lang as IconKeys]
+    : iconExtData[props.ext as IconExtKeys],
 );
 </script>

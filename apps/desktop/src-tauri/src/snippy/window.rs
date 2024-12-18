@@ -64,7 +64,23 @@ impl PopupWindow {
             .build()?,
         };
 
+        #[cfg(debug_assertions)]
+        popup_window.open_devtools();
+
         Ok(popup_window)
+    }
+
+    pub fn show_on_cursor(app: &tauri::AppHandle) -> tauri::Result<()> {
+        let popup_window = PopupWindow::get_or_create(&app)?;
+        if !popup_window.is_focused()? {
+            let new_position = PopupWindow::get_pos_from_cursor(&app)?;
+
+            popup_window.set_position(new_position)?;
+            popup_window.show()?;
+            popup_window.set_focus()?;
+        }
+
+        Ok(())
     }
 }
 
@@ -96,7 +112,7 @@ impl MainWindow {
                 let _ = window.set_focus();
 
                 window
-            },
+            }
             None => MainWindow::create(app)?,
         };
 

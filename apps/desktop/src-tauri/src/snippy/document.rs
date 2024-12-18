@@ -3,7 +3,6 @@ use std::{
     fs, io,
     path::{Path, PathBuf},
     sync::{Arc, Mutex},
-    time::UNIX_EPOCH,
 };
 
 pub use document_items::*;
@@ -22,10 +21,8 @@ use crate::{
 
 pub type DocumentFlatTree = HashMap<String, Vec<DocumentFlatTreeItem>>;
 
-mod document_indexer;
 mod document_items;
-
-pub use document_indexer::DocumentIndexer;
+mod document_util;
 
 pub enum AppDocumentStore {
     Metadata,
@@ -97,73 +94,10 @@ impl AppDocument {
     pub fn get_flat_tree(&self, app: &tauri::AppHandle) -> io::Result<DocumentFlatTree> {
         let metadata_store = self.get_store(app, AppDocumentStore::Metadata)?;
 
-        let mut flat_tree: DocumentFlatTree = HashMap::new();
-        flat_tree.insert(String::from("__root"), vec![]);
-
-        for entry in WalkDir::new(&self.snippets_dir)
-            .into_iter()
-            .filter_map(|e| e.ok())
-        {
-            let metadata = entry.metadata()?;
-            let relative_path = entry.path().strip_prefix(&self.snippets_dir).unwrap();
-            let stored_metadata: Option<SnippetStoredMetadata> = match metadata_store
-                .get(relative_path.to_slash().unwrap_or_default().to_string())
-            {
-                Some(value) => serde_json::from_value(value)?,
-                None => None,
-            };
-
-            let name = relative_path
-                .file_name()
-                .and_then(|val| val.to_str())
-                .unwrap_or_default()
-                .to_owned();
-            let is_dir = metadata.is_dir();
-            if name.is_empty() || (name == "__root" && is_dir) {
-                continue;
-            }
-
-            let item_key = relative_path.to_slash().unwrap_or_default().to_string();
-            let parent_key = match relative_path.parent().and_then(|val| val.to_slash()) {
-                Some(parent) if !parent.is_empty() => parent.to_string(),
-                _ => String::from("__root"),
-            };
-            let mtime = match metadata.modified() {
-                Ok(time) => time
-                    .duration_since(UNIX_EPOCH)
-                    .unwrap_or_default()
-                    .as_millis(),
-                Err(_) => 0,
-            };
-            let ext = if metadata.is_file() {
-                relative_path
-                    .extension()
-                    .and_then(|val| val.to_str())
-                    .unwrap_or_default()
-                    .to_owned()
-            } else {
-                String::new()
-            };
-
-            let tree_item = DocumentFlatTreeItem {
-                ext,
-                name,
-                mtime,
-                is_dir,
-                path: item_key.clone(),
-                metadata: stored_metadata,
-            };
-            match flat_tree.get_mut(&parent_key) {
-                Some(value) => {
-                    (*value).push(tree_item);
-                }
-                None => {
-                    flat_tree.insert(parent_key, vec![tree_item]);
-                }
-            };
-        }
-
-        Ok(flat_tree)
+        Ok(document_util::get_document_flat_tree(
+            &self.snippets_dir,
+            &metadata_store,
+        ))
     }
 
     pub fn move_document_items(&self, items: Vec<(String, String)>) -> io::Result<Vec<String>> {
@@ -342,6 +276,32 @@ impl AppDocument {
         }
 
         Ok(())
+    }
+
+    pub fn search(&self, search_term: &str) -> anyhow::Result<Vec<SearchItemEntry>> {
+        document_util::search_document(&self.snippets_dir, &search_term)
+    }
+
+    pub fn get_snippet_content<P: AsRef<Path>>(&self, path: P) -> io::Result<String> {
+        let path = self.snippets_dir.safe_join(path)?;
+        fs::read_to_string(path)
+    }
+
+    pub fn get_snippet_placeholders<P: AsRef<Path>>(
+        &self,
+        path: P,
+    ) -> anyhow::Result<Vec<SnippetPlaceholderItem>> {
+        let content = self.get_snippet_content(path)?;
+
+        let regex = regex::Regex::new(r"\[\[(\w+)\]\]")?;
+        Ok(regex
+            .find_iter(&content)
+            .map(|entry| SnippetPlaceholderItem {
+                end: entry.end(),
+                start: entry.start(),
+                name: entry.as_str().to_owned(),
+            })
+            .collect())
     }
 
     pub fn get_base_dir(&self) -> &PathBuf {

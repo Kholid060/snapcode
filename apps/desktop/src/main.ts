@@ -4,7 +4,6 @@ import { createPinia } from 'pinia';
 import { attachConsole } from '@tauri-apps/plugin-log';
 import { logger } from './services/logger.service';
 import { getLogMessage } from './utils/helper';
-import { migrate } from './db/migrate';
 import AppAsync from './AppAsync.vue';
 import documentService from './services/document.service';
 
@@ -14,7 +13,7 @@ import documentService from './services/document.service';
       await attachConsole();
     }
 
-    await Promise.all([migrate(), documentService.init()]);
+    await Promise.all([documentService.init()]);
 
     createApp(AppAsync).use(createPinia()).mount('#app');
   } catch (error) {

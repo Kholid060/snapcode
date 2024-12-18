@@ -479,7 +479,6 @@ async function loadNextListPage() {
       gistState.url.trim(),
       new URL(nextLink).searchParams,
     );
-    console.log(result);
 
     gistState.ratelimitRemaining = result.ratelimitRemaining ?? '';
     listGistsByUsernameData.value = listGistsByUsernameData.value.concat(
