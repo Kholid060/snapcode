@@ -1,4 +1,4 @@
-use std::{collections::HashMap, sync::Mutex};
+use std::{collections::HashMap, sync::Mutex, thread, time::Duration};
 use tauri::{Emitter, Manager};
 use tauri_plugin_clipboard_manager::ClipboardExt;
 use tauri_plugin_dialog::DialogExt;
@@ -76,6 +76,7 @@ pub fn send_snippet_content(
         }
         "paste" => {
             if content.is_empty() {
+                snippy::window::PopupWindow::hide(&app_handle);
                 return Ok(());
             }
 
@@ -86,6 +87,8 @@ pub fn send_snippet_content(
                 .write_text(content)
                 .map_err(stringify)?;
             snippy::window::PopupWindow::hide(&app_handle);
+
+            thread::sleep(Duration::from_millis(100));
 
             let mut enigo = enigo::Enigo::new(&enigo::Settings::default()).map_err(stringify)?;
             snippy::keyboard::press_paste(&mut enigo).map_err(stringify)?;
