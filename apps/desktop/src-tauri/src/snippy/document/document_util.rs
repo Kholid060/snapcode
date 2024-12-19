@@ -55,7 +55,8 @@ pub fn get_document_flat_tree<P: AsRef<Path>>(
             }
         };
         let parent_key = match Path::new(&item_key)
-            .parent().map(|v| v.to_string_lossy().to_string())
+            .parent()
+            .and_then(|v| Some(v.to_string_lossy().to_string()))
         {
             Some(parent) if !parent.is_empty() => ids
                 .entry(parent)
@@ -149,7 +150,8 @@ pub fn search_document<P: AsRef<Path>>(
 
                 let entry = entry.unwrap();
                 let is_file = entry
-                    .file_type().map(|val| val.is_file())
+                    .file_type()
+                    .and_then(|val| Some(val.is_file()))
                     .unwrap_or(true);
                 if !is_file || entry.is_stdin() {
                     return WalkState::Continue;

@@ -8,7 +8,11 @@
       --editor-font-family: 'JetBrains Mono';
     "
   ></div>
-  <EditorContentFooter :language-label="langLabel" :cursor-pos="cursorPos" />
+  <EditorContentFooter
+    v-if="!isNotTextFile"
+    :language-label="langLabel"
+    :cursor-pos="cursorPos"
+  />
 </template>
 <script setup lang="ts">
 import type { CMEditorView, ViewUpdate } from '@snippy/codemirror';
@@ -30,20 +34,24 @@ import { getSnippetLangFromName } from '@/utils/snippet-utils';
 import { indentUnit } from '@codemirror/language';
 import documentService from '@/services/document.service';
 import { loadEditorFontSettings } from '@/utils/editor-util';
+import { useToast } from '@snippy/ui';
 
 let isReplaceValue = false;
 const compartments = {
   tabSize: new Compartment(),
   language: new Compartment(),
+  readOnly: new Compartment(),
   lineNumbers: new Compartment(),
 };
 
+const { toast } = useToast();
 const editorStore = useEditorStore();
 
 const containerRef = useTemplateRef('container-ref');
 
 const langLabel = shallowRef('');
 const cmView = shallowRef<CMEditorView>();
+const isNotTextFile = shallowRef(false);
 
 const cursorPos = shallowReactive({
   col: 0,
@@ -91,6 +99,31 @@ function loadSettings() {
     ],
   });
 }
+async function getContent() {
+  if (!editorStore.activeSnippet?.path) return '';
+
+  try {
+    return await documentService.getFileContent(editorStore.activeSnippet.path);
+  } catch (error) {
+    if (typeof error === 'string') {
+      toast({
+        variant: 'destructive',
+        title:
+          error === 'not-text-file' ? 'This file is not a text file' : error,
+      });
+
+      if (error.includes('not found') || error === 'not-text-file') {
+        editorStore.state.updateState('activeFileId', '');
+        return;
+      }
+    }
+
+    editorStore.state.updateState('activeFileId', '');
+    logger.error(getLogMessage('get-snippet-content', error));
+
+    return '';
+  }
+}
 
 const handleContentChange = useDebounceFn(async (value: string) => {
   try {
@@ -103,29 +136,41 @@ const handleContentChange = useDebounceFn(async (value: string) => {
   }
 }, 1000);
 
-watchEffect(async () => {
-  const activeSnippet = editorStore.activeSnippet;
-  if (!activeSnippet || !cmView.value) return;
+watch(
+  () => editorStore.activeSnippet?.path,
+  async (path) => {
+    if (!path || !cmView.value) return;
 
-  try {
-    const content = await documentService.getFileContent(activeSnippet.path);
-
+    const content = await getContent();
     const newState = EditorState.create({
       doc: content ?? '',
     });
     cmView.value.replaceContent(newState);
+    cmView.value.dispatch({
+      effects: compartments.readOnly.reconfigure(
+        EditorState.readOnly.of(false),
+      ),
+    });
+
+    isNotTextFile.value = false;
 
     await loadLanguage();
-  } catch (error) {
-    logger.error(getLogMessage('get-snippet-content', error));
-  }
-});
+  },
+);
 watch(() => editorStore.activeSnippet?.metadata?.lang, loadLanguage);
 
 watch(editorStore.settings.data, loadSettings);
 
-onMounted(() => {
+defineExpose({
+  cmView,
+});
+
+onMounted(async () => {
+  const content = await getContent();
+
   const updateListenerExt = onUpdateExtension((update) => {
+    if (isNotTextFile.value) return;
+
     updateCursorPos(update);
 
     if (update.docChanged && !isReplaceValue) {
@@ -136,12 +181,13 @@ onMounted(() => {
   const settings = editorStore.settings.data;
   cmView.value = loadCodemirror(
     {
-      doc: '',
+      doc: content,
       parent: containerRef.value!,
       extensions: [
         updateListenerExt,
         snippetPlaceholder(),
         indentWithTabExtension,
+        compartments.readOnly.of([]),
         compartments.language.of([]),
         compartments.lineNumbers.of(
           settings.showLineNumbers ? lineNumbers() : [],

@@ -46,6 +46,7 @@ trash = "5.2.1"
 natord = "1.0.9"
 ignore = "0.4.23"
 anyhow = "1.0.94"
+file-id = "0.2.2"
 [target.'cfg(target_os = "linux")'.dependencies]
 dbus = "0.9"
 

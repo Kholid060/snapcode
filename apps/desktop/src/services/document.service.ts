@@ -13,9 +13,8 @@ import {
   SnippetNewPayload,
 } from '@/interface/snippet.interface';
 import { FolderNewPayload } from '@/interface/folder.interface';
-import { writeTextFile, watch, WatchEvent } from '@tauri-apps/plugin-fs';
+import { writeTextFile } from '@tauri-apps/plugin-fs';
 import { joinDocumentPath } from '@/utils/document-utils';
-import { createDebounce } from '@snippy/shared';
 
 interface DocumentStores {
   state: Readonly<LazyStore<DocumentStoreState>>;
@@ -24,21 +23,9 @@ interface DocumentStores {
   bookmarks: Readonly<LazyStore<DocumentStoreBookmarks>>;
 }
 
-const watcherDebounce = createDebounce();
-function createDocumentWatcher() {
-  const events: WatchEvent[] = [];
-  return (event: WatchEvent) => {
-    events.push(event);
-    watcherDebounce(() => {
-      console.log(events);
-    }, 1000);
-  };
-}
-
 class DocumentService {
   private appState!: AppDocumentState;
 
-  #buffer: string[] = [];
   #stores!: Readonly<DocumentStores>;
 
   async init() {
@@ -58,32 +45,14 @@ class DocumentService {
     return this.#stores;
   }
 
-  async startWatcher() {
-    return;
-    const watcher = createDocumentWatcher(this.appState.snippetsDir);
-    const unwatch = await watch(this.appState.snippetsDir, watcher, {
-      recursive: true,
-    });
-    window.onbeforeunload = () => {
-      unwatch();
-    };
-  }
-
   async createSnippets(snippets: SnippetNewPayload[]) {
     const items = await appCommand.invoke('create_snippets', { snippets });
-    items.forEach((item) => {
-      this.#buffer.push(item.path);
-    });
 
     return items;
   }
 
   async createFolders(folders: FolderNewPayload[]) {
     const items = await appCommand.invoke('create_folders', { folders });
-    items.forEach((item) => {
-      this.#buffer.push(item.path);
-    });
-
     return items;
   }
 
@@ -93,14 +62,13 @@ class DocumentService {
       oldPath,
     });
 
-    this.#buffer.push(path);
+    return path;
   }
 
   async moveItems(paths: DocumentOldNewVal[]) {
     const result = await appCommand.invoke('move_document_items', {
       items: paths,
     });
-    this.#buffer.push(...result);
 
     return result;
   }
@@ -111,8 +79,6 @@ class DocumentService {
 
   async deleteItems(paths: string[], toTrash: boolean) {
     await appCommand.invoke('remove_document_items', { paths, toTrash });
-    this.#buffer.push(...paths);
-
     await this.#stores.metadata.xDelete(paths);
   }
 
@@ -148,7 +114,6 @@ class DocumentService {
       joinDocumentPath(this.appState.snippetsDir, path),
       content,
     );
-    this.#buffer.push(path);
   }
 
   search(searchTerm: string) {

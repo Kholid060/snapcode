@@ -31,6 +31,10 @@
           <File01Icon />
           Import from file
         </DropdownMenuItem>
+        <DropdownMenuItem @click="reloadSnippetsData">
+          <FileSyncIcon />
+          Reload snippets data
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   </div>
@@ -81,6 +85,7 @@ import {
   FolderAddIcon,
   File01Icon,
   MoreHorizontalCircle01Icon,
+  FileSyncIcon,
 } from 'hugeicons-vue';
 import { useHotkey } from '@/composables/hotkey.composable';
 import { formatLogMessage, getLogMessage } from '@/utils/helper';
@@ -173,6 +178,21 @@ async function importSnippetFromFiles() {
       title: 'An error occured',
     });
     logger.error(formatLogMessage('import-snippet-from-file', message));
+  }
+}
+async function reloadSnippetsData() {
+  try {
+    await editorStore.init();
+    toast({
+      title: 'Snippets data reloaded',
+    });
+  } catch (error) {
+    logger.error(getLogMessage('reload-snippets-data', error));
+    toast({
+      variant: 'destructive',
+      title: 'An error occured',
+      description: typeof error === 'string' ? error : '',
+    });
   }
 }
 

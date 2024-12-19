@@ -49,8 +49,6 @@ const useEditorSettings = defineStore('editor:settings', () => {
 });
 
 export const useEditorStore = defineStore('editor', () => {
-  let initiated = false;
-
   const state = useEditorState();
   const document = useEditorDocument();
   const settings = useEditorSettings();
@@ -63,12 +61,8 @@ export const useEditorStore = defineStore('editor', () => {
   });
 
   async function init() {
-    if (initiated) return;
-
     await Promise.all([settings.init(), document.init()]);
     await state.init();
-
-    initiated = true;
   }
 
   return { state, settings, document, activeSnippet, activePath, init };

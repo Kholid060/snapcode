@@ -46,8 +46,6 @@ export const useEditorState = defineStore('editor:state', () => {
     documentService.stores.state.xSet('editor', data);
   }
   async function init() {
-    if (initiated) return;
-
     const storeData = await documentService.stores.state.xGet('editor', {
       ...DEFAULT_SIDEBAR_STATE,
     });

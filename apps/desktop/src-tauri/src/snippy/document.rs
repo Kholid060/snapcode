@@ -169,7 +169,8 @@ impl AppDocument {
             .unwrap()
             .to_path_buf();
         let file_path_str = file_path
-            .to_slash().map(|val| val.to_string())
+            .to_slash()
+            .map(|val| val.to_string())
             .unwrap_or_default();
 
         if let Some(metadata) = &snippet.stored {
@@ -221,7 +222,8 @@ impl AppDocument {
             Ok(FolderDocCreated {
                 metadata: folder.metadata,
                 path: folder_path
-                    .to_slash().map(|v| v.to_string())
+                    .to_slash()
+                    .map(|v| v.to_string())
                     .unwrap_or_default()
                     .to_owned(),
                 name: folder_path
@@ -288,7 +290,12 @@ impl AppDocument {
             return Err(io::Error::new(io::ErrorKind::NotFound, "File not found"));
         }
 
-        fs::read_to_string(path)
+        fs::read_to_string(path).map_err(|error| match error.kind() {
+            io::ErrorKind::InvalidData => {
+                io::Error::new(io::ErrorKind::InvalidData, "not-text-file")
+            }
+            _ => error,
+        })
     }
 
     pub fn get_snippet_placeholders<P: AsRef<Path>>(

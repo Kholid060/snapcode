@@ -30,8 +30,6 @@ type NewFlatTreeItem = SetOptional<DocumentFlatTreeItem, 'id' | 'parentId'>;
 type NewFlatTreeMetadataItem = SetOptional<DocumentFlatTreeMetadataItem, 'id'>;
 
 export const useEditorDocument = defineStore('editor:document', () => {
-  let initiated = false;
-
   const appStore = useAppStore();
   const editorState = useEditorState();
   const bookmarksStore = useBookmarksStore();
@@ -384,16 +382,12 @@ export const useEditorDocument = defineStore('editor:document', () => {
   }
 
   async function init() {
-    if (initiated) return;
-
     const data = await documentService.getFlatTree();
     Object.keys(data.flatTree).forEach((key) => {
       documentItemsSorter(data.flatTree[key], data.metadata);
     });
     Object.assign(treeData, data.flatTree);
     Object.assign(treeMetadata, data.metadata);
-
-    initiated = true;
   }
 
   return {

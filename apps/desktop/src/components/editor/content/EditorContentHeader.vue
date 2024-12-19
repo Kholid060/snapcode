@@ -30,7 +30,7 @@
     <template v-if="editorStore.activeSnippet">
       <UiEditable
         ref="name-form"
-        :value="editorStore.activeSnippet.name ?? ''"
+        :value="editorStore.activeSnippet.name"
         placeholder="Snippet name"
         class="hover:bg-secondary focus:bg-secondary ml-2 inline-block flex-shrink-0 truncate rounded px-1 py-0.5 transition before:pl-1 focus:outline-none"
         @submit="$event.isDirty && updateSnippetName($event.value ?? 'Unnamed')"
@@ -86,9 +86,11 @@ const bookmarksStore = useBookmarksStore();
 
 const nameForm = useTemplateRef('name-form');
 
-const isBookmarked = computed(() =>
-  bookmarksStore.isBookmarked(editorStore.state.state.activeFileId),
-);
+const isBookmarked = computed(() => {
+  if (!editorStore.state.state.activeFileId) return false;
+
+  return bookmarksStore.isBookmarked(editorStore.state.state.activeFileId);
+});
 
 async function updateSnippetName(newName: string) {
   if (!editorStore.activeSnippet) return;
@@ -113,6 +115,4 @@ async function updateSnippetName(newName: string) {
     nameForm.value?.resetValue();
   }
 }
-
-onUnmounted(() => {});
 </script>
