@@ -1,7 +1,6 @@
 // https://github.com/tauri-apps/plugins-workspace/issues/999#issuecomment-1965624559
 use std::{io, process::Command};
 // State is used by linux
-use tauri::{Manager, State};
 
 #[cfg(not(target_os = "windows"))]
 use std::path::PathBuf;

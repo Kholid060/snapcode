@@ -6,12 +6,12 @@
   "scripts": {
     "dev": "vite",
     "tauri": "tauri",
-    "tauri:dev": "tauri dev",
+    "tauri:dev": "dotenvx run -- tauri dev",
     "preview": "vite preview",
     "typecheck": "vue-tsc --noEmit",
     "lint": "eslint . --max-warnings 0",
     "build": "pnpm lint && vite build",
-    "build:prod": "tauri build"
+    "build:prod": "dotenvx run -- tauri build"
   },
   "dependencies": {
     "@atlaskit/pragmatic-drag-and-drop": "^1.4.0",
@@ -55,13 +55,13 @@
     "vue-router": "4"
   },
   "devDependencies": {
+    "@dotenvx/dotenvx": "^1.31.0",
     "@iconify-json/solar": "^1.2.1",
     "@snippy/eslint-config": "workspace:*",
     "@tauri-apps/cli": "^2",
     "@types/sanitize-html": "^2.13.0",
     "@vitejs/plugin-vue": "^5.0.5",
     "autoprefixer": "^10.4.20",
-    "dotenv": "^16.4.7",
     "drizzle-kit": "^0.28.1",
     "eslint": "^9.15.0",
     "postcss": "^8.4.49",

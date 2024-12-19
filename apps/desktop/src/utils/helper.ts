@@ -72,4 +72,12 @@ export function preventGlobalContextMenu() {
 
     event.preventDefault();
   });
+
+  document.body.addEventListener(
+    'touchmove',
+    (event) => {
+      event.preventDefault();
+    },
+    { passive: false },
+  );
 }

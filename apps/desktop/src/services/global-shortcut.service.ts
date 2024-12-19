@@ -10,11 +10,8 @@ class GlobalShortcut {
   constructor() {}
 
   async register(shortcut: string, handler: ShortcutHandler) {
-    // sometime it reload on dev causing error because the shortcut is already registered
-    if (import.meta.env.DEV) {
-      if (await isRegistered(shortcut)) {
-        await unregister(shortcut);
-      }
+    if (await isRegistered(shortcut)) {
+      await unregister(shortcut);
     }
 
     await register(shortcut, handler);

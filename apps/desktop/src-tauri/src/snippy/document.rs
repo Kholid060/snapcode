@@ -7,7 +7,6 @@ use std::{
 pub use document_items::*;
 use normalize_path::NormalizePath;
 use path_slash::PathExt;
-use serde::ser::SerializeStruct;
 use serde_json::json;
 use tauri::{self, Manager};
 use tauri_plugin_store::StoreExt;
@@ -18,7 +17,6 @@ use crate::{
     util::PathUtil,
 };
 
-use super::shell;
 
 mod document_items;
 mod document_util;

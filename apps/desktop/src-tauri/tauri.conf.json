@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "desktop",
+  "productName": "Snippy",
   "version": "0.1.0",
   "identifier": "com.snippy.app",
   "build": {

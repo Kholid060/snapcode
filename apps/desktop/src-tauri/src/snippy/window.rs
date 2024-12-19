@@ -49,6 +49,7 @@ impl PopupWindow {
                 "popup",
                 tauri::WebviewUrl::App("popup.html".into()),
             )
+            .title("Snippy - Quick Access")
             .position(f64::from(initial_pos.x), f64::from(initial_pos.y))
             .decorations(false)
             .skip_taskbar(true)
@@ -58,7 +59,8 @@ impl PopupWindow {
             )
             .always_on_top(true)
             .on_navigation(|url| {
-                url.scheme() == "tauri" || (cfg!(dev) && url.host_str() == Some("localhost"))
+                url.host_str().unwrap_or_default().starts_with("tauri")
+                    || (cfg!(dev) && url.host_str() == Some("localhost"))
             })
             .resizable(false)
             .build()?,
@@ -93,10 +95,12 @@ impl MainWindow {
             "main",
             tauri::WebviewUrl::App("index.html".into()),
         )
+        .title("Snippy")
         .min_inner_size(800.0, 600.0)
         .disable_drag_drop_handler()
         .on_navigation(|url| {
-            url.scheme() == "tauri" || (cfg!(dev) && url.host_str() == Some("localhost"))
+            url.host_str().unwrap_or_default().starts_with("tauri")
+                || (cfg!(dev) && url.host_str() == Some("localhost"))
         })
         .build()?;
         window.create_overlay_titlebar()?;

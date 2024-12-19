@@ -72,3 +72,8 @@ button {
 span[search-result] {
   @apply bg-primary/40 text-foreground rounded;
 }
+
+.cmx-search-input:not(:placeholder-shown) + svg[clear-icon],
+.cmx-search-input:not(:placeholder-shown) + button[clear-icon] {
+  display: block;
+}

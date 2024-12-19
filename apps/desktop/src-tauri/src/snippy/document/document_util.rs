@@ -163,7 +163,7 @@ pub fn search_document<P: AsRef<Path>>(
                     let match_range = offset..(offset + matcher.len());
                     file_name.replace_range(
                         match_range.clone(),
-                        &format!("<span search-result>{}</span>", (&file_name[match_range])),
+                        &format!("<span search-result>{}</span>", &file_name[match_range]),
                     );
                     let mut result = result.lock().unwrap();
                     result.push((entry.path().to_slash_lossy().to_string(), file_name));

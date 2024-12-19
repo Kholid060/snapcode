@@ -1,8 +1,8 @@
 [package]
 name = "desktop"
 version = "0.1.0"
-description = "A Tauri App"
-authors = ["you"]
+description = "Snippet management tool"
+authors = ["Ahmad Kholid"]
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -28,25 +28,19 @@ tauri-plugin-store = { "path" = "../../../packages/tauri-plugin-store" }
 tauri-plugin-decorum = { "path" = "../../../packages/tauri-plugin-decorum" }
 tauri-plugin-os = "2.0.1"
 tauri-plugin-dialog = "2.2.0"
-sqlx = "0.8.2"
 regex = "1.11.1"
 enigo = "0.3.0"
 tauri-plugin-clipboard-manager = "2.0.2"
 tauri-plugin-http = "2.0.4"
 tauri-plugin-stronghold = "2"
-windows-sys = "0.59.0"
 tauri-plugin-prevent-default = "0.8.0"
 tauri-plugin-shell = "2.2.0"
-notify-debouncer-full = "0.4.0"
 walkdir = "2.5.0"
-tantivy = "0.22.0"
 path-slash = "0.2.1"
 normalize-path = "0.2.1"
 trash = "5.2.1"
-natord = "1.0.9"
 ignore = "0.4.23"
 anyhow = "1.0.94"
-file-id = "0.2.2"
 [target.'cfg(target_os = "linux")'.dependencies]
 dbus = "0.9"
 

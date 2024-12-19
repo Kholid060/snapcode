@@ -11,16 +11,39 @@
   <Command
     v-else
     v-bind="forwarded"
+    items=""
+    open
+    class="h-full w-full overflow-hidden"
     @update:selected-value="
       actionState = { actionIndex: -1, path: $event as string }
     "
   >
     <div class="search-input relative px-4 pb-3 pt-1.5">
-      <UiComboboxSearch
+      <CommandInput
+        default-theme
+        container-class="relative"
         ref="search-input"
-        auto-focus
+        placeholder="Search..."
         @keydown="handleInputKeydown"
-      />
+        role="input"
+        class="focus:ring-ring focus:ring-offset-background cmx-search-input h-9 w-full rounded-md border bg-inherit px-10 text-sm transition focus:outline-none focus:ring-2 focus:ring-offset-2"
+      >
+        <template #icon>
+          <Search01Icon
+            class="text-muted-foreground pointer-events-none absolute left-3 top-1/2 size-5 -translate-y-1/2"
+          />
+        </template>
+        <template #append>
+          <button
+            tabindex="-1"
+            clear-icon=""
+            class="absolute right-3 top-1/2 z-10 hidden -translate-y-1/2"
+            @click="clearSearch"
+          >
+            <CancelCircleIcon class="text-muted-foreground size-5" />
+          </button>
+        </template>
+      </CommandInput>
     </div>
     <CommandList class="max-h-none px-4 pb-4 pt-1">
       <CommandEmpty>
@@ -86,15 +109,20 @@ import {
   Command,
   CommandEmpty,
   CommandGroup,
+  CommandInput,
   CommandItem,
   CommandList,
   TooltipSimple,
   useToast,
 } from '@snippy/ui';
-import UiComboboxSearch from '../ui/UiComboboxSearch.vue';
 import type { ComboboxRootProps } from 'radix-vue';
 import { useForwardPropsEmits, type ComboboxRootEmits } from 'radix-vue';
-import { Copy02Icon, FileEditIcon } from 'hugeicons-vue';
+import {
+  CancelCircleIcon,
+  Copy02Icon,
+  FileEditIcon,
+  Search01Icon,
+} from 'hugeicons-vue';
 import { appCommand } from '@/services/app-command.service';
 import { getCurrentWindow } from '@tauri-apps/api/window';
 import { sanitizeSnippetHTML } from '@/utils/snippet-utils';
@@ -105,6 +133,7 @@ import { logger } from '@/services/logger.service';
 import { getLogMessage } from '@/utils/helper';
 import { getNameFromPath } from '@/utils/document-utils';
 import type { SnippetWithPlaceholder } from '@/interface/snippet.interface';
+import { unrefElement } from '@vueuse/core';
 
 defineOptions({
   inheritAttrs: false,
@@ -134,7 +163,7 @@ const currentWindow = getCurrentWindow();
 
 const { toast } = useToast();
 const forwarded = useForwardPropsEmits(props, emit);
-const searchInput = useTemplateRef('search-input');
+const searchInput = useTemplateRef<HTMLInputElement>('search-input');
 
 const inputSnippet = shallowRef<SnippetWithPlaceholder | null>(null);
 const actionState = ref({
@@ -212,7 +241,16 @@ async function handleSelectItem(item: DocumentSearchEntry) {
     });
   }
 }
+function clearSearch() {
+  const container = unrefElement(searchInput);
+  if (!container) return;
 
+  const inputEl = container.querySelector('input');
+  if (!inputEl) return;
+
+  inputEl.value = '';
+  inputEl.dispatchEvent(new InputEvent('input'));
+}
 async function editSnippet() {
   try {
     await appCommand.invoke('open_snippet', {
@@ -249,13 +287,13 @@ async function copyContent() {
 }
 
 useTauriWindowEvent('tauri://focus', () => {
-  searchInput.value?.inputEl?.focus();
+  unrefElement(searchInput.value)?.focus();
 });
 
 watchEffect(() => {
   if (!inputSnippet.value) {
     nextTick(() => {
-      searchInput.value?.inputEl?.focus();
+      unrefElement(searchInput.value)?.focus();
     });
   }
 });
@@ -275,4 +313,8 @@ watch(
   },
   { deep: true },
 );
+
+onMounted(() => {
+  unrefElement(searchInput.value)?.focus();
+});
 </script>
