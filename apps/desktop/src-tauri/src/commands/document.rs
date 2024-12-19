@@ -3,6 +3,7 @@ use std::{collections::HashMap, sync::Mutex};
 use crate::{
     common::stringify,
     snippy::{self, document::AppDocument},
+    util::PathUtil,
 };
 
 #[tauri::command]
@@ -139,4 +140,21 @@ pub fn get_snippet_content(
 ) -> Result<String, String> {
     let app_document = app_document.lock().unwrap();
     app_document.get_snippet_content(&path).map_err(stringify)
+}
+
+#[tauri::command(async)]
+pub fn show_item_in_folder(
+    app_handle: tauri::AppHandle,
+    app_document: tauri::State<Mutex<AppDocument>>,
+    path: String,
+) -> Result<(), String> {
+    let app_document = app_document.lock().unwrap();
+    let path = app_document
+        .get_snippets_dir()
+        .safe_join(path)
+        .map_err(stringify)?;
+    snippy::shell::show_item_in_folder(app_handle, path.to_string_lossy().to_string())
+        .map_err(stringify)?;
+
+    Ok(())
 }

@@ -12,29 +12,7 @@
     </ContextMenuItem>
   </ContextMenuContent>
   <ContextMenuContent v-else class="context-menu-content min-w-40">
-    <template v-if="ctxData.type === 'snippet'">
-      <ContextMenuItem @click="renameItem">
-        <PencilEditIcon class="mr-2 size-4" />
-        Rename
-      </ContextMenuItem>
-      <ContextMenuItem @click="toggleBookmark">
-        <component
-          :is="isBookmarked ? Bookmark02Icon : BookmarkAdd02Icon"
-          class="mr-2 size-4"
-          :class="isBookmarked && 'fill-current'"
-        />
-        {{ isBookmarked ? 'Remove from bookmark' : 'Add to bookmark' }}
-      </ContextMenuItem>
-      <ContextMenuSeparator />
-      <ContextMenuItem
-        class="text-destructive-text focus:text-destructive-text"
-        @click="deleteItem"
-      >
-        <DeleteIcon class="mr-2 size-4" />
-        Delete
-      </ContextMenuItem>
-    </template>
-    <template v-else>
+    <template v-if="ctxData.type === 'folder'">
       <ContextMenuItem @click="createFolderSnippet">
         <FileAddIcon class="mr-2 size-4" />
         New snippet
@@ -44,33 +22,39 @@
         New folder
       </ContextMenuItem>
       <ContextMenuSeparator />
-      <ContextMenuItem @click="renameItem">
-        <PencilEditIcon class="mr-2 size-4" />
-        Rename
-      </ContextMenuItem>
-      <ContextMenuItem @click="toggleBookmark">
-        <component
-          :is="isBookmarked ? Bookmark02Icon : BookmarkAdd02Icon"
-          class="mr-2 size-4"
-          :class="isBookmarked && 'fill-current'"
-        />
-        {{ isBookmarked ? 'Remove from bookmark' : 'Add to bookmark' }}
-      </ContextMenuItem>
-      <ContextMenuSeparator />
-      <ContextMenuItem
-        class="text-destructive-text focus:text-destructive-text"
-        @click="deleteItem"
-      >
-        <DeleteIcon class="mr-2 size-4" />
-        Delete
-      </ContextMenuItem>
     </template>
+    <ContextMenuItem @click="renameItem">
+      <PencilEditIcon class="mr-2 size-4" />
+      Rename
+    </ContextMenuItem>
+    <ContextMenuItem @click="toggleBookmark">
+      <component
+        :is="isBookmarked ? Bookmark02Icon : BookmarkAdd02Icon"
+        class="mr-2 size-4"
+        :class="isBookmarked && 'fill-current'"
+      />
+      {{ isBookmarked ? 'Remove from bookmark' : 'Add to bookmark' }}
+    </ContextMenuItem>
+    <ContextMenuSeparator />
+    <ContextMenuItem @click="showInExplorer">
+      <ExternalDriveIcon class="mr-2 size-4" />
+      Show in system explorer
+    </ContextMenuItem>
+    <ContextMenuSeparator />
+    <ContextMenuItem
+      class="text-destructive-text focus:text-destructive-text"
+      @click="deleteItem"
+    >
+      <DeleteIcon class="mr-2 size-4" />
+      Delete
+    </ContextMenuItem>
   </ContextMenuContent>
 </template>
 <script setup lang="ts">
 import type { EditorSidebarSnippetsCtxMenu } from '@/interface/editor.interface';
 import { useAppDialog } from '@/providers/app-dialog.provider';
 import { useEditorSidebarProvider } from '@/providers/editor.provider';
+import { appCommand } from '@/services/app-command.service';
 import documentService from '@/services/document.service';
 import { logger } from '@/services/logger.service';
 import { useAppStore } from '@/stores/app.store';
@@ -92,6 +76,7 @@ import {
   FolderAddIcon,
   Bookmark02Icon,
   BookmarkAdd02Icon,
+  ExternalDriveIcon,
   Delete02Icon as DeleteIcon,
   PencilEdit01Icon as PencilEditIcon,
 } from 'hugeicons-vue';
@@ -116,6 +101,9 @@ const isBookmarked = computed(() => {
     : false;
 });
 
+function showInExplorer() {
+  appCommand.invoke('show_item_in_folder', { path: metadata.value.path });
+}
 async function createFolderSnippet() {
   try {
     if (props.ctxData.type !== 'folder') return;

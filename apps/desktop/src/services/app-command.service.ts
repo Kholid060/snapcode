@@ -46,6 +46,7 @@ interface FolderCommands {
 }
 
 interface DocumentCommands {
+  show_item_in_folder: [{ path: string }, void];
   get_document_state: [undefined, AppDocumentState];
   get_document_flat_tree: [undefined, DocumenFlatTreeData];
   get_all_document_folders: [undefined, DocumentFolderEntry[]];

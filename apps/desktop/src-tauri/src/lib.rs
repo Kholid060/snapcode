@@ -45,6 +45,7 @@ pub fn run() {
             commands::document::get_document_state,
             commands::document::get_snippet_content,
             commands::document::move_document_items,
+            commands::document::show_item_in_folder,
             commands::document::rename_document_item,
             commands::document::remove_document_items,
             commands::document::get_document_flat_tree,

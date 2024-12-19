@@ -18,6 +18,8 @@ use crate::{
     util::PathUtil,
 };
 
+use super::shell;
+
 mod document_items;
 mod document_util;
 
