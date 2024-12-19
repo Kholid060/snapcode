@@ -141,7 +141,7 @@ function handleSelect(
   const value = event.detail.value!;
 
   if (value.type === 'file') {
-    const treeItem = editorStore.document.findSnippetByPath(value.path);
+    const treeItem = editorStore.document.findItemByPath(value.path);
     if (!treeItem) {
       toast({
         variant: 'destructive',
@@ -151,6 +151,7 @@ function handleSelect(
     }
 
     editorStore.state.updateState('activeFileId', treeItem.id);
+    return;
   }
 
   const findFolderPath = (

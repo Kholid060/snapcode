@@ -1,4 +1,4 @@
-use std::{collections::HashMap, sync::Mutex, time::Instant};
+use std::{collections::HashMap, sync::Mutex};
 
 use crate::{
     common::stringify,

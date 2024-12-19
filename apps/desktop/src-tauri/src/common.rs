@@ -10,7 +10,7 @@ pub fn stringify<T: ToString>(x: T) -> String {
 }
 
 pub fn ensure_dir<P: AsRef<path::Path>>(path: &P) -> io::Result<()> {
-    if let false = fs::exists(path)? {
+    if !(fs::exists(path)?) {
         fs::create_dir(path)?;
     };
 

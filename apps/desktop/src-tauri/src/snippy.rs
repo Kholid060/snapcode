@@ -7,11 +7,11 @@ pub mod document;
 pub mod keyboard;
 
 pub fn init_app(app: &mut tauri::App) -> tauri::Result<()> {
-    tray::init_app_tray(&app)?;
-    document::init_app_document(&app)?;
+    tray::init_app_tray(app)?;
+    document::init_app_document(app)?;
 
-    if let None = std::env::args().find(|arg| arg == "autostart") {
-        window::MainWindow::create_or_show(&app.app_handle())?;
+    if !std::env::args().any(|arg| &arg == "autostart") {
+        window::MainWindow::create_or_show(app.app_handle())?;
     }
 
     Ok(())

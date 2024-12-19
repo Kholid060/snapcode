@@ -14,18 +14,26 @@ import EditorContentHeader from './content/EditorContentHeader.vue';
 import EditorSidebar from './sidebar/EditorSidebar.vue';
 import { useEditorStore } from '@/stores/editor.store';
 import { useTauriWindowEvent } from '@/composables/tauri.composable';
+import { getDocumentParentDir } from '@/utils/document-utils';
+import { TREE_ROOT_KEY } from '@/utils/tree-data-utils';
 
 const editorStore = useEditorStore();
 
 useTauriWindowEvent('snippet:open', (event) => {
-  const item = editorStore.document.findSnippetByPath(event.payload);
+  const item = editorStore.document.findItemByPath(event.payload);
   if (!item) return;
 
   editorStore.state.updateState('activeFileId', item.id);
 });
 useTauriWindowEvent('snippet:created', (event) => {
+  const parsedPath = getDocumentParentDir(event.payload.path);
+  const parent = parsedPath.parentDir
+    ? editorStore.document.findItemByPath(parsedPath.parentDir, true)?.id ||
+      TREE_ROOT_KEY
+    : TREE_ROOT_KEY;
+
   editorStore.document.registerItems({
-    snippets: [event.payload],
+    snippets: [{ ...event.payload, metadata: { parentId: parent } }],
   });
 });
 </script>

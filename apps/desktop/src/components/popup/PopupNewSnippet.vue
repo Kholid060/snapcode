@@ -17,7 +17,7 @@
     "
   ></div>
   <div class="flex items-center gap-2 px-4 py-2">
-    <Popover v-slot="{ open }">
+    <Popover v-model:open="newSnippet.showFolder" v-slot="{ open }">
       <PopoverTrigger as-child>
         <Button
           variant="outline"
@@ -30,7 +30,7 @@
         </Button>
       </PopoverTrigger>
       <PopoverContent class="p-0" align="start">
-        <Command v-model="newSnippet.folder">
+        <Command>
           <CommandInput placeholder="Search folder..." />
           <CommandEmpty>No folder found.</CommandEmpty>
           <CommandList>
@@ -38,17 +38,21 @@
               <CommandItem
                 v-for="folder in folders"
                 :key="folder.path"
-                :value="folder"
+                :value="folder.path || TREE_ROOT_KEY"
+                @select="
+                  newSnippet.showFolder = false;
+                  newSnippet.folder = folder;
+                "
               >
                 <Tick02Icon
                   :class="[
-                    'mr-2 h-4 w-4',
+                    'mr-2 h-4 w-4 flex-shrink-0',
                     newSnippet.folder.path === folder.path
                       ? 'opacity-100'
                       : 'opacity-0',
                   ]"
                 />
-                {{ folder.path || '(root)' }}
+                <p class="line-clamp-2 grow">{{ folder.path || '(root)' }}</p>
               </CommandItem>
             </CommandGroup>
           </CommandList>
@@ -102,6 +106,7 @@ import type { DocumentFolderEntry } from '@/interface/document.interface';
 import type { EditorSettings } from '@/interface/editor.interface';
 import documentService from '@/services/document.service';
 import { EDITOR_DEFAULT_SETTINGS } from '@/utils/const/editor.const';
+import { TREE_ROOT_KEY } from '@/utils/tree-data-utils';
 
 let lastFetch = 0;
 
@@ -123,9 +128,11 @@ const editorSettings = shallowReactive<EditorSettings>({
 });
 const newSnippet = shallowReactive<{
   name: string;
+  showFolder: boolean;
   folder: DocumentFolderEntry;
 }>({
   name: '',
+  showFolder: false,
   folder: { ...ROOT_FOLDER },
 });
 const folders = shallowRef<DocumentFolderEntry[]>([]);
@@ -161,7 +168,9 @@ async function createSnippet() {
 }
 function fetchData() {
   appCommand.invoke('get_all_document_folders', undefined).then((entries) => {
-    folders.value = [ROOT_FOLDER, ...entries];
+    folders.value = [ROOT_FOLDER, ...entries].sort(
+      (a, z) => a.path.split('/').length - z.path.split('/').length,
+    );
     lastFetch = Date.now();
   });
   documentService.stores.state.xGet('editor').then((value) => {

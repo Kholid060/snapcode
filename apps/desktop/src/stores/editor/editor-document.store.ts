@@ -15,6 +15,7 @@ import { useEditorState } from './editor-state.store';
 import {
   documentItemsSorter,
   getDocumentParentDir,
+  getRootPaths,
   joinDocumentPath,
 } from '@/utils/document-utils';
 import { TREE_ROOT_KEY } from '@/utils/tree-data-utils';
@@ -191,7 +192,7 @@ export const useEditorDocument = defineStore('editor:document', () => {
     });
 
     await documentService.deleteItems(
-      itemPaths,
+      getRootPaths(itemPaths),
       appStore.settings.deleteToTrash,
     );
     await documentService.stores.metadata.xDelete(metadataPaths);
@@ -210,7 +211,6 @@ export const useEditorDocument = defineStore('editor:document', () => {
     const oldParentTree = treeData[oldParentId || TREE_ROOT_KEY];
     const oldItemIndex =
       oldParentTree.findIndex((item) => item.id === id) ?? -1;
-    console.log({ oldParentTree, oldItemIndex });
     if (oldItemIndex === -1) return;
 
     const metadata = treeMetadata[id];
@@ -218,12 +218,6 @@ export const useEditorDocument = defineStore('editor:document', () => {
     const newParentPath = treeMetadata[newParentId]?.path;
     if (!metadata || !isString(oldParentPath) || !isString(newParentPath))
       return;
-
-    console.log(
-      'before:',
-      { oldPath: oldParentPath, id, newPath: newParentPath },
-      JSON.parse(JSON.stringify(treeMetadata)),
-    );
 
     const newPath = joinDocumentPath(newParentPath, metadata.name);
     const [movedPath] = await documentService.moveItems([
@@ -240,6 +234,13 @@ export const useEditorDocument = defineStore('editor:document', () => {
     });
     oldParentTree.splice(oldItemIndex, 1);
 
+    bookmarksStore.renameBookmark({
+      newPath: movedPath,
+      isDir: metadata.isDir,
+      oldPath: metadata.path,
+    });
+
+    metadata.path = movedPath;
     if (metadata.isDir) {
       await renameFolderMetadata({
         id,
@@ -247,11 +248,14 @@ export const useEditorDocument = defineStore('editor:document', () => {
       });
     }
   }
-  function findSnippetByPath(path: string) {
+  function findItemByPath(path: string, isDir = false) {
     for (const key in treeData) {
       for (const item of treeData[key]) {
-        if (treeMetadata[item.id]?.path === path && !item.isDir) {
-          return treeMetadata[key];
+        if (
+          treeMetadata[item.id]?.path === path &&
+          (isDir ? true : isDir === item.isDir)
+        ) {
+          return treeMetadata[item.id];
         }
       }
     }
@@ -281,7 +285,7 @@ export const useEditorDocument = defineStore('editor:document', () => {
   }
   async function updateSnippetMetadata(
     id: string,
-    payload: Partial<DocumentFlatTreeMetadataItem>,
+    payload: Omit<Partial<DocumentFlatTreeMetadataItem>, 'path'>,
   ) {
     const currMetadata = treeMetadata[id];
     if (!currMetadata) return;
@@ -346,6 +350,8 @@ export const useEditorDocument = defineStore('editor:document', () => {
     if (newMetadatKeys.length > 0) {
       await documentService.renameMetadata(newMetadatKeys);
     }
+
+    editorState.saveState();
   }
   function getItemMetadata(itemId: string) {
     return treeMetadata[itemId] ?? null;
@@ -403,7 +409,7 @@ export const useEditorDocument = defineStore('editor:document', () => {
     treeMetadata,
     registerItems,
     getItemMetadata,
-    findSnippetByPath,
+    findItemByPath,
     updateSnippetContents,
     updateSnippetMetadata,
   };

@@ -55,6 +55,7 @@ export const useBookmarksStore = defineStore('bookmarks', () => {
       const isMatch = isDir
         ? bookmark.path.startsWith(oldPath)
         : bookmark.path === oldPath;
+      console.log(isMatch, { bookmark, oldPath, newPath });
       if (!isMatch) return bookmark;
 
       isChanged = true;

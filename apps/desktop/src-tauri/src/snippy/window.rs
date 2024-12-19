@@ -41,7 +41,7 @@ impl PopupWindow {
     }
 
     pub fn get_or_create(app: &tauri::AppHandle) -> Result<WebviewWindow, tauri::Error> {
-        let initial_pos = PopupWindow::get_pos_from_cursor(&app)?;
+        let initial_pos = PopupWindow::get_pos_from_cursor(app)?;
         let popup_window = match app.get_webview_window("popup") {
             Some(window) => window,
             None => tauri::WebviewWindowBuilder::new(
@@ -71,9 +71,9 @@ impl PopupWindow {
     }
 
     pub fn show_on_cursor(app: &tauri::AppHandle) -> tauri::Result<()> {
-        let popup_window = PopupWindow::get_or_create(&app)?;
+        let popup_window = PopupWindow::get_or_create(app)?;
         if !popup_window.is_focused()? {
-            let new_position = PopupWindow::get_pos_from_cursor(&app)?;
+            let new_position = PopupWindow::get_pos_from_cursor(app)?;
 
             popup_window.set_position(new_position)?;
             popup_window.show()?;

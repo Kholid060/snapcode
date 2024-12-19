@@ -23,10 +23,10 @@ import { useBookmarksStore } from './stores/bookmarks.store';
 
 await Promise.all([
   useAppStore().init().catch(console.error),
-  useHotkeysStore().init(),
   useEditorStore().init(),
-  useBookmarksStore().init(),
 ]);
+useHotkeysStore().init();
+useBookmarksStore().init();
 
 documentService.startWatcher();
 

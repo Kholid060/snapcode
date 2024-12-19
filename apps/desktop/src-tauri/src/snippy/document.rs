@@ -1,5 +1,4 @@
 use std::{
-    collections::HashMap,
     fs, io,
     path::{Path, PathBuf},
     sync::{Arc, Mutex},
@@ -8,7 +7,7 @@ use std::{
 pub use document_items::*;
 use normalize_path::NormalizePath;
 use path_slash::PathExt;
-use serde::{ser::SerializeStruct, Serialize};
+use serde::ser::SerializeStruct;
 use serde_json::json;
 use tauri::{self, Manager};
 use tauri_plugin_store::StoreExt;
@@ -161,15 +160,14 @@ impl AppDocument {
             .snippets_dir
             .safe_join(snippet.path)?
             .gen_unique_filename()?;
-        fs::write(&file_path, &snippet.contents)?;
+        fs::write(file_path, &snippet.contents)?;
 
         let file_path = file_path
             .strip_prefix(&self.snippets_dir)
             .unwrap()
             .to_path_buf();
         let file_path_str = file_path
-            .to_slash()
-            .and_then(|val| Some(val.to_string()))
+            .to_slash().map(|val| val.to_string())
             .unwrap_or_default();
 
         if let Some(metadata) = &snippet.stored {
@@ -212,7 +210,7 @@ impl AppDocument {
                 .snippets_dir
                 .safe_join(&folder.path)?
                 .gen_unique_filename()?;
-            fs::create_dir_all(&folder_path)?;
+            fs::create_dir_all(folder_path)?;
 
             let folder_path = folder_path
                 .strip_prefix(&self.snippets_dir)
@@ -221,8 +219,7 @@ impl AppDocument {
             Ok(FolderDocCreated {
                 metadata: folder.metadata,
                 path: folder_path
-                    .to_slash()
-                    .and_then(|v| Some(v.to_string()))
+                    .to_slash().map(|v| v.to_string())
                     .unwrap_or_default()
                     .to_owned(),
                 name: folder_path
@@ -242,7 +239,7 @@ impl AppDocument {
         new_path: Q,
     ) -> io::Result<Q> {
         let old_path = self.snippets_dir.safe_join(old_path.as_ref())?;
-        let new_path_buf = self.snippets_dir.safe_join(&new_path.as_ref())?;
+        let new_path_buf = self.snippets_dir.safe_join(new_path.as_ref())?;
 
         if fs::exists(&new_path_buf)? {
             Err(io::Error::new(
@@ -280,7 +277,7 @@ impl AppDocument {
     }
 
     pub fn search(&self, search_term: &str) -> anyhow::Result<Vec<SearchItemEntry>> {
-        document_util::search_document(&self.snippets_dir, &search_term)
+        document_util::search_document(&self.snippets_dir, search_term)
     }
 
     pub fn get_snippet_content<P: AsRef<Path>>(&self, path: P) -> io::Result<String> {

@@ -60,3 +60,22 @@ export function sanitizeDocumentFileName(input: string) {
 
   return new TextDecoder().decode(truncated);
 }
+
+export function getRootPaths(paths: string[]) {
+  if (paths.length <= 1) return paths;
+
+  const splittedPaths = paths.map((path) => path.split('/'));
+  paths.sort(
+    (a, z) =>
+      splittedPaths[paths.indexOf(a)].length -
+      splittedPaths[paths.indexOf(z)].length,
+  );
+
+  const rootItems: string[] = [];
+  for (const path of paths) {
+    const isRoot = !rootItems.some((root) => path.startsWith(root));
+    if (isRoot) rootItems.push(path);
+  }
+
+  return rootItems;
+}

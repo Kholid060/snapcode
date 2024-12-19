@@ -12,14 +12,14 @@
         v-for="item in result"
         :key="item.path"
         :value="item.path"
-        class="border-border/50 mb-px block"
+        class="border-border/50 mb-px block text-sm"
         :title="item.path"
         @select.prevent="
           editorStore.state.updateState('activeFileId', item.path)
         "
       >
-        <p v-html="sanitizeSnippetHTML(item.name)"></p>
-        <p class="text-muted-foreground truncate text-xs leading-tight">
+        <p v-html="sanitizeSnippetHTML(item.name)" class="truncate"></p>
+        <p class="text-muted-foreground line-clamp-2 text-xs leading-tight">
           /{{ item.path }}
         </p>
         <p

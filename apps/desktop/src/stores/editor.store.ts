@@ -65,7 +65,8 @@ export const useEditorStore = defineStore('editor', () => {
   async function init() {
     if (initiated) return;
 
-    await Promise.all([state.init(), settings.init(), document.init()]);
+    await Promise.all([settings.init(), document.init()]);
+    await state.init();
 
     initiated = true;
   }

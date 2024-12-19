@@ -17,19 +17,16 @@ impl AppTray {
     fn build_tray(app: &App, menu: &TrayMenu) -> Result<(), Error> {
         TrayIconBuilder::with_id("main")
             .icon(app.default_window_icon().unwrap().clone())
-            .on_tray_icon_event(|tray, event| match event {
-                TrayIconEvent::Click {
+            .on_tray_icon_event(|tray, event| if let TrayIconEvent::Click {
                     button: MouseButton::Left,
                     button_state: MouseButtonState::Up,
                     ..
-                } => {
-                    let app = tray.app_handle();
-                    if let Some(main_window) = app.get_webview_window("main") {
-                        let _ = main_window.show();
-                        let _ = main_window.set_focus();
-                    }
+                } = event {
+                let app = tray.app_handle();
+                if let Some(main_window) = app.get_webview_window("main") {
+                    let _ = main_window.show();
+                    let _ = main_window.set_focus();
                 }
-                _ => {}
             })
             .on_menu_event(|app, event| match event.id.as_ref() {
                 "open-app" => {
@@ -40,7 +37,7 @@ impl AppTray {
                     app.exit(0);
                 }
                 "quick-access" => {
-                    if let Ok(window) = snippy::window::PopupWindow::get_or_create(&app) {
+                    if let Ok(window) = snippy::window::PopupWindow::get_or_create(app) {
                         let _ = window.show();
                         let _ = window.set_focus();
                     }

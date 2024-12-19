@@ -1,6 +1,6 @@
 <template>
   <Dialog default-open>
-    <DialogContent class="max-w-xl overflow-hidden p-0 shadow-lg">
+    <DialogContent class="max-w-2xl overflow-hidden p-0 shadow-lg">
       <Command
         default-open
         v-model:search-term="search"
@@ -29,8 +29,9 @@
           <CommandItem
             v-for="folder in folders"
             :key="folder.id"
-            :value="folder.id"
-            class="line-clamp-2 block leading-tight"
+            :value="folder.path || TREE_ROOT_KEY"
+            :title="folder.path"
+            class="line-clamp-2 block truncate leading-tight"
             @click="
               $emit('close', {
                 canceled: false,
@@ -80,7 +81,9 @@ const editorStore = useEditorStore();
 const search = shallowRef('');
 
 const folders = computed(() =>
-  Object.values(editorStore.document.treeMetadata).filter((item) => item.isDir),
+  Object.values(editorStore.document.treeMetadata)
+    .filter((item) => item.isDir)
+    .sort((a, z) => a.path.split('/').length - z.path.split('/').length),
 );
 
 async function createFolder() {

@@ -110,7 +110,7 @@ async function updateSnippetLang(lang: string) {
     openLangSelector.value = false;
 
     await editorStore.document.updateSnippetMetadata(
-      editorStore.activeSnippet.path,
+      editorStore.activeSnippet.id,
       {
         metadata: { lang },
       },

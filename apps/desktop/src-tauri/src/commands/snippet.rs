@@ -57,7 +57,7 @@ pub fn send_snippet_content(
     let app_document = app_document.lock().unwrap();
 
     let mut content = app_document.get_snippet_content(path).map_err(stringify)?;
-    let content = if placeholders.len() > 0 {
+    let content = if !placeholders.is_empty() {
         snippy::snippet::replace_snippet_placeholders(
             &mut content,
             &placeholders,
