@@ -60,3 +60,16 @@ export function createDebounce() {
 export function updateObject<T extends object>(target: T, source: Partial<T>) {
   Object.assign(target, source);
 }
+
+export function preventGlobalContextMenu() {
+  document.body.addEventListener('contextmenu', (event) => {
+    if (
+      event.target instanceof HTMLElement &&
+      event.target.hasAttribute('data-contextmenu')
+    ) {
+      return;
+    }
+
+    event.preventDefault();
+  });
+}

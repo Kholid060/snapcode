@@ -106,12 +106,7 @@ class DocumentService {
   }
 
   async getFlatTree() {
-    return appCommand
-      .invoke('get_document_flat_tree', undefined)
-      .then((value) => {
-        console.log(value);
-        return value;
-      });
+    return appCommand.invoke('get_document_flat_tree', undefined);
   }
 
   async deleteItems(paths: string[], toTrash: boolean) {

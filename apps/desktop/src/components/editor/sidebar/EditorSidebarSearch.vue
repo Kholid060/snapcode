@@ -14,9 +14,7 @@
         :value="item.path"
         class="border-border/50 mb-px block text-sm"
         :title="item.path"
-        @select.prevent="
-          editorStore.state.updateState('activeFileId', item.path)
-        "
+        @select.prevent="handleSelect(item.path)"
       >
         <p v-html="sanitizeSnippetHTML(item.name)" class="truncate"></p>
         <p class="text-muted-foreground line-clamp-2 text-xs leading-tight">
@@ -47,6 +45,19 @@ const editorStore = useEditorStore();
 
 const result = shallowRef<DocumentSearchEntry[]>([]);
 const isLoading = shallowRef(false);
+
+function handleSelect(path: string) {
+  const itemId = editorStore.document.findItemByPath(path)?.id;
+  if (!itemId) {
+    toast({
+      variant: 'destructive',
+      title: 'Item not found',
+    });
+    return;
+  }
+
+  editorStore.state.updateState('activeFileId', itemId);
+}
 
 const onSearchChanged = useDebounceFn((searchTerm: string) => {
   if (!searchTerm.trim()) {

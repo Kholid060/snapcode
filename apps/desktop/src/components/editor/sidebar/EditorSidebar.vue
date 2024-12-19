@@ -43,7 +43,11 @@
     </KeepAlive>
     <ContextMenu>
       <ContextMenuTrigger as-child>
-        <button ref="context-menu-trigger" class="hidden"></button>
+        <button
+          ref="context-menu-trigger"
+          class="hidden"
+          data-contextmenu
+        ></button>
       </ContextMenuTrigger>
       <component
         v-if="ctxMenuData"

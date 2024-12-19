@@ -3,16 +3,17 @@ import './assets/css/style.css';
 import { createPinia } from 'pinia';
 import { attachConsole } from '@tauri-apps/plugin-log';
 import { logger } from './services/logger.service';
-import { getLogMessage } from './utils/helper';
+import { getLogMessage, preventGlobalContextMenu } from './utils/helper';
 import AppAsync from './AppAsync.vue';
 import documentService from './services/document.service';
 
 (async () => {
   try {
+    preventGlobalContextMenu();
+
     if (import.meta.env.DEV) {
       await attachConsole();
     }
-
     await Promise.all([documentService.init()]);
 
     createApp(AppAsync).use(createPinia()).mount('#app');

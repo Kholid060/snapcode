@@ -15,8 +15,9 @@
         v-for="item in flattenItems"
         :key="item._id + item.index"
         :item="item"
+        data-contextmenu
         @select="handleSelect($event, item, flattenItems)"
-        @contextmenu.prevent="
+        @contextmenu.prevent.stop="
           $emit('item:context-menu', { event: $event, item })
         "
       />
@@ -119,7 +120,6 @@ watchEffect((onCleanup) => {
 
         try {
           const newParentId = target.isDir ? target.id : target.parentId;
-          console.log(newParentId, previous);
           if (newParentId === previous.parentId) return;
           await editorStore.document.moveItem({
             newParentId,

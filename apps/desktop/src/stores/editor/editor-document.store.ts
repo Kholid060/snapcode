@@ -388,12 +388,10 @@ export const useEditorDocument = defineStore('editor:document', () => {
 
     const data = await documentService.getFlatTree();
     Object.keys(data.flatTree).forEach((key) => {
-      // treeFolderIds.set(data.metadata[key].path, key);
       documentItemsSorter(data.flatTree[key], data.metadata);
     });
     Object.assign(treeData, data.flatTree);
     Object.assign(treeMetadata, data.metadata);
-    console.log(treeMetadata);
 
     initiated = true;
   }

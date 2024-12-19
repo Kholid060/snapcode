@@ -563,8 +563,6 @@ async function storeGitHubGists(
     }),
   );
 
-  console.log({ folders, snippets });
-
   if (folders.length > 0) await editorStore.document.addFolders(folders);
   if (snippets.length > 0) await editorStore.document.addSnippets(snippets);
 
