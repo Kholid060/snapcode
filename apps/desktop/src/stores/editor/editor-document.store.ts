@@ -22,9 +22,9 @@ import { TREE_ROOT_KEY } from '@/utils/tree-data-utils';
 import { useBookmarksStore } from '../bookmarks.store';
 import type { SetOptional } from 'type-fest';
 import { nanoid } from 'nanoid/non-secure';
-import { updateObject } from '@/utils/helper';
 import { isString } from '@/utils/data-type';
 import { useAppStore } from '../app.store';
+import { getSnippetLangFromName } from '@/utils/snippet-utils';
 
 type NewFlatTreeItem = SetOptional<DocumentFlatTreeItem, 'id' | 'parentId'>;
 type NewFlatTreeMetadataItem = SetOptional<DocumentFlatTreeMetadataItem, 'id'>;
@@ -296,7 +296,7 @@ export const useEditorDocument = defineStore('editor:document', () => {
   }
   async function updateSnippetMetadata(
     id: string,
-    payload: Omit<Partial<DocumentFlatTreeMetadataItem>, 'path'>,
+    payload: Partial<DocumentFlatTreeMetadataItem>,
   ) {
     const currMetadata = treeMetadata[id];
     if (!currMetadata) return;
@@ -308,10 +308,17 @@ export const useEditorDocument = defineStore('editor:document', () => {
         ...payload.metadata,
       };
       await documentService.setMetadata(currMetadata.path, metadata);
+
+      if (payload.path) {
+        await documentService.renameMetadata([
+          [currMetadata.path, payload.path],
+        ]);
+      }
     }
 
     treeMetadata[id] = {
       ...treeMetadata[id],
+      ...payload,
       metadata,
     };
   }
@@ -381,16 +388,24 @@ export const useEditorDocument = defineStore('editor:document', () => {
       treeMetadata[id].name = newName;
       await renameFolderMetadata({ id, newPath });
     } else {
-      updateObject(treeMetadata[id], {
+      await updateSnippetMetadata(id, {
         path: newPath,
         name: newName,
+        metadata: { lang: (await getSnippetLangFromName(newName))?.name ?? '' },
       });
+    }
+
+    if (
+      editorState.state.activeFileId === id ||
+      editorState.state.activeFolderIds.includes(id)
+    ) {
+      editorState.saveState();
     }
 
     await bookmarksStore.renameBookmark({
       newPath,
-      oldPath: itemMetadata.path,
       isDir: itemMetadata.isDir,
+      oldPath: itemMetadata.path,
     });
   }
 

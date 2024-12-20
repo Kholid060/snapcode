@@ -15,7 +15,7 @@
             !($event as KeyboardEvent).defaultPrevented && createFolder()
           "
         />
-        <CommandList class="p-1.5">
+        <CommandList class="min-h-64 p-1.5">
           <CommandEmpty
             class="bg-accent text-muted-foreground relative block w-full cursor-default select-none items-center rounded-sm px-2 py-1.5 text-left text-sm outline-none"
             as="button"

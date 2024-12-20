@@ -26,6 +26,7 @@ pub fn store_rename_root_keys(
     keys.iter().for_each(|(old_key, new_key)| {
         if let Some(value) = store.get(old_key) {
           store.set(new_key, value);
+          store.delete(old_key);
         }
     });
 
