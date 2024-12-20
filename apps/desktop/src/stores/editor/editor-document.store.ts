@@ -144,6 +144,7 @@ export const useEditorDocument = defineStore('editor:document', () => {
   async function deleteItems(items: DocumentFlatTreeItem[]) {
     const itemPaths: string[] = [];
     const metadataPaths: string[] = [];
+    let removeActiveFile = false;
 
     items.sort((a, z) => {
       if (a.isDir && z.isDir) return 1;
@@ -165,12 +166,20 @@ export const useEditorDocument = defineStore('editor:document', () => {
           metadataPaths.push(treeMetadata[item.id].path);
         }
 
+        if (item.id === editorState.state.activeFileId) {
+          removeActiveFile = true;
+        }
+
         if (item.isDir) walkFolder(item.id);
       });
 
       delete treeData[folderId];
     };
     items.forEach((item) => {
+      if (item.id === editorState.state.activeFileId) {
+        removeActiveFile = true;
+      }
+
       const itemIndex =
         treeData[item.parentId]?.findIndex(
           (treeItem) => treeItem.id === item.id,
@@ -194,6 +203,10 @@ export const useEditorDocument = defineStore('editor:document', () => {
       appStore.settings.deleteToTrash,
     );
     await documentService.stores.metadata.xDelete(metadataPaths);
+
+    if (removeActiveFile) {
+      editorState.updateState('activeFileId', '');
+    }
   }
   async function moveItem({
     id,
