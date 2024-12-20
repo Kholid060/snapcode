@@ -36,6 +36,10 @@
       {{ isBookmarked ? 'Remove from bookmark' : 'Add to bookmark' }}
     </ContextMenuItem>
     <ContextMenuSeparator />
+    <ContextMenuItem v-if="ctxData.type === 'snippet'" @click="makeSnippetCopy">
+      <Copy01Icon class="mr-2 size-4" />
+      Make a copy
+    </ContextMenuItem>
     <ContextMenuItem @click="moveItemFolder">
       <FolderTransferIcon class="mr-2 size-4" />
       Move {{ ctxData.type === 'folder' ? 'folder' : 'snippet' }}
@@ -84,6 +88,7 @@ import {
   FolderTransferIcon,
   Delete02Icon as DeleteIcon,
   PencilEdit01Icon as PencilEditIcon,
+  Copy01Icon,
 } from 'hugeicons-vue';
 
 const props = defineProps<{
@@ -171,7 +176,23 @@ async function createFolderFolder() {
     });
   }
 }
+async function makeSnippetCopy() {
+  try {
+    const metadata = editorStore.document.getItemMetadata(
+      props.ctxData.item.id,
+    );
+    if (!metadata || metadata.isDir) return;
 
+    await editorStore.document.duplicateSnippet(metadata.path);
+  } catch (error) {
+    logger.error(getLogMessage('duplicate-snippet', error));
+    toast({
+      variant: 'destructive',
+      title: 'An error occured',
+      description: typeof error === 'string' ? error : '',
+    });
+  }
+}
 async function renameItem() {
   try {
     const result = await appDialog.prompt({
@@ -203,7 +224,7 @@ async function renameItem() {
 }
 async function toggleBookmark() {
   try {
-    bookmarksStore.setBookmark(
+    await bookmarksStore.setBookmark(
       {
         path: metadata.value.path,
         type: props.ctxData.type === 'folder' ? 'folder' : 'file',

@@ -22,6 +22,7 @@ interface StoreCommands {
 }
 
 interface SnippetCommands {
+  duplicate_snippet: [{ path: string }, DocumentCreatedSnippet];
   get_snippet_content: [{ path: string }, string];
   create_snippets: [
     { snippets: Pick<SnippetNewPayload, 'path' | 'contents'>[] },

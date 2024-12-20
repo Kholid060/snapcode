@@ -121,6 +121,10 @@ class DocumentService {
       searchTerm: searchTerm.slice(0, 120),
     });
   }
+
+  duplicateSnippet(path: string) {
+    return appCommand.invoke('duplicate_snippet', { path });
+  }
 }
 
 const documentService = new DocumentService();

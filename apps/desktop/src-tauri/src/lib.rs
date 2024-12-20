@@ -41,6 +41,7 @@ pub fn run() {
             commands::document::create_folders,
             commands::document::document_search,
             commands::document::create_snippets,
+            commands::document::duplicate_snippet,
             commands::document::get_document_state,
             commands::document::get_snippet_content,
             commands::document::move_document_items,

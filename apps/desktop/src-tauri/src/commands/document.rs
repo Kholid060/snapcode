@@ -156,3 +156,12 @@ pub fn show_item_in_folder(
 
     Ok(())
 }
+
+#[tauri::command]
+pub fn duplicate_snippet(
+    app_document: tauri::State<Mutex<AppDocument>>,
+    path: String,
+) -> Result<snippy::document::SnippetDocCreated, String> {
+    let app_document = app_document.lock().unwrap();
+    app_document.duplicate_snippet(path).map_err(stringify)
+}

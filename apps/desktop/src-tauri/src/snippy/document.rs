@@ -17,7 +17,6 @@ use crate::{
     util::PathUtil,
 };
 
-
 mod document_items;
 mod document_util;
 
@@ -311,6 +310,31 @@ impl AppDocument {
                 name: entry.as_str().to_owned(),
             })
             .collect())
+    }
+
+    pub fn duplicate_snippet<P: AsRef<Path>>(&self, path: P) -> io::Result<SnippetDocCreated> {
+        let mut source_path = self.snippets_dir.safe_join(path)?;
+        let destination_path = source_path.gen_unique_filename()?;
+
+        fs::copy(source_path, &destination_path)?;
+
+        Ok(SnippetDocCreated {
+            name: destination_path
+                .file_name()
+                .map(|val| val.to_str().unwrap_or_default().to_string())
+                .unwrap_or_default(),
+            ext: destination_path
+                .extension()
+                .map(|val| val.to_str().unwrap_or_default().to_string())
+                .unwrap_or_default(),
+            stored: None,
+            metadata: None,
+            path: destination_path
+                .strip_prefix(&self.snippets_dir)
+                .unwrap()
+                .to_slash_lossy()
+                .to_string(),
+        })
     }
 
     pub fn get_base_dir(&self) -> &PathBuf {

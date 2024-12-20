@@ -274,6 +274,10 @@ export const useEditorDocument = defineStore('editor:document', () => {
     return null;
   }
 
+  async function duplicateSnippet(path: string) {
+    const snippet = await documentService.duplicateSnippet(path);
+    registerItems({ snippets: [snippet] });
+  }
   async function addSnippets(payload: SnippetNewPayload[]) {
     const { snippets } = registerItems({
       snippets: await documentService.createSnippets(payload),
@@ -428,8 +432,9 @@ export const useEditorDocument = defineStore('editor:document', () => {
     addSnippets,
     treeMetadata,
     registerItems,
-    getItemMetadata,
     findItemByPath,
+    getItemMetadata,
+    duplicateSnippet,
     updateSnippetContents,
     updateSnippetMetadata,
   };
