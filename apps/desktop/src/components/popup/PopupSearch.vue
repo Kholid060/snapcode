@@ -4,7 +4,8 @@
     model-value=""
     :is-loading="isLoading"
     class="pb-4"
-    include-close-action
+    :include-close-action="searchEmpty"
+    close-action-label="Remove from recent"
     :group-heading="searchEmpty ? 'Recent snippets' : ''"
     @snippet:sent="addToRecent"
     @snippet:close="removeFromRecent($event.path)"
@@ -12,28 +13,17 @@
     :item-contains-html="!searchEmpty"
     :filter-function="(value) => value"
   >
-    <template v-if="searchEmpty" #actions:suffix="{ item }">
-      <TooltipSimple label="Remove from recent">
-        <button
-          class="text-muted-foreground ml-0.5"
-          @click.stop="removeFromRecent(item.path)"
-        >
-          <Cancel01Icon class="size-4" />
-        </button>
-      </TooltipSimple>
-    </template>
   </PopupSnippetCombobox>
 </template>
 <script setup lang="ts">
 import { useDebounceFn } from '@vueuse/core';
-import { TooltipSimple, useToast } from '@snippy/ui';
+import { useToast } from '@snippy/ui';
 import { logger } from '@/services/logger.service';
 import { getLogMessage } from '@/utils/helper';
 import PopupSnippetCombobox from './PopupSnippetCombobox.vue';
 import documentService from '@/services/document.service';
 import type { DocumentSearchEntry } from '@/interface/document.interface';
 import { getNameFromPath } from '@/utils/document-utils';
-import { Cancel01Icon } from 'hugeicons-vue';
 
 const { toast } = useToast();
 

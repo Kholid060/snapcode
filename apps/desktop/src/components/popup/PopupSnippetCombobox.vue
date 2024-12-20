@@ -146,6 +146,7 @@ defineOptions({
 const props = defineProps<
   ComboboxRootProps & {
     groupHeading?: string;
+    closeActionLabel?: string;
     itemContainsHtml?: boolean;
     includeCloseAction?: boolean;
     items: DocumentSearchEntry[];
@@ -193,7 +194,11 @@ const itemActions = computed(() => {
     { icon: FileEditIcon, id: 'edit', label: 'Edit' },
   ];
   if (props.includeCloseAction) {
-    actions.push({ icon: Cancel01Icon, id: 'close', label: 'Close' });
+    actions.push({
+      id: 'close',
+      icon: Cancel01Icon,
+      label: props.closeActionLabel || 'Close',
+    });
   }
 
   return actions;
