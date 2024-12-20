@@ -144,7 +144,6 @@ pub fn get_snippet_content(
 
 #[tauri::command(async)]
 pub fn show_item_in_folder(
-    app_handle: tauri::AppHandle,
     app_document: tauri::State<Mutex<AppDocument>>,
     path: String,
 ) -> Result<(), String> {
@@ -153,8 +152,7 @@ pub fn show_item_in_folder(
         .get_snippets_dir()
         .safe_join(path)
         .map_err(stringify)?;
-    snippy::shell::show_item_in_folder(app_handle, path.to_string_lossy().to_string())
-        .map_err(stringify)?;
+    tauri_plugin_opener::reveal_item_in_dir(path).map_err(stringify)?;
 
     Ok(())
 }

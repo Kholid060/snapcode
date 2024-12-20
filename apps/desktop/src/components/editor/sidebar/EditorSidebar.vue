@@ -35,6 +35,35 @@
           <EditorSettings />
         </DialogContent>
       </Dialog>
+      <DropdownMenu>
+        <DropdownMenuTrigger as-child>
+          <Button size="icon" variant="ghost">
+            <MoreHorizontalCircle01Icon class="size-5" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem as-child>
+            <UiLink href="https://snippy-app.netlify.app">
+              <InternetIcon class="size-4" />
+              Website
+            </UiLink>
+          </DropdownMenuItem>
+          <DropdownMenuItem as-child>
+            <UiLink href="https://github.com/kholid060/snippy">
+              <img src="@/assets/svg/github-mark-white.svg" class="size-4" />
+              View on GitHub
+            </UiLink>
+          </DropdownMenuItem>
+          <DropdownMenuItem as-child>
+            <UiLink
+              href="https://github.com/kholid060/snippy/issues/new/choose"
+            >
+              <img src="@/assets/svg/github-mark-white.svg" class="size-4" />
+              Report Issue
+            </UiLink>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
     <KeepAlive include="EditorSidebarSnippets,EditorSidebarSearch">
       <component
@@ -63,6 +92,8 @@ import EditorSidebarSearch from './EditorSidebarSearch.vue';
 import {
   AllBookmarkIcon,
   FolderFileStorageIcon,
+  InternetIcon,
+  MoreHorizontalCircle01Icon,
   Search01Icon,
   Settings01Icon,
 } from 'hugeicons-vue';
@@ -73,6 +104,10 @@ import {
   Dialog,
   DialogContent,
   DialogTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
   TooltipSimple,
   useToast,
 } from '@snippy/ui';
@@ -95,6 +130,7 @@ import EditorSettings from '../EditorSettings.vue';
 import { useHotkeysStore } from '@/stores/hotkeys.store';
 import documentService from '@/services/document.service';
 import type { DocumentFlatTreeItem } from '@/interface/document.interface';
+import UiLink from '@/components/ui/UiLink.vue';
 
 const items: {
   label: string;

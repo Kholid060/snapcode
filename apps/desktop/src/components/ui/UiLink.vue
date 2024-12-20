@@ -6,7 +6,7 @@
 <script setup lang="ts">
 import { logger } from '@/services/logger.service';
 import { getLogMessage } from '@/utils/helper';
-import { open } from '@tauri-apps/plugin-shell';
+import { openUrl } from '@tauri-apps/plugin-opener';
 
 const props = defineProps<{ href?: string }>();
 
@@ -15,7 +15,7 @@ function handleLink(event: MouseEvent) {
   if (!url || !url.startsWith('http')) return;
 
   event.preventDefault();
-  open(url).catch((error) => {
+  openUrl(url).catch((error) => {
     logger.error(getLogMessage('app:open-link', error));
   });
 }
