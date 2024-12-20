@@ -69,7 +69,9 @@ export const useAppStore = defineStore('app-store', () => {
       store.xGet('autoUpdate', true),
       documentService.stores.settings.xGet('general', APP_DEFAULT_SETTINGS),
     ]);
-    if (autoCheckUpdate && !import.meta.env.DEV) await checkUpdate();
+    if (autoCheckUpdate && !import.meta.env.DEV) {
+      await checkUpdate().catch(() => {});
+    }
 
     Object.assign(settings, appSettings);
   }

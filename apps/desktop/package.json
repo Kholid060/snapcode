@@ -11,7 +11,8 @@
     "typecheck": "vue-tsc --noEmit",
     "lint": "eslint . --max-warnings 0",
     "build": "pnpm lint && vite build",
-    "build:prod": "dotenvx run -- tauri build"
+    "build:prod": "dotenvx run -- tauri build",
+    "build:debug": "dotenvx run -- tauri build --debug --no-bundle"
   },
   "dependencies": {
     "@atlaskit/pragmatic-drag-and-drop": "^1.4.0",
