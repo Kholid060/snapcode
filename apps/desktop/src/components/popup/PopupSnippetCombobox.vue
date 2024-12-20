@@ -4,7 +4,7 @@
     :snippet="inputSnippet"
     @close="inputSnippet = null"
     @sended="
-      emit('snippet:sended', inputSnippet.path);
+      emit('snippet:sent', inputSnippet.path);
       inputSnippet = null;
     "
   />
@@ -25,7 +25,7 @@
         ref="search-input"
         placeholder="Search..."
         @keydown="handleInputKeydown"
-        role="input"
+        role="textbox"
         class="focus:ring-ring focus:ring-offset-background cmx-search-input h-9 w-full rounded-md border bg-inherit px-10 text-sm transition focus:outline-none focus:ring-2 focus:ring-offset-2"
       >
         <template #icon>
@@ -81,7 +81,11 @@
               <button
                 class="hover:bg-secondary hover:text-foreground size-6 flex-shrink-0 content-center rounded-sm text-center transition-colors"
                 :id="item.path + index"
-                @click.stop="actionHandlerMap[action.id]"
+                @click.stop="
+                  action.id === 'close'
+                    ? actionHandlerMap.close(item)
+                    : actionHandlerMap[action.id]
+                "
                 :class="
                   item.path === actionState.path &&
                   index === actionState.actionIndex
@@ -118,6 +122,7 @@ import {
 import type { ComboboxRootProps } from 'radix-vue';
 import { useForwardPropsEmits, type ComboboxRootEmits } from 'radix-vue';
 import {
+  Cancel01Icon,
   CancelCircleIcon,
   Copy02Icon,
   FileEditIcon,
@@ -142,21 +147,32 @@ const props = defineProps<
   ComboboxRootProps & {
     groupHeading?: string;
     itemContainsHtml?: boolean;
+    includeCloseAction?: boolean;
     items: DocumentSearchEntry[];
   }
 >();
-const emit = defineEmits<ComboboxRootEmits & { 'snippet:sended': [string] }>();
+const emit = defineEmits<
+  ComboboxRootEmits & {
+    'snippet:sent': [string];
+    'snippet:close': [item: DocumentSearchEntry];
+  }
+>();
 
-type ActionItems = 'copy' | 'edit';
+type ActionItems = 'copy' | 'edit' | 'close';
+interface ItemAction {
+  label: string;
+  id: ActionItems;
+  icon: Component;
+}
 
 let prevActiveAction: HTMLElement | null = null;
-const itemActions: { id: ActionItems; icon: Component; label: string }[] = [
-  { icon: Copy02Icon, id: 'copy', label: 'Copy' },
-  { icon: FileEditIcon, id: 'edit', label: 'Edit' },
-];
+
 const actionHandlerMap = {
   edit: editSnippet,
   copy: copyContent,
+  close: (item: DocumentSearchEntry) => {
+    emit('snippet:close', item);
+  },
 };
 
 const currentWindow = getCurrentWindow();
@@ -169,6 +185,18 @@ const inputSnippet = shallowRef<SnippetWithPlaceholder | null>(null);
 const actionState = ref({
   path: '',
   actionIndex: -1,
+});
+
+const itemActions = computed(() => {
+  const actions: ItemAction[] = [
+    { icon: Copy02Icon, id: 'copy', label: 'Copy' },
+    { icon: FileEditIcon, id: 'edit', label: 'Edit' },
+  ];
+  if (props.includeCloseAction) {
+    actions.push({ icon: Cancel01Icon, id: 'close', label: 'Close' });
+  }
+
+  return actions;
 });
 
 function handleInputKeydown(event: KeyboardEvent) {
@@ -187,7 +215,7 @@ function handleInputKeydown(event: KeyboardEvent) {
     actionState.value.actionIndex -= 1;
   } else {
     if (
-      actionState.value.actionIndex >= itemActions.length - 1 ||
+      actionState.value.actionIndex >= itemActions.value.length - 1 ||
       inputEl.value.length !== inputEl.selectionEnd
     )
       return;
@@ -196,15 +224,23 @@ function handleInputKeydown(event: KeyboardEvent) {
 
   event.preventDefault();
 }
+
 async function handleSelectItem(item: DocumentSearchEntry) {
   const action = actionState.value.path
-    ? itemActions[actionState.value.actionIndex]
+    ? itemActions.value[actionState.value.actionIndex]
     : null;
   if (action) {
-    if (action.id === 'edit') editSnippet();
-    else copyContent();
-
-    return;
+    switch (action.id) {
+      case 'close':
+        emit('snippet:close', item);
+        return;
+      case 'copy':
+        await copyContent();
+        return;
+      case 'edit':
+        await editSnippet();
+        return;
+    }
   }
 
   try {
@@ -222,7 +258,7 @@ async function handleSelectItem(item: DocumentSearchEntry) {
         placeholders: [],
         plaholdersValue: {},
       });
-      emit('snippet:sended', item.path);
+      emit('snippet:sent', item.path);
       return;
     }
 
@@ -241,6 +277,7 @@ async function handleSelectItem(item: DocumentSearchEntry) {
     });
   }
 }
+
 function clearSearch() {
   const container = unrefElement(searchInput);
   if (!container) return;
@@ -251,6 +288,7 @@ function clearSearch() {
   inputEl.value = '';
   inputEl.dispatchEvent(new InputEvent('input'));
 }
+
 async function editSnippet() {
   try {
     await appCommand.invoke('open_snippet', {
@@ -264,6 +302,7 @@ async function editSnippet() {
     });
   }
 }
+
 async function copyContent() {
   try {
     await appCommand.invoke('send_snippet_content', {

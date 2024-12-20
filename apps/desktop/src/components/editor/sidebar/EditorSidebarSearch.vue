@@ -11,7 +11,7 @@
         container-class="relative"
         ref="search-input"
         placeholder="Search..."
-        role="input"
+        role="textbox"
         class="focus:ring-ring focus:ring-offset-background cmx-search-input h-9 w-full rounded-md border bg-inherit px-10 text-sm transition focus:outline-none focus:ring-2 focus:ring-offset-2"
       >
         <template #icon>

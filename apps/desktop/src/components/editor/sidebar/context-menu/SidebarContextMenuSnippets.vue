@@ -36,6 +36,10 @@
       {{ isBookmarked ? 'Remove from bookmark' : 'Add to bookmark' }}
     </ContextMenuItem>
     <ContextMenuSeparator />
+    <ContextMenuItem @click="moveItemFolder">
+      <FolderTransferIcon class="mr-2 size-4" />
+      Move {{ ctxData.type === 'folder' ? 'folder' : 'snippet' }}
+    </ContextMenuItem>
     <ContextMenuItem @click="showInExplorer">
       <ExternalDriveIcon class="mr-2 size-4" />
       Show in system explorer
@@ -77,6 +81,7 @@ import {
   Bookmark02Icon,
   BookmarkAdd02Icon,
   ExternalDriveIcon,
+  FolderTransferIcon,
   Delete02Icon as DeleteIcon,
   PencilEdit01Icon as PencilEditIcon,
 } from 'hugeicons-vue';
@@ -101,6 +106,27 @@ const isBookmarked = computed(() => {
     : false;
 });
 
+async function moveItemFolder() {
+  try {
+    const selectedFolder = await appDialog.selectFolder({
+      title: `Select folder where to move the ${props.ctxData.type === 'folder' ? 'folder' : 'snippet'}`,
+    });
+    if (
+      selectedFolder.canceled ||
+      (props.ctxData.item.isDir &&
+        props.ctxData.item.id === selectedFolder.folder.id)
+    )
+      return;
+
+    await editorStore.document.moveItem({
+      id: props.ctxData.item.id,
+      newParentId: selectedFolder.folder.id,
+      oldParentId: props.ctxData.item.parentId,
+    });
+  } catch (error) {
+    logger.error(getLogMessage('ctx-menu-move-item', error));
+  }
+}
 function showInExplorer() {
   appCommand.invoke('show_item_in_folder', { path: metadata.value.path });
 }

@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="fe6af304-747c-4910-9b36-ec41b71a8d34" name="Changes" comment="" />
+    <list default="true" id="fe6af304-747c-4910-9b36-ec41b71a8d34" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/apps/desktop/src-tauri/capabilities/default.json" beforeDir="false" afterPath="$PROJECT_DIR$/apps/desktop/src-tauri/capabilities/default.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/desktop/src-tauri/capabilities/popup.json" beforeDir="false" afterPath="$PROJECT_DIR$/apps/desktop/src-tauri/capabilities/popup.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/desktop/src/App.vue" beforeDir="false" afterPath="$PROJECT_DIR$/apps/desktop/src/App.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/desktop/src/AppAsync.vue" beforeDir="false" afterPath="$PROJECT_DIR$/apps/desktop/src/AppAsync.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/desktop/src/components/editor/sidebar/context-menu/SidebarContextMenuSnippets.vue" beforeDir="false" afterPath="$PROJECT_DIR$/apps/desktop/src/components/editor/sidebar/context-menu/SidebarContextMenuSnippets.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/desktop/src/stores/app.store.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/desktop/src/stores/app.store.ts" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -10,9 +17,9 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 3
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 3
+}</component>
   <component name="ProjectId" id="2pBQKvxHoNpop8Nf5eSHAeN26hX" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -23,7 +30,7 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "dart.analysis.tool.window.visible": "false",
     "git-widget-placeholder": "master",
-    "last_opened_file_path": "D:/dev/projects/snapcode",
+    "last_opened_file_path": "D:/dev/projects/snippy/apps/desktop",
     "node.js.detected.package.eslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "nodejs_package_manager_path": "pnpm",
@@ -47,6 +54,7 @@
       <option name="presentableId" value="Default" />
       <updated>1732236928517</updated>
       <workItem from="1732236929556" duration="160000" />
+      <workItem from="1734647678760" duration="33000" />
     </task>
     <servers />
   </component>

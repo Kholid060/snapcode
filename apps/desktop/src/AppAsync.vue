@@ -3,7 +3,7 @@
     <App />
   </Suspense>
   <div
-    v-if="errorMessage"
+    v-if="errorMessage && !appStore.appInitiated"
     class="flex h-screen w-screen flex-col items-center justify-center"
   >
     <div class="max-w-xl">
@@ -31,6 +31,9 @@ import App from './App.vue';
 import UiLink from './components/ui/UiLink.vue';
 import { logger } from './services/logger.service';
 import { getLogMessage } from './utils/helper';
+import { useAppStore } from './stores/app.store';
+
+const appStore = useAppStore();
 
 const errorMessage = shallowRef('');
 

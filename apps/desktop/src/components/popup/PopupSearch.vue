@@ -4,8 +4,10 @@
     model-value=""
     :is-loading="isLoading"
     class="pb-4"
+    include-close-action
     :group-heading="searchEmpty ? 'Recent snippets' : ''"
-    @snippet:sended="addToRecent"
+    @snippet:sent="addToRecent"
+    @snippet:close="removeFromRecent($event.path)"
     @update:search-term="fetchSnippets"
     :item-contains-html="!searchEmpty"
     :filter-function="(value) => value"

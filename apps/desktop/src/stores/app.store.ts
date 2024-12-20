@@ -17,6 +17,7 @@ const APP_DEFAULT_SETTINGS: AppSettings = {
 };
 
 export const useAppStore = defineStore('app-store', () => {
+  const appInitiated = shallowRef(false);
   const updateState = shallowReactive<UpdateState>({
     status: 'latest',
     latestVersion: '',
@@ -68,7 +69,7 @@ export const useAppStore = defineStore('app-store', () => {
       store.xGet('autoUpdate', true),
       documentService.stores.settings.xGet('general', APP_DEFAULT_SETTINGS),
     ]);
-    if (autoCheckUpdate) await checkUpdate();
+    if (autoCheckUpdate && !import.meta.env.DEV) await checkUpdate();
 
     Object.assign(settings, appSettings);
   }
@@ -78,6 +79,7 @@ export const useAppStore = defineStore('app-store', () => {
     settings,
     checkUpdate,
     updateState,
+    appInitiated,
     updateSettings,
   };
 });

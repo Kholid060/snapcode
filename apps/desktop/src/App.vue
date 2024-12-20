@@ -20,12 +20,13 @@ import { appCommand } from './services/app-command.service';
 import { useEditorStore } from './stores/editor.store';
 import { useBookmarksStore } from './stores/bookmarks.store';
 
-await Promise.all([
-  useAppStore().init().catch(console.error),
-  useEditorStore().init(),
-]);
+const appStore = useAppStore();
+
+await Promise.all([appStore.init(), useEditorStore().init()]);
 useHotkeysStore().init();
 useBookmarksStore().init();
+
+appStore.appInitiated = true;
 
 useGlobalHotkey(
   'quickAccessWindow',
