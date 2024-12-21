@@ -7,11 +7,16 @@ import { getLogMessage } from '@/utils/helper';
 import PopupSnippetCombobox from './PopupSnippetCombobox.vue';
 import type { AppBookmarksState } from '@/interface/app.interface';
 import documentService from '@/services/document.service';
-import type { DocumentStoreBookmarksItem } from '@/interface/document.interface';
+import type {
+  DocumentSearchEntry,
+  DocumentStoreBookmarksItem,
+} from '@/interface/document.interface';
 import { bookmarksSorter } from '@/utils/bookmarks-util';
 import { getDocumentParentDir } from '@/utils/document-utils';
 
-interface BookmarkSnippetItem extends DocumentStoreBookmarksItem {
+interface BookmarkSnippetItem
+  extends DocumentStoreBookmarksItem,
+    DocumentSearchEntry {
   name: string;
 }
 
@@ -33,6 +38,7 @@ async function fetchBookmarks() {
         bookmarkData.items as DocumentStoreBookmarksItem[]
       ).map((item) => ({
         ...item,
+        contents: [],
         name: getDocumentParentDir(item.path).filename,
       }));
       bookmarks.value = bookmarksSorter(mappedItem, bookmarkState.value);

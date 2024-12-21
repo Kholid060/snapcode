@@ -58,7 +58,7 @@ useTauriWindowEvent('tauri://blur', () => {
   }, TIMEOUT_WINDOW_MS);
 });
 
-const excludeRole = ['combobox', 'textbox'];
+const excludeRole = ['combobox'];
 window.addEventListener('keydown', (event) => {
   if (event.key !== 'Escape' || event.ctrlKey || event.shiftKey || event.altKey)
     return;
