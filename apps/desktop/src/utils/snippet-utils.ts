@@ -24,7 +24,6 @@ export function getSnippetLang({ name, ext }: { name: string; ext?: string }) {
 
 export function sanitizeSnippetHTML(str: string) {
   return sanitizeHtml(str, {
-    allowedTags: ['span'],
-    allowedAttributes: { span: ['search-result'] },
+    allowedTags: ['mk'],
   });
 }

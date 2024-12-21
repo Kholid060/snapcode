@@ -1,18 +1,23 @@
 use path_slash::PathExt;
 use std::{
     collections::HashMap,
-    path::Path,
-    sync::{Arc, Mutex},
+    path::{Path, PathBuf},
+    sync::{mpsc, Arc},
     time::UNIX_EPOCH,
 };
 use walkdir::WalkDir;
 
 use ignore::{WalkBuilder, WalkState};
-
-use crate::snippy::document::SearchItemEntry;
+use {
+    grep_matcher::Matcher,
+    grep_regex::{RegexMatcher, RegexMatcherBuilder},
+    grep_searcher::sinks::UTF8,
+    grep_searcher::Searcher,
+};
 
 use super::{
-    DocumentFlatTree, DocumentFlatTreeItem, DocumentFlatTreeMetadataItem, SnippetStoredMetadata,
+    DocumentFlatTree, DocumentFlatTreeItem, DocumentFlatTreeMetadataItem, SearchItemEntry,
+    SnippetStoredMetadata,
 };
 
 pub fn get_document_flat_tree<P: AsRef<Path>>(
@@ -124,6 +129,95 @@ pub fn get_document_flat_tree<P: AsRef<Path>>(
     }
 }
 
+struct SearchMatcher {
+    base_dir: PathBuf,
+    matcher: RegexMatcher,
+}
+impl SearchMatcher {
+    fn new(base_dir: PathBuf, search_term: &str) -> Result<Self, grep_regex::Error> {
+        let matcher = RegexMatcherBuilder::new()
+            .case_insensitive(true)
+            .fixed_strings(true)
+            .build(search_term)?;
+
+        Ok(Self { matcher, base_dir })
+    }
+
+    fn get_item(&self, entry: Result<ignore::DirEntry, ignore::Error>) -> Option<SearchItemEntry> {
+        if entry.is_err() {
+            return None;
+        }
+
+        let entry = entry.unwrap();
+        let is_file = entry.file_type().map(|val| val.is_file()).unwrap_or(true);
+        if !is_file || entry.is_stdin() {
+            return None;
+        }
+
+        let mut file_name = entry.file_name().to_string_lossy().to_string();
+        let mut matches_filename = false;
+        let _ = Searcher::new().search_slice(
+            &self.matcher,
+            entry.file_name().to_string_lossy().as_bytes(),
+            UTF8(|_lnum, line| {
+                let search_match = self.matcher.find(line.as_bytes())?.unwrap();
+                file_name.replace_range(
+                    search_match.start()..search_match.end(),
+                    &format!(
+                        "<mk>{}</mk>",
+                        &file_name[search_match.start()..search_match.end()]
+                    ),
+                );
+                matches_filename = true;
+
+                Ok(true)
+            }),
+        );
+
+        let file_path = entry.path();
+
+
+        let mut contents: Vec<(u64, String)> = vec![];
+        let _ = Searcher::new().search_path(
+            &self.matcher,
+            file_path,
+            UTF8(|lnum, line| {
+                if contents.len() >= 5 {
+                    return Ok(false);
+                }
+
+                let search_match = self.matcher.find(line.as_bytes())?.unwrap();
+                let mut content = line.to_string();
+
+                content.replace_range(
+                    search_match.start()..search_match.end(),
+                    &format!(
+                        "<mk>{}</mk>",
+                        line[search_match].to_string()
+                    ),
+                );
+                contents.push((lnum, content));
+
+                Ok(true)
+            }),
+        );
+
+        if matches_filename || !contents.is_empty() {
+            Some(SearchItemEntry {
+                contents,
+                name: file_name,
+                path: file_path
+                    .strip_prefix(&self.base_dir)
+                    .unwrap()
+                    .to_slash_lossy()
+                    .to_string(),
+            })
+        } else {
+            None
+        }
+    }
+}
+
 pub fn search_document<P: AsRef<Path>>(
     base_dir: P,
     search_term: &str,
@@ -132,64 +226,29 @@ pub fn search_document<P: AsRef<Path>>(
         return Ok(vec![]);
     }
 
-    let matcher = Arc::new(Mutex::new(search_term));
-    let result = Arc::new(Mutex::new(vec![]));
+    let (sx, rx) = mpsc::channel();
+    let matcher = SearchMatcher::new(base_dir.as_ref().to_path_buf(), search_term)?;
 
     WalkBuilder::new(&base_dir)
         .follow_links(false)
         .ignore(false)
         .build_parallel()
         .run(|| {
-            let result = result.clone();
-            let matcher = matcher.clone();
+            let sx = sx.clone();
+            let matcher = &matcher;
 
             Box::new(move |entry| {
-                if entry.is_err() {
+                let Some(item) = matcher.get_item(entry) else {
                     return WalkState::Continue;
-                }
+                };
 
-                let entry = entry.unwrap();
-                let is_file = entry
-                    .file_type()
-                    .and_then(|val| Some(val.is_file()))
-                    .unwrap_or(true);
-                if !is_file || entry.is_stdin() {
-                    return WalkState::Continue;
+                match sx.send(item) {
+                    Ok(_) => WalkState::Continue,
+                    Err(_) => WalkState::Quit,
                 }
-
-                let mut file_name = entry.file_name().to_string_lossy().to_string();
-                let matcher = matcher.lock().unwrap().to_string();
-                if let Some(offset) = file_name.to_lowercase().find(&matcher.to_lowercase()) {
-                    let match_range = offset..(offset + matcher.len());
-                    file_name.replace_range(
-                        match_range.clone(),
-                        &format!("<span search-result>{}</span>", &file_name[match_range]),
-                    );
-                    let mut result = result.lock().unwrap();
-                    result.push((entry.path().to_slash_lossy().to_string(), file_name));
-                    
-                    if result.len() >= 25 {
-                        return WalkState::Quit;
-                    }
-                }
-
-                WalkState::Continue
             })
         });
+    drop(sx);
 
-    let result: Vec<SearchItemEntry> = result
-        .lock()
-        .unwrap()
-        .iter()
-        .map(|(path, filename)| SearchItemEntry {
-            path: Path::new(&path)
-                .strip_prefix(&base_dir)
-                .unwrap()
-                .to_string_lossy()
-                .to_string(),
-            name: filename.clone(),
-        })
-        .collect();
-
-    Ok(result)
+    Ok(rx.into_iter().collect())
 }

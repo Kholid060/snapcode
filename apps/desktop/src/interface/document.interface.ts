@@ -87,5 +87,5 @@ export interface DocumentFolderEntry {
 export interface DocumentSearchEntry {
   path: string;
   name: string;
-  content?: string;
+  contents: [number, string][];
 }

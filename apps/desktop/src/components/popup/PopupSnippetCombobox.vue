@@ -59,17 +59,16 @@
           class="border-border/50 relative mb-px block overflow-hidden"
           @select.prevent="handleSelectItem(item)"
         >
-          <p
-            v-if="itemContainsHtml"
-            v-html="sanitizeSnippetHTML(item.name ?? '')"
-            class="truncate pr-2"
-          ></p>
-          <p v-else v-text="item.name" class="grow truncate pr-2"></p>
-          <p class="text-muted-foreground truncate text-xs leading-tight">
-            /{{ item.path }}
-          </p>
+          <SearchItem :item="item">
+            <p
+              v-if="itemContainsHtml"
+              v-html="sanitizeSnippetHTML(item.name ?? '')"
+              class="truncate pr-2"
+            ></p>
+            <p v-else v-text="item.name" class="grow truncate pr-2"></p>
+          </SearchItem>
           <div
-            class="action from-accent invisible absolute right-0 top-0 flex h-full items-center gap-0.5 bg-gradient-to-l from-70% to-transparent pl-4 pr-2"
+            class="action from-accent invisible absolute right-0 top-0 flex h-8 items-center gap-0.5 bg-gradient-to-l from-70% to-transparent pl-4 pr-2"
           >
             <TooltipSimple
               v-for="(action, index) in itemActions"
@@ -98,11 +97,6 @@
             </TooltipSimple>
             <slot name="actions:suffix" :item="item"></slot>
           </div>
-          <p
-            v-if="'content' in item"
-            v-html="sanitizeSnippetHTML(item.content ?? '')"
-            class="text-muted-foreground mt-1 max-h-[120px] overflow-hidden overflow-ellipsis whitespace-pre-wrap border-t pt-1 text-xs"
-          ></p>
         </CommandItem>
       </CommandGroup>
     </CommandList>
@@ -139,6 +133,7 @@ import { getLogMessage } from '@/utils/helper';
 import { getNameFromPath } from '@/utils/document-utils';
 import type { SnippetWithPlaceholder } from '@/interface/snippet.interface';
 import { unrefElement } from '@vueuse/core';
+import SearchItem from '../search/SearchItem.vue';
 
 defineOptions({
   inheritAttrs: false,

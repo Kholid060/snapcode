@@ -40,15 +40,9 @@
         :title="item.path"
         @select.prevent="handleSelect(item.path)"
       >
-        <p v-html="sanitizeSnippetHTML(item.name)" class="truncate"></p>
-        <p class="text-muted-foreground line-clamp-2 text-xs leading-tight">
-          /{{ item.path }}
-        </p>
-        <p
-          v-if="item.content"
-          v-html="sanitizeSnippetHTML(item.content)"
-          class="text-muted-foreground mt-1 max-h-[120px] overflow-hidden overflow-ellipsis whitespace-pre-wrap border-t pt-1 text-xs"
-        ></p>
+        <SearchItem :item="item">
+          <p class="grow truncate" v-html="sanitizeSnippetHTML(item.name)"></p>
+        </SearchItem>
       </CommandItem>
     </CommandList>
   </Command>
@@ -69,6 +63,7 @@ import type { DocumentSearchEntry } from '@/interface/document.interface';
 import { logger } from '@/services/logger.service';
 import { getLogMessage } from '@/utils/helper';
 import { CancelCircleIcon, Search01Icon } from 'hugeicons-vue';
+import SearchItem from '@/components/search/SearchItem.vue';
 
 const { toast } = useToast();
 const editorStore = useEditorStore();
@@ -110,7 +105,9 @@ const onSearchChanged = useDebounceFn((searchTerm: string) => {
   isLoading.value = true;
   documentService
     .search(searchTerm)
-    .then((val) => (result.value = val))
+    .then((val) => {
+      result.value = val;
+    })
     .catch((error) => {
       toast({
         variant: 'destructive',

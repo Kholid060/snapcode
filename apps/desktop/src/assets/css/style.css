@@ -69,7 +69,7 @@ button {
   }
 }
 
-span[search-result] {
+span[search-result], mk {
   @apply bg-primary/40 text-foreground rounded;
 }
 

@@ -73,6 +73,7 @@ async function addToRecent(snippetPath: string) {
       recentSnippets.value.unshift(...snippet);
     } else {
       recentSnippets.value.unshift({
+        contents: [],
         path: snippetPath,
         name: getNameFromPath(snippetPath),
       });
@@ -111,6 +112,7 @@ async function fetchRecentSnippets() {
 
     recentSnippets.value = snippetPaths.map((path) => ({
       path,
+      contents: [],
       name: getNameFromPath(path),
     }));
   } catch (error) {

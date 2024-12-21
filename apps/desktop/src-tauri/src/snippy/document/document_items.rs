@@ -48,6 +48,7 @@ pub struct FolderEntry {
 pub struct SearchItemEntry {
     pub path: String,
     pub name: String,
+    pub contents: Vec<(u64, String)>,
 }
 
 #[derive(Deserialize, Serialize)]

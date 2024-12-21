@@ -6,9 +6,6 @@ pub mod snippet;
 pub mod document;
 pub mod keyboard;
 
-#[cfg(target_os = "linux")]
-pub struct DbusState(Mutex<Option<dbus::blocking::SyncConnection>>);
-
 pub fn init_app(app: &mut tauri::App) -> tauri::Result<()> {
     tray::init_app_tray(app)?;
     document::init_app_document(app)?;

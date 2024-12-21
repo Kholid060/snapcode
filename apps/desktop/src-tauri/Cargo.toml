@@ -50,8 +50,9 @@ normalize-path = "0.2.1"
 trash = "5.2.1"
 ignore = "0.4.23"
 anyhow = "1.0.94"
-[target.'cfg(target_os = "linux")'.dependencies]
-dbus = "0.9"
+grep-matcher = "0.1.7"
+grep-searcher = "0.1.14"
+grep-regex = "0.1.13"
 
 [target.'cfg(any(target_os = "macos", windows, target_os = "linux"))'.dependencies]
 tauri-plugin-autostart = "2.2.0"
