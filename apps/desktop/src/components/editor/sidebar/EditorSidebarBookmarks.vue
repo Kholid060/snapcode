@@ -133,6 +133,7 @@ function handleSelect(
       item,
       event,
       items,
+      itemKey: 'path',
       selectedItems: selectedItems.value,
     });
     if (event.defaultPrevented) return;

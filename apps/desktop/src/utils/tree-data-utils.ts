@@ -6,8 +6,10 @@ export function selectTreeItemsByMouse<T>({
   item,
   event,
   items,
+  itemKey,
   selectedItems: selectedItemsParam,
 }: {
+  itemKey?: keyof T;
   selectedItems: T[];
   item: FlattenedItem<T>;
   items: FlattenedItem<T>[];
@@ -26,9 +28,12 @@ export function selectTreeItemsByMouse<T>({
   const [firstValue] = selectedItems;
   if (!originalEvent.shiftKey || !firstValue) return selectedItems;
 
-  const firstIndex = items.findIndex(
-    (treeItem) => treeItem.value === firstValue,
+  const firstIndex = items.findIndex((treeItem) =>
+    itemKey
+      ? treeItem.value[itemKey] === firstValue[itemKey]
+      : treeItem.value === firstValue,
   );
+
   const itemIndex = items.indexOf(item);
   if (firstIndex === -1 || itemIndex === -1 || firstIndex === itemIndex)
     return selectedItems;

@@ -3,7 +3,7 @@ use crate::snippy;
 
 pub fn replace_snippet_placeholders<'a>(
     content: &'a mut String,
-    placeholders: &Vec<snippy::document::SnippetPlaceholderItem>,
+    placeholders: &[snippy::document::SnippetPlaceholderItem],
     placeholders_value: &HashMap<String, String>,
 ) -> &'a String {
     for placeholder in placeholders.iter().rev() {

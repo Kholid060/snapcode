@@ -364,10 +364,9 @@ where
         })
         .collect();
 
-    if error.is_some() && result.is_empty() {
-        Err(error.unwrap())
-    } else {
-        Ok(result)
+    match error {
+        Some(error) if result.is_empty() => Err(error),
+        _ => Ok(result),
     }
 }
 

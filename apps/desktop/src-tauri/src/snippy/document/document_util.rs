@@ -61,7 +61,7 @@ pub fn get_document_flat_tree<P: AsRef<Path>>(
         };
         let parent_key = match Path::new(&item_key)
             .parent()
-            .and_then(|v| Some(v.to_string_lossy().to_string()))
+            .map(|v| v.to_string_lossy().to_string())
         {
             Some(parent) if !parent.is_empty() => ids
                 .entry(parent)
@@ -193,7 +193,7 @@ impl SearchMatcher {
                     search_match.start()..search_match.end(),
                     &format!(
                         "<mk>{}</mk>",
-                        line[search_match].to_string()
+                        &line[search_match].to_string()
                     ),
                 );
                 contents.push((lnum, content));

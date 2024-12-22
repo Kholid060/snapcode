@@ -25,10 +25,7 @@ pub fn update_popup_window_tray_menu(
     let tray_menu_items = tray_menu.items().map_err(stringify)?;
     let quick_access_item = tray_menu_items
         .iter()
-        .find(|item| match item.as_menuitem() {
-            Some(item) if item.id() == "quick-access" => true,
-            _ => false,
-        });
+        .find(|item| matches!(item.as_menuitem(), Some(item) if item.id() == "quick-access"));
 
     if quick_access_item.is_some() {
         let quick_access_item = quick_access_item.unwrap().as_menuitem().unwrap();
