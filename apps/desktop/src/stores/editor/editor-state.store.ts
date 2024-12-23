@@ -43,10 +43,10 @@ export const useEditorState = defineStore('editor:state', () => {
     data.activeFolderIds = getMappedFolderIds();
     data.activeFileId = docStore.treeMetadata[data.activeFileId]?.path ?? '';
 
-    documentService.stores.state.xSet('editor', data);
+    documentService.stores.data.xSet('editor', data);
   }
   async function init() {
-    const storeData = await documentService.stores.state.xGet('editor', {
+    const storeData = await documentService.stores.data.xGet('editor', {
       ...DEFAULT_SIDEBAR_STATE,
     });
     const activeFolderIds = new Set(storeData.activeFolderIds);

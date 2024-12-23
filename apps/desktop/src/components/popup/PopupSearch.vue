@@ -83,7 +83,7 @@ async function addToRecent(snippetPath: string) {
       recentSnippets.value.pop();
     }
 
-    await documentService.stores.state.xSet(
+    await documentService.stores.data.xSet(
       'recentSnippets',
       recentSnippets.value.map((item) => item.path),
     );
@@ -97,14 +97,14 @@ function removeFromRecent(path: string) {
   if (items.length === recentSnippets.value.length) return;
 
   recentSnippets.value = items;
-  documentService.stores.state.xSet(
+  documentService.stores.data.xSet(
     'recentSnippets',
     items.map((item) => item.path),
   );
 }
 async function fetchRecentSnippets() {
   try {
-    const snippetPaths = await documentService.stores.state.xGet(
+    const snippetPaths = await documentService.stores.data.xGet(
       'recentSnippets',
       [],
     );

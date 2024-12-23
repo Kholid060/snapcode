@@ -173,7 +173,7 @@ function fetchData() {
     );
     lastFetch = Date.now();
   });
-  documentService.stores.state.xGet('editor').then((value) => {
+  documentService.stores.data.xGet('editor').then((value) => {
     if (!value) return;
     Object.assign(editorSettings, value);
   });

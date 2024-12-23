@@ -25,7 +25,7 @@ export interface DocumentStoreSettings {
   hotkeys: Record<AppHotkeys, string>;
 }
 
-export interface DocumentStoreState {
+export interface DocumentStoreData {
   recentSnippets: string[];
   editor: EditorSidebarState;
 }

@@ -6,7 +6,7 @@ import {
   DocumentStoreBookmarks,
   DocumentStoreMetadata,
   DocumentStoreSettings,
-  DocumentStoreState,
+  DocumentStoreData,
 } from '@/interface/document.interface';
 import {
   SnippetMetadata,
@@ -17,7 +17,7 @@ import { writeTextFile } from '@tauri-apps/plugin-fs';
 import { joinDocumentPath } from '@/utils/document-utils';
 
 interface DocumentStores {
-  state: Readonly<LazyStore<DocumentStoreState>>;
+  data: Readonly<LazyStore<DocumentStoreData>>;
   settings: Readonly<LazyStore<DocumentStoreSettings>>;
   metadata: Readonly<LazyStore<DocumentStoreMetadata>>;
   bookmarks: Readonly<LazyStore<DocumentStoreBookmarks>>;
@@ -32,7 +32,7 @@ class DocumentService {
     this.appState = await appCommand.invoke('get_document_state', undefined);
 
     this.#stores = Object.freeze({
-      state: new LazyStore(this.appState.metadataDir + '/state.json'),
+      data: new LazyStore(this.appState.metadataDir + '/data.json'),
       settings: new LazyStore(this.appState.metadataDir + '/settings.json'),
       bookmarks: new LazyStore(this.appState.metadataDir + '/bookmarks.json'),
       metadata: new LazyStore<DocumentStoreMetadata>(

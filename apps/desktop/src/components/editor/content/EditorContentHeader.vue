@@ -28,21 +28,21 @@
       </Button>
     </TooltipSimple>
     <template v-if="editorStore.activeSnippet">
-      <UiEditable
-        ref="name-form"
-        :value="editorStore.activeSnippet.name"
-        placeholder="Snippet name"
-        class="hover:bg-secondary focus:bg-secondary ml-2 inline-block flex-shrink-0 truncate rounded px-1 py-0.5 transition before:pl-1 focus:outline-none"
-        @submit="$event.isDirty && updateSnippetName($event.value ?? 'Unnamed')"
-      />
-      <div class="pointer-events-none grow"></div>
+      <div class="pointer-events-none ml-2 grow overflow-hidden">
+        <p
+          v-text="editorStore.activeSnippet.name"
+          placeholder="Snippet name"
+          class="hover:bg-secondary focus:bg-secondary pointer-events-auto line-clamp-2 inline-block max-w-full truncate rounded px-1 py-0.5 align-sub transition focus:outline-none"
+          @click="updateSnippetName"
+        />
+      </div>
       <TooltipSimple
         :label="isBookmarked ? 'Remove from bookmark' : 'Add to bookmark'"
       >
         <Button
           variant="secondary"
           size="icon"
-          class="ml-4"
+          class="ml-4 flex-shrink-0"
           :class="{ 'text-primary bg-primary/10': isBookmarked }"
           @click="
             bookmarksStore.setBookmark(
@@ -66,7 +66,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import UiEditable from '@/components/ui/UiEditable.vue';
+import { useAppDialog } from '@/providers/app-dialog.provider';
 import { logger } from '@/services/logger.service';
 import { useBookmarksStore } from '@/stores/bookmarks.store';
 import { useEditorStore } from '@/stores/editor.store';
@@ -81,10 +81,9 @@ import {
 } from 'hugeicons-vue';
 
 const { toast } = useToast();
+const appDialog = useAppDialog();
 const editorStore = useEditorStore();
 const bookmarksStore = useBookmarksStore();
-
-const nameForm = useTemplateRef('name-form');
 
 const isBookmarked = computed(() => {
   if (!editorStore.state.state.activeFileId) return false;
@@ -92,12 +91,20 @@ const isBookmarked = computed(() => {
   return bookmarksStore.isBookmarked(editorStore.state.state.activeFileId);
 });
 
-async function updateSnippetName(newName: string) {
+async function updateSnippetName() {
   if (!editorStore.activeSnippet) return;
 
   try {
     const { name, id } = editorStore.activeSnippet;
-    const sanitizedNewName = sanitizeDocumentFileName(newName) || 'unnamed.txt';
+    const newName = await appDialog.prompt({
+      defaultValue: name,
+      okBtnLabel: 'Rename',
+      title: 'Rename snippet',
+    });
+    if (newName.canceled) return;
+
+    const sanitizedNewName =
+      sanitizeDocumentFileName(newName.value) || 'unnamed.txt';
     if (name === sanitizedNewName) return;
 
     await editorStore.document.rename({
@@ -111,8 +118,6 @@ async function updateSnippetName(newName: string) {
       title: 'An error occured',
       description: typeof error === 'string' ? error : (error as Error).message,
     });
-  } finally {
-    nameForm.value?.resetValue();
   }
 }
 </script>

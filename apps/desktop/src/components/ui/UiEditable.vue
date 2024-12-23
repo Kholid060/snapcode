@@ -3,7 +3,7 @@
     ref="el"
     :contenteditable="state.isFocus"
     @pointerdown="handlePointerDown"
-    class="ui-editable focus:ring-offset-background focus:ring-ring relative whitespace-pre-wrap focus:outline-none focus:ring-2 focus:ring-offset-2"
+    class="ui-editable focus:ring-offset-background focus:ring-ring relative focus:outline-none focus:ring-2 focus:ring-offset-2"
     :data-placholder="state.hasValue ? '' : placeholder"
     :style="{ cursor: state.isFocus ? 'auto' : 'default' }"
     @input="handleInput"
