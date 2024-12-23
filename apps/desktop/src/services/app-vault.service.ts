@@ -27,7 +27,7 @@ class StrongholdStore implements VaultStore {
     );
 
     let vault: Client;
-    const clientName = 'name your client';
+    const clientName = 'keys';
     try {
       vault = await stronghold.loadClient(clientName);
     } catch {

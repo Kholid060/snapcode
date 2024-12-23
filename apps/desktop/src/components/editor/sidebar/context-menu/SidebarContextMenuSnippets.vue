@@ -27,6 +27,13 @@
       <PencilEditIcon class="mr-2 size-4" />
       Rename
     </ContextMenuItem>
+    <ContextMenuItem
+      v-if="ctxData.type === 'snippet'"
+      @click="copySnippetContent"
+    >
+      <Copy01Icon class="mr-2 size-4" />
+      Copy content
+    </ContextMenuItem>
     <ContextMenuItem @click="toggleBookmark">
       <component
         :is="isBookmarked ? Bookmark02Icon : BookmarkAdd02Icon"
@@ -37,7 +44,7 @@
     </ContextMenuItem>
     <ContextMenuSeparator />
     <ContextMenuItem v-if="ctxData.type === 'snippet'" @click="makeSnippetCopy">
-      <Copy01Icon class="mr-2 size-4" />
+      <File01Icon class="mr-2 size-4" />
       Make a copy
     </ContextMenuItem>
     <ContextMenuItem @click="moveItemFolder">
@@ -89,6 +96,7 @@ import {
   Delete02Icon as DeleteIcon,
   PencilEdit01Icon as PencilEditIcon,
   Copy01Icon,
+  File01Icon,
 } from 'hugeicons-vue';
 
 const props = defineProps<{
@@ -237,6 +245,7 @@ async function toggleBookmark() {
     toast({
       variant: 'destructive',
       title: `Error updating bookmark`,
+      description: typeof error === 'string' ? error : '',
     });
   }
 }
@@ -274,6 +283,26 @@ async function deleteItem() {
     toast({
       variant: 'destructive',
       title: `Error deleting ${props.ctxData.type}`,
+    });
+  }
+}
+async function copySnippetContent() {
+  try {
+    await appCommand.invoke('send_snippet_content', {
+      action: 'copy',
+      placeholders: [],
+      plaholdersValue: {},
+      path: metadata.value.path,
+    });
+    toast({
+      title: 'Content copied',
+    });
+  } catch (error) {
+    logger.error(getLogMessage('copy-snippet-content', error));
+    toast({
+      variant: 'destructive',
+      title: `Error updating bookmark`,
+      description: typeof error === 'string' ? error : '',
     });
   }
 }
