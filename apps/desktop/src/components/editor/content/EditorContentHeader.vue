@@ -61,6 +61,23 @@
           />
         </Button>
       </TooltipSimple>
+      <DropdownMenu>
+        <DropdownMenuTrigger as-child>
+          <Button variant="secondary" size="icon" class="ml-2 flex-shrink-0">
+            <Share01Icon class="size-5" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" class="min-w-44">
+          <DropdownMenuLabel class="py-1">Share snippet to</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            @click="editorStore.state.setActiveShareModal('github-gist')"
+          >
+            <img src="@/assets/svg/github-mark-white.svg" class="size-5" />
+            GitHub Gist
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
       <span class="bg-border ml-4 h-3/5 w-px" />
     </template>
   </div>
@@ -72,10 +89,21 @@ import { useBookmarksStore } from '@/stores/bookmarks.store';
 import { useEditorStore } from '@/stores/editor.store';
 import { sanitizeDocumentFileName } from '@/utils/document-utils';
 import { getLogMessage } from '@/utils/helper';
-import { Button, TooltipSimple, useToast } from '@snippy/ui';
+import {
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  TooltipSimple,
+  useToast,
+} from '@snippy/ui';
 import {
   Bookmark02Icon,
   BookmarkAdd02Icon,
+  Share01Icon,
   SidebarLeft01Icon,
   SidebarRight01Icon,
 } from 'hugeicons-vue';

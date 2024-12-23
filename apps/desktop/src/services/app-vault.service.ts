@@ -1,20 +1,22 @@
 import { appDataDir } from '@tauri-apps/api/path';
 import { Client, Stronghold, Store } from '@tauri-apps/plugin-stronghold';
 
+type VaultKeys = 'github-key';
 type VaultValue = string | null;
 abstract class VaultStore {
-  abstract get(key: string): Promise<VaultValue>;
+  abstract get(key: VaultKeys): Promise<VaultValue>;
 
-  abstract insert(key: string, value: string): Promise<void>;
+  abstract insert(key: VaultKeys, value: string): Promise<void>;
 
-  abstract update(key: string, value: string): Promise<void>;
+  abstract update(key: VaultKeys, value: string): Promise<void>;
 
-  abstract remove(key: string): Promise<void>;
+  abstract remove(key: VaultKeys): Promise<void>;
 
   abstract save(): Promise<void>;
 }
 
 class StrongholdStore implements VaultStore {
+  #cache = new Map<string, VaultValue>();
   #stronghold: { store: Store; stronghold: Stronghold } | null = null;
 
   async #getStore() {
@@ -50,25 +52,36 @@ class StrongholdStore implements VaultStore {
     return Array.from(new TextEncoder().encode(value));
   }
 
-  async get(key: string): Promise<VaultValue> {
+  async get(key: VaultKeys): Promise<VaultValue> {
     const { store } = await this.#getStore();
-    return this.decodeStoreValue(await store.get(key));
+    if (this.#cache.has(key)) {
+      return this.#cache.get(key)!;
+    }
+
+    const value = this.decodeStoreValue(await store.get(key));
+    this.#cache.set(key, value);
+
+    return value;
   }
 
-  async insert(key: string, value: string): Promise<void> {
+  async insert(key: VaultKeys, value: string): Promise<void> {
     const { store } = await this.#getStore();
+    this.#cache.set(key, value);
+
     await store.insert(key, this.encodeStoreValue(value));
   }
 
-  async update(key: string, value: string): Promise<void> {
+  async update(key: VaultKeys, value: string): Promise<void> {
     const { store } = await this.#getStore();
     await store.remove(key);
     await store.insert(key, this.encodeStoreValue(value));
+    this.#cache.set(key, value);
   }
 
-  async remove(key: string): Promise<void> {
+  async remove(key: VaultKeys): Promise<void> {
     const { store } = await this.#getStore();
     await store.remove(key);
+    this.#cache.delete(key);
   }
 
   async save(): Promise<void> {
@@ -78,20 +91,20 @@ class StrongholdStore implements VaultStore {
 }
 
 class LocalStore implements VaultStore {
-  get(key: string): Promise<VaultValue> {
+  get(key: VaultKeys): Promise<VaultValue> {
     return Promise.resolve(localStorage.getItem(key));
   }
 
-  insert(key: string, value: string): Promise<void> {
+  insert(key: VaultKeys, value: string): Promise<void> {
     localStorage.setItem(key, value);
     return Promise.resolve();
   }
 
-  update(key: string, value: string): Promise<void> {
+  update(key: VaultKeys, value: string): Promise<void> {
     return this.insert(key, value);
   }
 
-  remove(key: string): Promise<void> {
+  remove(key: VaultKeys): Promise<void> {
     localStorage.removeItem(key);
     return Promise.resolve();
   }
@@ -106,23 +119,26 @@ class AppVault {
   // https://github.com/tauri-apps/plugins-workspace/issues/2048
   #store = import.meta.env.DEV ? new LocalStore() : new StrongholdStore();
 
-  async get(keys: string): Promise<VaultValue>;
-  async get(keys: string[]): Promise<VaultValue[]>;
-  async get(keys: string | string[]): Promise<VaultValue | VaultValue[]> {
+  async get(keys: VaultKeys): Promise<VaultValue>;
+  async get(keys: VaultKeys[]): Promise<VaultValue[]>;
+  async get(keys: VaultKeys | VaultKeys[]): Promise<VaultValue | VaultValue[]> {
     return Array.isArray(keys)
       ? Promise.all(keys.map(async (key) => this.#store.get(key)))
       : this.#store.get(keys);
   }
 
-  async insert(key: string, value: string): Promise<void>;
-  async insert(key: Record<string, string>, value?: string): Promise<void>;
-  async insert(key: string | Record<string, string>, value: string) {
+  async insert(key: VaultKeys, value: string): Promise<void>;
+  async insert(key: Record<VaultKeys, string>, value?: string): Promise<void>;
+  async insert(key: VaultKeys | Record<VaultKeys, string>, value: string) {
     if (typeof key === 'string') {
       await this.#store.insert(key, value);
     } else {
       await Promise.all(
         Object.keys(key).map((insertKey) =>
-          this.#store.insert(insertKey, key[insertKey]),
+          this.#store.insert(
+            insertKey as VaultKeys,
+            key[insertKey as VaultKeys],
+          ),
         ),
       );
     }
@@ -130,12 +146,12 @@ class AppVault {
     await this.#store.save();
   }
 
-  async update(key: string, value: string) {
+  async update(key: VaultKeys, value: string) {
     await this.#store.update(key, value);
     await this.#store.save();
   }
 
-  async remove(keys: string | string[]) {
+  async remove(keys: VaultKeys | VaultKeys[]) {
     if (Array.isArray(keys)) {
       await Promise.all(keys.map((key) => this.#store.remove(key)));
     } else {

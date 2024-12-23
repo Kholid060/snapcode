@@ -1316,6 +1316,7 @@ dependencies = [
  "normalize-path",
  "path-slash",
  "regex",
+ "rust-argon2 2.1.0",
  "serde",
  "serde_json",
  "tauri",

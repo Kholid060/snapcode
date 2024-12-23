@@ -48,3 +48,11 @@ export interface EditorSettings {
   showLineNumbers: boolean;
   fontFamily: AppEditorFonts | 'custom';
 }
+
+export type EditorShareModal = 'github-gist';
+
+export type EditorSettingItems =
+  | 'general'
+  | 'editor'
+  | 'hotkeys'
+  | 'integration:github-gist';

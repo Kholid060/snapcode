@@ -35,48 +35,6 @@
       class="overflow-auto px-6 pb-6"
       style="max-height: calc(100vh - 18rem)"
     >
-      <CollapsibleRoot
-        v-if="!listGistsByUsernameData"
-        v-model:open="openSettings"
-      >
-        <CollapsibleContent
-          class="CollapsibleContent mt-2 rounded-md p-2"
-          :class="openSettings && 'bg-card'"
-        >
-          <div class="flex items-center">
-            <Label for="pat-input">GitHub Personal access tokens</Label>
-            <div class="grow"></div>
-            <button
-              v-if="hasGitHubPAT"
-              type="button"
-              class="text-sm underline"
-              @click="removeGitHubPAT"
-            >
-              remove
-            </button>
-          </div>
-          <Input
-            id="pat-input"
-            v-model="githubPat"
-            placeholder="github_pat_xxxx"
-            class="bg-transparent"
-            autocomplete="off"
-            :disabled="hasGitHubPAT"
-            @blur="saveGitHubPAT"
-          />
-          <p class="text-muted-foreground mt-0.5 text-xs">
-            Use
-            <UiLink
-              href="https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-fine-grained-personal-access-token"
-              class="underline"
-            >
-              GitHub fine-grained access tokens
-            </UiLink>
-            to increase the API limit. You can use one that doesn't have any
-            permissions.
-          </p>
-        </CollapsibleContent>
-      </CollapsibleRoot>
       <ListboxRoot
         v-model="selectedGists"
         v-if="listGistsByUsernameData"
@@ -190,17 +148,9 @@
         class="px-2"
         variant="ghost"
         type="button"
-        :class="[
-          openSettings
-            ? 'bg-secondary text-foreground'
-            : 'text-muted-foreground',
-        ]"
-        @click="openSettings = !openSettings"
+        @click="editorStore.state.openSettings('integration:github-gist')"
       >
-        <component
-          :is="openSettings ? Cancel01Icon : Settings01Icon"
-          class="size-5"
-        />
+        <Settings01Icon class="size-5" />
         Settings
       </Button>
       <div class="grow"></div>
@@ -248,7 +198,6 @@
   </form>
 </template>
 <script setup lang="ts">
-import UiLink from '@/components/ui/UiLink.vue';
 import type { FolderNewPayload } from '@/interface/folder.interface';
 import type {
   GitHubApiPagination,
@@ -295,7 +244,6 @@ import {
 import {
   ArrowDown01Icon,
   ArrowLeft01Icon,
-  Cancel01Icon,
   Loading03Icon,
   MinusSignIcon,
   Settings01Icon,
@@ -303,8 +251,6 @@ import {
 } from 'hugeicons-vue';
 import { nanoid } from 'nanoid/non-secure';
 import {
-  CollapsibleContent,
-  CollapsibleRoot,
   ListboxContent,
   ListboxItem,
   ListboxItemIndicator,
@@ -353,7 +299,6 @@ const selectedGists = shallowRef<GitHubGistListItem[]>([]);
 const listGistsByUsernameData = shallowRef<GitHubGistListItem[] | null>(null);
 
 const githubPat = shallowRef('');
-const openSettings = shallowRef(false);
 const hasGitHubPAT = shallowRef(false);
 
 const githubGistsList = computed(() => {
@@ -570,24 +515,6 @@ async function storeGitHubGists(
     folders: folders.length,
     snippets: snippets.length,
   };
-}
-async function saveGitHubPAT() {
-  try {
-    if (hasGitHubPAT.value) return;
-
-    await appVault.update('github-key', githubPat.value);
-  } catch (error) {
-    logger.error(getLogMessage('import-gists:save-key', error));
-  }
-}
-async function removeGitHubPAT() {
-  try {
-    await appVault.remove('github-key');
-    githubPat.value = '';
-    hasGitHubPAT.value = false;
-  } catch (error) {
-    logger.error(getLogMessage('import-gists:remove-key', error));
-  }
 }
 async function importById(url: string) {
   try {

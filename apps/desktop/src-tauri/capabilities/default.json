@@ -28,6 +28,7 @@
     "fs:default",
     "autostart:default",
     "updater:default",
+    "clipboard-manager:allow-write-text",
     "dialog:allow-open",
     {
       "identifier": "opener:allow-open-url",

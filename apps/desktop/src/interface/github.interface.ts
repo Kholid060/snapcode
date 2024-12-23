@@ -20,3 +20,9 @@ export interface GitHubGistListItem {
 export type GitHubLinkHeaderRel = 'next' | 'first' | 'last' | 'prev';
 
 export type GitHubApiPagination = Partial<Record<GitHubLinkHeaderRel, string>>;
+
+export interface GitHubCreateGistPayload {
+  public?: boolean;
+  description?: string;
+  files?: Record<string, { content: string }>;
+}

@@ -86,3 +86,7 @@ export function githubLinkHeaderParser(header: string) {
 export function getGitHubGistName(gist: GitHubGistListItem) {
   return gist.description || Object.keys(gist.files)[0] || '(unnamed gist)';
 }
+
+export function getGitHubGistUrl(gistId: string) {
+  return `${GITHUB_GISTS_BASE_URL}${gistId}`;
+}

@@ -58,7 +58,7 @@
     "
     class="mt-2 grow overflow-auto px-2 pb-4 pt-1"
   />
-  <Dialog v-model:open="showGitHubGistsDialog">
+  <Dialog v-model:open="showGitHubGistsDialog" modal>
     <DialogContent class="block space-y-0 p-0">
       <EditorSidebarGitHubGists @close="showGitHubGistsDialog = false" />
     </DialogContent>

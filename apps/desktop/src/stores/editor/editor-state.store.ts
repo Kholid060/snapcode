@@ -1,4 +1,8 @@
-import { EditorSidebarState } from '@/interface/editor.interface';
+import {
+  EditorSettingItems,
+  EditorShareModal,
+  EditorSidebarState,
+} from '@/interface/editor.interface';
 import documentService from '@/services/document.service';
 import { watchDebounced } from '@vueuse/core';
 import { defineStore } from 'pinia';
@@ -20,7 +24,22 @@ export const useEditorState = defineStore('editor:state', () => {
   const state = reactive<EditorSidebarState>({
     ...DEFAULT_SIDEBAR_STATE,
   });
+  const settingsState = shallowReactive<{
+    open: boolean;
+    activeItem: EditorSettingItems;
+  }>({
+    open: false,
+    activeItem: 'general',
+  });
+  const activeShareModal = shallowRef<EditorShareModal | ''>('');
 
+  function openSettings(activeItem: EditorSettingItems = 'general') {
+    settingsState.activeItem = activeItem;
+    settingsState.open = true;
+  }
+  function setActiveShareModal(modal: EditorShareModal | '') {
+    activeShareModal.value = modal;
+  }
   function getMappedFolderIds() {
     return state.activeFolderIds.reduce<string[]>((acc, folderId) => {
       if (docStore.treeMetadata[folderId]) {
@@ -77,5 +96,9 @@ export const useEditorState = defineStore('editor:state', () => {
     state,
     saveState,
     updateState,
+    openSettings,
+    settingsState,
+    activeShareModal,
+    setActiveShareModal,
   };
 });

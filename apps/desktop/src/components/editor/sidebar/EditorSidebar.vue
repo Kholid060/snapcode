@@ -20,7 +20,7 @@
         </Button>
       </TooltipSimple>
       <div class="grow"></div>
-      <Dialog v-model:open="showSettings" modal>
+      <Dialog v-model:open="editorStore.state.settingsState.open" modal>
         <TooltipSimple
           content-class="capitalize"
           :label="`Settings (${hotkeysStore.getLabel('openSettings')})`"
@@ -31,7 +31,9 @@
             </Button>
           </DialogTrigger>
         </TooltipSimple>
-        <DialogContent class="block max-w-5xl space-y-0 overflow-auto p-0">
+        <DialogContent
+          class="z-[51] block max-w-5xl space-y-0 overflow-auto p-0"
+        >
           <EditorSettings />
         </DialogContent>
       </Dialog>
@@ -174,7 +176,6 @@ const appDialog = useAppDialog();
 const editorStore = useEditorStore();
 const hotkeysStore = useHotkeysStore();
 
-const showSettings = shallowRef(false);
 const selectedItems = ref<DocumentFlatTreeItem[]>([]);
 const ctxMenuData = shallowRef<EditorSidebarContextMenuItems | null>(null);
 
@@ -247,7 +248,7 @@ useHotkey(
         editorStore.state.updateState('activeMenu', 'search');
         break;
       case 'openSettings':
-        showSettings.value = true;
+        editorStore.state.openSettings('general');
         break;
     }
   },

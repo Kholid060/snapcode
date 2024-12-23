@@ -7,6 +7,7 @@
     <EditorContentHeader />
     <EditorContentCM v-if="editorStore.activeSnippet" />
   </div>
+  <ShareSnippet />
 </template>
 <script setup lang="ts">
 import EditorContentCM from './content/EditorContentCM.vue';
@@ -16,6 +17,7 @@ import { useEditorStore } from '@/stores/editor.store';
 import { useTauriWindowEvent } from '@/composables/tauri.composable';
 import { getDocumentParentDir } from '@/utils/document-utils';
 import { TREE_ROOT_KEY } from '@/utils/tree-data-utils';
+import ShareSnippet from './share/ShareSnippet.vue';
 
 const editorStore = useEditorStore();
 

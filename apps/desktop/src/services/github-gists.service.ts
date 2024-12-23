@@ -1,6 +1,9 @@
 import appVault from './app-vault.service';
 import { FetchError } from '@/utils/errors';
-import { GitHubGistListItem } from '@/interface/github.interface';
+import {
+  GitHubCreateGistPayload,
+  GitHubGistListItem,
+} from '@/interface/github.interface';
 import { githubLinkHeaderParser } from '@/utils/github-utils';
 
 type FetchInit = RequestInit & {
@@ -61,6 +64,19 @@ export async function listGitHubGistsByUsername(
 
 export async function getGitHubGistsById(id: string) {
   const result = await fetchGitHubApi<GitHubGistListItem>(`/gists/${id}`);
+
+  return {
+    data: result.data,
+    ratelimitRemaining: result.headers.get('x-ratelimit-remaining'),
+  };
+}
+
+export async function createGitHubGist(payload: GitHubCreateGistPayload) {
+  const result = await fetchGitHubApi<GitHubGistListItem>('/gists', {
+    auth: true,
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
 
   return {
     data: result.data,

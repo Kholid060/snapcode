@@ -25,9 +25,17 @@ export interface DocumentStoreSettings {
   hotkeys: Record<AppHotkeys, string>;
 }
 
+export interface DocumentSharedSnippet {
+  id: string;
+  name: string;
+  createdAt: number;
+  type: 'github-gist';
+  description?: string;
+}
 export interface DocumentStoreData {
   recentSnippets: string[];
   editor: EditorSidebarState;
+  sharedSnippets: DocumentSharedSnippet[];
 }
 
 export type DocumentStoreMetadata = Record<string, SnippetMetadata>;
