@@ -25,6 +25,7 @@
     "@snippy/shared": "workspace:*",
     "@snippy/tauri-plugin-store": "workspace:*",
     "@snippy/ui": "workspace:*",
+    "@tanstack/vue-query": "^5.62.9",
     "@tauri-apps/api": "^2",
     "@tauri-apps/plugin-autostart": "^2.2.0",
     "@tauri-apps/plugin-clipboard-manager": "^2.2.0",

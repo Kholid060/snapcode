@@ -13,12 +13,12 @@ import type {
   AppDialogProvider,
   AppDialogItems,
 } from '@/providers/app-dialog.provider';
-import { APP_SELECT_FOLDER_PROVIDER_KEY } from '@/providers/app-dialog.provider';
+import { APP_DIALOG_PROVIDER_KEY } from '@/providers/app-dialog.provider';
 import { promiseWithResolver, type PromiseWithResolver } from '@snippy/shared';
-import AppDialogSelectFolder from './dialog/AppDialogSelectFolder.vue';
 import AppDialogConfirm from './dialog/AppDialogConfirm.vue';
 import AppDialogPrompt from './dialog/AppDialogPrompt.vue';
 import type { Component } from 'vue';
+import AppDialogSelectData from './dialog/AppDialogSelectData.vue';
 
 interface AppDialogItemsData {
   id: number;
@@ -34,7 +34,7 @@ const DIALOGS_COMPONENT_MAP: Record<
 > = {
   prompt: AppDialogPrompt,
   confirm: AppDialogConfirm,
-  'select-folder': AppDialogSelectFolder,
+  'select-data': AppDialogSelectData,
 };
 
 const items = ref<AppDialogItemsData[]>([]);
@@ -65,9 +65,9 @@ function dialogHandler<T>(data: AppDialogItems): Promise<T> {
   return resolver.promise;
 }
 
-provide<AppDialogProvider>(APP_SELECT_FOLDER_PROVIDER_KEY, {
-  async selectFolder(options) {
-    return dialogHandler({ type: 'select-folder', options });
+provide<AppDialogProvider>(APP_DIALOG_PROVIDER_KEY, {
+  async selectData(options) {
+    return dialogHandler({ type: 'select-data', options });
   },
   async confirm(options) {
     return dialogHandler({ type: 'confirm', options });

@@ -1,23 +1,24 @@
 import { ButtonVariants } from '@snippy/ui';
 
-export const APP_SELECT_FOLDER_PROVIDER_KEY = Symbol('app-select-folder');
+export const APP_DIALOG_PROVIDER_KEY = Symbol('app-dialog');
 
-export interface AppDialogSelectFolderOptions {
+export interface AppDialogSelectDataOptions {
+  type: 'folder' | 'snippet';
   title?: string;
 }
 
-export type AppDialogSelectFolderResult =
+export type AppDialogSelectDataResult =
   | {
-      folder: null;
+      data: null;
       canceled: true;
     }
   | {
       canceled: false;
-      folder: { id: string; path: string };
+      data: { id: string; path: string };
     };
-export interface AppDialogSelectFolder {
-  type: 'select-folder';
-  options?: AppDialogSelectFolderOptions;
+export interface AppDialogSelectData {
+  type: 'select-data';
+  options?: AppDialogSelectDataOptions;
 }
 
 export interface AppDialogConfirm {
@@ -56,9 +57,9 @@ export interface AppDialogPromptResult {
 }
 
 export interface AppDialogProvider {
-  selectFolder(
-    options?: AppDialogSelectFolderOptions,
-  ): Promise<AppDialogSelectFolderResult>;
+  selectData(
+    options?: AppDialogSelectDataOptions,
+  ): Promise<AppDialogSelectDataResult>;
   confirm(options: AppDialogConfirmOptions): Promise<AppDialogConfirmResult>;
   prompt(options: AppDialogPromptOptions): Promise<AppDialogPromptResult>;
 }
@@ -66,10 +67,10 @@ export interface AppDialogProvider {
 export type AppDialogItems =
   | AppDialogPrompt
   | AppDialogConfirm
-  | AppDialogSelectFolder;
+  | AppDialogSelectData;
 
 export function useAppDialog() {
-  const value = inject(APP_SELECT_FOLDER_PROVIDER_KEY) as AppDialogProvider;
+  const value = inject(APP_DIALOG_PROVIDER_KEY) as AppDialogProvider;
 
   return value;
 }

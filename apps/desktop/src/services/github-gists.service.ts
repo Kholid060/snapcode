@@ -3,6 +3,7 @@ import { FetchError } from '@/utils/errors';
 import {
   GitHubCreateGistPayload,
   GitHubGistListItem,
+  GitHubUpdateGistPayload,
 } from '@/interface/github.interface';
 import { githubLinkHeaderParser } from '@/utils/github-utils';
 
@@ -75,6 +76,22 @@ export async function createGitHubGist(payload: GitHubCreateGistPayload) {
   const result = await fetchGitHubApi<GitHubGistListItem>('/gists', {
     auth: true,
     method: 'POST',
+    body: JSON.stringify(payload),
+  });
+
+  return {
+    data: result.data,
+    ratelimitRemaining: result.headers.get('x-ratelimit-remaining'),
+  };
+}
+
+export async function updateGitHubGist(
+  gistId: string,
+  payload: GitHubUpdateGistPayload,
+) {
+  const result = await fetchGitHubApi<GitHubGistListItem>(`/gists/${gistId}`, {
+    auth: true,
+    method: 'PATCH',
     body: JSON.stringify(payload),
   });
 

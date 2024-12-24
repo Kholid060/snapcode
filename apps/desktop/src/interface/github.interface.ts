@@ -26,3 +26,8 @@ export interface GitHubCreateGistPayload {
   description?: string;
   files?: Record<string, { content: string }>;
 }
+
+export interface GitHubUpdateGistPayload {
+  description?: string;
+  files?: Record<string, { content?: string; filename?: string | null } | null>;
+}

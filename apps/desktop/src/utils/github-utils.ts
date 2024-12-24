@@ -16,8 +16,8 @@ export const GITHUB_GISTS_BASE_URL = 'https://gist.github.com/';
 export function extractGistsIdFromURL(url: string) {
   if (!url.startsWith(GITHUB_GISTS_BASE_URL)) return null;
 
-  const { 1: gistId } = url.slice(GITHUB_GISTS_BASE_URL.length).split('/');
-  return gistId ?? null;
+  const paths = url.slice(GITHUB_GISTS_BASE_URL.length).split('/');
+  return paths[1] ?? paths[0] ?? null;
 }
 
 export async function githubGistFileToSnippet({

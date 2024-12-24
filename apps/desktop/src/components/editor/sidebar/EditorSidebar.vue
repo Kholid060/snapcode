@@ -1,31 +1,31 @@
 <template>
   <aside class="bg-olive-2 flex h-screen w-64 flex-col border-r">
     <div
-      class="text-muted-foreground relative flex h-14 flex-shrink-0 items-center gap-1 border-b px-4"
+      class="text-muted-foreground relative flex h-14 flex-shrink-0 items-center justify-evenly border-b px-4"
     >
       <TooltipSimple
         v-for="item in items"
         :key="item.id"
         content-class="capitalize"
-        :label="`${item.label} (${hotkeysStore.getLabel(item.hotkey)})`"
+        :label="`${item.label} ${item.hotkey ? `(${hotkeysStore.getLabel(item.hotkey)})` : ''}`"
       >
         <Button
           size="icon"
           :variant="
             editorStore.state.state.activeMenu === item.id ? 'default' : 'ghost'
           "
+          class="flex-shrink-0"
           @click="editorStore.state.updateState('activeMenu', item.id)"
         >
           <component :is="item.icon" class="size-5" />
         </Button>
       </TooltipSimple>
-      <div class="grow"></div>
       <Dialog v-model:open="editorStore.state.settingsState.open" modal>
         <TooltipSimple
           content-class="capitalize"
           :label="`Settings (${hotkeysStore.getLabel('openSettings')})`"
         >
-          <DialogTrigger>
+          <DialogTrigger as-child>
             <Button size="icon" variant="ghost">
               <Settings01Icon class="size-5" />
             </Button>
@@ -94,6 +94,7 @@ import EditorSidebarSearch from './EditorSidebarSearch.vue';
 import {
   AllBookmarkIcon,
   FolderFileStorageIcon,
+  FolderShared02Icon,
   InternetIcon,
   MoreHorizontalCircle01Icon,
   Search01Icon,
@@ -133,11 +134,12 @@ import { useHotkeysStore } from '@/stores/hotkeys.store';
 import documentService from '@/services/document.service';
 import type { DocumentFlatTreeItem } from '@/interface/document.interface';
 import UiLink from '@/components/ui/UiLink.vue';
+import EditorSidebarShared from './EditorSidebarShared.vue';
 
 const items: {
   label: string;
-  hotkey: AppHotkeys;
   icon: Component;
+  hotkey?: AppHotkeys;
   id: EditorSidebarItems;
 }[] = [
   {
@@ -158,9 +160,15 @@ const items: {
     icon: Search01Icon,
     hotkey: 'searchMenu',
   },
+  {
+    id: 'shared',
+    label: 'Shared snippets',
+    icon: FolderShared02Icon,
+  },
 ];
 const sidebarComponentsMap: Record<EditorSidebarItems, Component> = {
   search: EditorSidebarSearch,
+  shared: EditorSidebarShared,
   snippets: EditorSidebarSnippets,
   bookmarks: EditorSidebarBookmarks,
 };

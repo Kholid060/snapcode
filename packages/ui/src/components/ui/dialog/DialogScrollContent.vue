@@ -13,7 +13,10 @@ import {
 import { computed, type HTMLAttributes } from 'vue';
 
 const props = defineProps<
-  DialogContentProps & { class?: HTMLAttributes['class'] }
+  DialogContentProps & {
+    hideCloseBtn?: boolean;
+    class?: HTMLAttributes['class'];
+  }
 >();
 const emits = defineEmits<DialogContentEmits>();
 
@@ -55,6 +58,7 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits);
         <slot />
 
         <DialogClose
+          v-if="!hideCloseBtn"
           class="hover:bg-secondary absolute right-3 top-3 rounded-md p-0.5 transition-colors"
         >
           <X class="h-4 w-4" />

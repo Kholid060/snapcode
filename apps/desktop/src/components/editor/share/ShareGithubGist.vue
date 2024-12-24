@@ -5,9 +5,22 @@
   <div v-if="sharedGist.isShared">
     <p class="text-sm">Snippets successfully shared to GitHub Gist</p>
     <div class="flex items-center gap-2">
-      <Input :model-value="getGitHubGistUrl(sharedGist.id)" readonly />
-      <Button @click="copyGistUrl">
-        {{ sharedGist.copied ? '✅ Copied' : 'Copy' }}
+      <div class="relative grow">
+        <Input
+          :model-value="getGitHubGistUrl(sharedGist.id)"
+          readonly
+          class="pr-9"
+          @click="$event.target.select()"
+        />
+        <UiLink
+          class="absolute right-2 top-1/2 -translate-y-1/2"
+          :href="getGitHubGistUrl(sharedGist.id)"
+        >
+          <LinkCircle02Icon class="size-5" />
+        </UiLink>
+      </div>
+      <Button @click="copyText(getGitHubGistUrl(sharedGist.id))">
+        {{ copied ? '✅ Copied' : 'Copy' }}
       </Button>
     </div>
   </div>
@@ -156,8 +169,7 @@ import {
   useToast,
 } from '@snippy/ui';
 import { useEditorStore } from '@/stores/editor.store';
-import { writeText } from '@tauri-apps/plugin-clipboard-manager';
-import { Settings01Icon } from 'hugeicons-vue';
+import { LinkCircle02Icon, Settings01Icon } from 'hugeicons-vue';
 import { logger } from '@/services/logger.service';
 import { getLogMessage } from '@/utils/helper';
 import { getNameFromPath } from '@/utils/document-utils';
@@ -166,9 +178,12 @@ import type { GitHubCreateGistPayload } from '@/interface/github.interface';
 import documentService from '@/services/document.service';
 import { getGitHubGistName, getGitHubGistUrl } from '@/utils/github-utils';
 import { FetchError } from '@/utils/errors';
+import UiLink from '@/components/ui/UiLink.vue';
+import { useCopyText } from '@/composables/clipboard.composable';
 
 const { toast } = useToast();
 const editorStore = useEditorStore();
+const { copied, copyText } = useCopyText();
 
 const open = shallowRef(false);
 const searchTerm = shallowRef('');
@@ -177,7 +192,6 @@ const hasGithubPat = shallowRef(false);
 
 const sharedGist = shallowReactive({
   id: '',
-  copied: false,
   isShared: false,
 });
 const gistPayload = reactive<{
@@ -203,15 +217,6 @@ const filteredSnippets = computed(() =>
   ),
 );
 
-async function copyGistUrl() {
-  if (sharedGist.copied) return;
-
-  await writeText(getGitHubGistUrl(sharedGist.id));
-  sharedGist.copied = true;
-  setTimeout(() => {
-    sharedGist.copied = false;
-  }, 2000);
-}
 async function checkToken() {
   hasGithubPat.value = await appVault
     .get('github-key')

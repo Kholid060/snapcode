@@ -322,7 +322,8 @@ async function importAll() {
   }
 
   try {
-    const selectFolder = await appDialog.selectFolder({
+    const selectFolder = await appDialog.selectData({
+      type: 'folder',
       title: 'Select folder where to store the snippets',
     });
     if (selectFolder.canceled) return;
@@ -334,7 +335,7 @@ async function importAll() {
 
     while (true) {
       const result = await listGitHubGistsByUsername(username, params);
-      await storeGitHubGists(result.data, selectFolder.folder.id);
+      await storeGitHubGists(result.data, selectFolder.data.id);
 
       listImportState.importCount += result.data.length;
       gistState.ratelimitRemaining = result.ratelimitRemaining ?? '';
@@ -364,7 +365,8 @@ async function importAll() {
 }
 async function importSelectedGists() {
   try {
-    const selectFolder = await appDialog.selectFolder({
+    const selectFolder = await appDialog.selectData({
+      type: 'folder',
       title: 'Select folder where to store the snippets',
     });
     if (selectFolder.canceled) return;
@@ -379,7 +381,7 @@ async function importSelectedGists() {
       );
       if (gists.length <= 0) break;
 
-      await storeGitHubGists(gists, selectFolder.folder.id);
+      await storeGitHubGists(gists, selectFolder.data.id);
       listImportState.importCount += gists.length;
 
       page += 1;
@@ -532,12 +534,13 @@ async function importById(url: string) {
     const gist = await getGitHubGistsById(gistId);
     gistState.ratelimitRemaining = gist.ratelimitRemaining ?? '';
 
-    const result = await appDialog.selectFolder({
+    const result = await appDialog.selectData({
+      type: 'folder',
       title: 'Select folder where to store the snippets',
     });
     if (result.canceled) return;
 
-    const storedData = await storeGitHubGists([gist.data], result.folder.id);
+    const storedData = await storeGitHubGists([gist.data], result.data.id);
 
     toast({
       title: `${storedData.snippets} snippets imported`,

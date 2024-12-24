@@ -1,7 +1,7 @@
 import { AppEditorFonts } from '@/utils/const/app.const';
 import { DocumentFlatTreeItem } from './document.interface';
 
-export type EditorSidebarItems = 'snippets' | 'bookmarks' | 'search';
+export type EditorSidebarItems = 'snippets' | 'bookmarks' | 'search' | 'shared';
 
 export interface EditorSidebarState {
   showSidebar: boolean;

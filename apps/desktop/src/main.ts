@@ -1,6 +1,7 @@
 import { createApp } from 'vue';
 import './assets/css/style.css';
 import { createPinia } from 'pinia';
+import { VueQueryPlugin } from '@tanstack/vue-query';
 import { attachConsole } from '@tauri-apps/plugin-log';
 import { logger } from './services/logger.service';
 import { getLogMessage, preventGlobalContextMenu } from './utils/helper';
@@ -16,7 +17,7 @@ import documentService from './services/document.service';
     }
     await Promise.all([documentService.init()]);
 
-    createApp(AppAsync).use(createPinia()).mount('#app');
+    createApp(AppAsync).use(VueQueryPlugin).use(createPinia()).mount('#app');
   } catch (error) {
     logger.error(getLogMessage('init-app', error));
     throw error;

@@ -150,7 +150,8 @@ async function createNewFolder() {
 }
 async function importSnippetFromFiles() {
   try {
-    const { canceled, folder } = await appDialog.selectFolder({
+    const { canceled, data: folder } = await appDialog.selectData({
+      type: 'folder',
       title: 'Select a folder where to put the snippets',
     });
     if (canceled || !folder) return;

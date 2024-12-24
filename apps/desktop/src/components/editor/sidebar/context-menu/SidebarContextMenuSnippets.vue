@@ -121,19 +121,20 @@ const isBookmarked = computed(() => {
 
 async function moveItemFolder() {
   try {
-    const selectedFolder = await appDialog.selectFolder({
+    const selectedFolder = await appDialog.selectData({
+      type: 'folder',
       title: `Select folder where to move the ${props.ctxData.type === 'folder' ? 'folder' : 'snippet'}`,
     });
     if (
       selectedFolder.canceled ||
       (props.ctxData.item.isDir &&
-        props.ctxData.item.id === selectedFolder.folder.id)
+        props.ctxData.item.id === selectedFolder.data.id)
     )
       return;
 
     await editorStore.document.moveItem({
       id: props.ctxData.item.id,
-      newParentId: selectedFolder.folder.id,
+      newParentId: selectedFolder.data.id,
       oldParentId: props.ctxData.item.parentId,
     });
   } catch (error) {
