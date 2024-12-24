@@ -1,5 +1,8 @@
 import { AppEditorFonts } from '@/utils/const/app.const';
-import { DocumentFlatTreeItem } from './document.interface';
+import {
+  DocumentFlatTreeItem,
+  DocumentSharedSnippet,
+} from './document.interface';
 
 export type EditorSidebarItems = 'snippets' | 'bookmarks' | 'search' | 'shared';
 
@@ -25,6 +28,13 @@ export type EditorSidebarSnippetsCtxMenu = EditorSidebarCtxMenuBase<
   }
 >;
 
+export type EditorSidebarSharedSnippetsCtxMenu = EditorSidebarCtxMenuBase<
+  'shared-snippets',
+  {
+    item: DocumentSharedSnippet;
+  }
+>;
+
 export type EditorSidebarBookmarksCtxMenu = EditorSidebarCtxMenuBase<
   'bookmarks',
   {
@@ -38,7 +48,8 @@ export type EditorSidebarBookmarksCtxMenu = EditorSidebarCtxMenuBase<
 
 export type EditorSidebarContextMenuItems =
   | EditorSidebarSnippetsCtxMenu
-  | EditorSidebarBookmarksCtxMenu;
+  | EditorSidebarBookmarksCtxMenu
+  | EditorSidebarSharedSnippetsCtxMenu;
 
 export interface EditorSettings {
   fontSize: number;

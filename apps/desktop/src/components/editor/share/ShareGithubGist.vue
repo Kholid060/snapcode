@@ -180,10 +180,12 @@ import { getGitHubGistName, getGitHubGistUrl } from '@/utils/github-utils';
 import { FetchError } from '@/utils/errors';
 import UiLink from '@/components/ui/UiLink.vue';
 import { useCopyText } from '@/composables/clipboard.composable';
+import { useSharedSnippetsStore } from '@/stores/shared-snippets.store';
 
 const { toast } = useToast();
 const editorStore = useEditorStore();
 const { copied, copyText } = useCopyText();
+const sharedSnippetsStore = useSharedSnippetsStore();
 
 const open = shallowRef(false);
 const searchTerm = shallowRef('');
@@ -253,7 +255,7 @@ async function shareSnippets() {
     );
 
     const gist = await createGitHubGist(payload);
-    await documentService.addSharedSnippets({
+    await sharedSnippetsStore.addItem({
       id: gist.data.id,
       type: 'github-gist',
       createdAt: Date.now(),

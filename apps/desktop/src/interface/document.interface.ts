@@ -22,6 +22,7 @@ export interface DocumentStoreSettings {
   general: AppSettings;
   editor: EditorSettings;
   noPromptDelete: boolean;
+  noPromptDeleteGist: boolean;
   hotkeys: Record<AppHotkeys, string>;
 }
 

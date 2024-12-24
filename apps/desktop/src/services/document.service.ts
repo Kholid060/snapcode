@@ -3,11 +3,10 @@ import { appCommand } from './app-command.service';
 import LazyStore from '@/lib/LazyStore';
 import {
   DocumentOldNewVal,
-  DocumentStoreBookmarks,
+  DocumentStoreData,
   DocumentStoreMetadata,
   DocumentStoreSettings,
-  DocumentStoreData,
-  DocumentSharedSnippet,
+  DocumentStoreBookmarks,
 } from '@/interface/document.interface';
 import {
   SnippetMetadata,
@@ -125,12 +124,6 @@ class DocumentService {
 
   duplicateSnippet(path: string) {
     return appCommand.invoke('duplicate_snippet', { path });
-  }
-
-  async addSharedSnippets(snippet: DocumentSharedSnippet) {
-    const snippets = await this.#stores.data.xGet('sharedSnippets', []);
-    snippets.push(snippet);
-    await this.#stores.data.xSet('sharedSnippets', snippets);
   }
 }
 

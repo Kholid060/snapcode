@@ -28,6 +28,13 @@
       v-for="snippet in sortedSnippets"
       :key="snippet.id"
       @click="activeSnippet = snippet"
+      @contextmenu="
+        sidebarProvider.handleContextMenu({
+          type: 'shared-snippets',
+          data: { item: snippet },
+          event: $event as PointerEvent,
+        })
+      "
       class="text-muted-foreground hover:bg-accent/70 rounded-md px-2 py-1 text-sm"
     >
       <p class="text-foreground">{{ snippet.name }}</p>
@@ -61,7 +68,6 @@
 <script setup lang="ts">
 import type { AppBookmarkSort } from '@/interface/app.interface';
 import type { DocumentSharedSnippet } from '@/interface/document.interface';
-import documentService from '@/services/document.service';
 import {
   Button,
   Select,
@@ -77,6 +83,8 @@ import { SelectTrigger } from 'radix-vue';
 import dayjs from 'dayjs';
 import { Sorting05Icon } from 'hugeicons-vue';
 import SharedEditGithubGist from '../share/edit/SharedEditGithubGist.vue';
+import { useSharedSnippetsStore } from '@/stores/shared-snippets.store';
+import { useEditorSidebarProvider } from '@/providers/editor.provider';
 
 const sortItems: { label: string; id: AppBookmarkSort }[] = [
   { id: 'name-asc', label: 'Name (A-Z)' },
@@ -88,7 +96,9 @@ const sharedProviderLabel: Record<DocumentSharedSnippet['type'], string> = {
   'github-gist': 'GitHub Gist',
 };
 
-const snippets = shallowRef<DocumentSharedSnippet[]>([]);
+const sidebarProvider = useEditorSidebarProvider();
+const sharedSnippetsStore = useSharedSnippetsStore();
+
 const activeSnippet = shallowRef<DocumentSharedSnippet | null>(null);
 const sortBy = ref<AppBookmarkSort>(
   (localStorage.getItem('shared-sort') as AppBookmarkSort) ?? 'created-desc',
@@ -118,7 +128,7 @@ const sortedSnippets = computed(() => {
   }
 
   const isNumber = key === 'createdAt';
-  return snippets.value.slice().sort((a, z) => {
+  return sharedSnippetsStore.snippets.slice().sort((a, z) => {
     const aData = a[key];
     const zData = z[key];
 
@@ -132,17 +142,10 @@ const sortedSnippets = computed(() => {
   });
 });
 
-function updateSharedSnippetData({ name }: { name: string }) {
+async function updateSharedSnippetData({ name }: { name: string }) {
   if (!activeSnippet.value) return;
 
-  const index = snippets.value.findIndex(
-    (item) => item.id === activeSnippet.value!.id,
-  );
-  if (index === -1) return;
-
-  snippets.value[index].name = name;
-  documentService.stores.data.xSet('sharedSnippets', snippets.value);
-  activeSnippet.value = null;
+  await sharedSnippetsStore.updateItem(activeSnippet.value.id, { name });
 }
 function updateSort(value: AppBookmarkSort) {
   localStorage.setItem('shared-sort', value);
@@ -150,6 +153,6 @@ function updateSort(value: AppBookmarkSort) {
 }
 
 onBeforeMount(async () => {
-  snippets.value = await documentService.stores.data.xGet('sharedSnippets', []);
+  await sharedSnippetsStore.load();
 });
 </script>

@@ -9,15 +9,16 @@ import { githubLinkHeaderParser } from '@/utils/github-utils';
 
 type FetchInit = RequestInit & {
   auth?: boolean;
+  responseType?: 'json' | 'text';
 };
 
 const GITHUB_API_BASE_URL = 'https://api.github.com';
 
 async function fetchGitHubApi<T = unknown>(
   path: string,
-  init: FetchInit = { auth: true },
+  init: FetchInit = { auth: true, responseType: 'json' },
 ) {
-  const fetchInit = init;
+  const fetchInit: FetchInit = { auth: true, responseType: 'json', ...init };
   fetchInit.headers = new Headers(fetchInit.headers);
   fetchInit.headers.set('Accept', 'application/vnd.github+json');
 
@@ -30,7 +31,18 @@ async function fetchGitHubApi<T = unknown>(
   }
 
   const response = await fetch(`${GITHUB_API_BASE_URL}${path}`, fetchInit);
-  const result = (await response.json()) as T;
+  let result: T;
+
+  switch (fetchInit.responseType) {
+    case 'json':
+      result = await response.json();
+      break;
+    case 'text':
+      result = (await response.text()) as T;
+      break;
+    default:
+      throw new Error('Invalid response type');
+  }
 
   if (!response.ok) {
     throw new FetchError({
@@ -93,6 +105,19 @@ export async function updateGitHubGist(
     auth: true,
     method: 'PATCH',
     body: JSON.stringify(payload),
+  });
+
+  return {
+    data: result.data,
+    ratelimitRemaining: result.headers.get('x-ratelimit-remaining'),
+  };
+}
+
+export async function deleteGitHubGist(gistId: string) {
+  const result = await fetchGitHubApi(`/gists/${gistId}`, {
+    auth: true,
+    method: 'DELETE',
+    responseType: 'text',
   });
 
   return {

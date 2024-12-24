@@ -135,6 +135,7 @@ import documentService from '@/services/document.service';
 import type { DocumentFlatTreeItem } from '@/interface/document.interface';
 import UiLink from '@/components/ui/UiLink.vue';
 import EditorSidebarShared from './EditorSidebarShared.vue';
+import SidebarContextMenuSharedSnippets from './context-menu/SidebarContextMenuSharedSnippets.vue';
 
 const items: {
   label: string;
@@ -175,6 +176,7 @@ const sidebarComponentsMap: Record<EditorSidebarItems, Component> = {
 const ctxMenuComps: Record<EditorSidebarContextMenuItems['type'], Component> = {
   snippets: SidebarContextMenuSnippets,
   bookmarks: SidebarContextMenuBookmarks,
+  'shared-snippets': SidebarContextMenuSharedSnippets,
 };
 
 const contextMenuTrigger = useTemplateRef('context-menu-trigger');
