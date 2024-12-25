@@ -74,7 +74,7 @@ const result = shallowRef<DocumentSearchEntry[]>([]);
 const isLoading = shallowRef(false);
 
 function handleSelect(path: string) {
-  const itemId = editorStore.document.findItemByPath(path)?.id;
+  const itemId = editorStore.document.findItemMetadataByPath(path)?.id;
   if (!itemId) {
     toast({
       variant: 'destructive',

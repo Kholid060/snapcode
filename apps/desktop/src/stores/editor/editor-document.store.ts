@@ -25,6 +25,7 @@ import { nanoid } from 'nanoid/non-secure';
 import { isString } from '@/utils/data-type';
 import { useAppStore } from '../app.store';
 import { getSnippetLangFromName } from '@/utils/snippet-utils';
+import { extname } from '@tauri-apps/api/path';
 
 type NewFlatTreeItem = SetOptional<DocumentFlatTreeItem, 'id' | 'parentId'>;
 type NewFlatTreeMetadataItem = SetOptional<DocumentFlatTreeMetadataItem, 'id'>;
@@ -266,12 +267,16 @@ export const useEditorDocument = defineStore('editor:document', () => {
           treeMetadata[item.id]?.path === path &&
           (isDir ? true : isDir === item.isDir)
         ) {
-          return treeMetadata[item.id];
+          return item;
         }
       }
     }
-
-    return null;
+  }
+  function findItemMetadataByPath(path: string, isDir = false) {
+    const item = Object.values(treeMetadata).find(
+      (item) => item.path === path && (isDir ? true : isDir === item.isDir),
+    );
+    return item ?? null;
   }
 
   async function duplicateSnippet(path: string) {
@@ -342,13 +347,12 @@ export const useEditorDocument = defineStore('editor:document', () => {
     const newMetadatKeys: DocumentOldNewVal[] = [];
 
     const walkFolder = ({ id, newPath }: RenameFolderPayload) => {
-      const childs = treeData[id];
       const metadata = treeMetadata[id];
-      if (!childs || !metadata) return;
+      if (!metadata) return;
 
       metadata.path = newPath;
 
-      for (const child of childs) {
+      for (const child of treeData[id] || []) {
         const childMetadata = treeMetadata[child.id];
         if (!childMetadata) continue;
 
@@ -395,9 +399,13 @@ export const useEditorDocument = defineStore('editor:document', () => {
       await updateSnippetMetadata(id, {
         path: newPath,
         name: newName,
+        ext: (await extname(newName)) || 'txt',
         metadata: { lang: (await getSnippetLangFromName(newName))?.name ?? '' },
       });
     }
+
+    const item = findItemByPath(newPath, itemMetadata.isDir);
+    if (item) sortTree(item.parentId);
 
     if (
       editorState.state.activeFileId === id ||
@@ -432,10 +440,10 @@ export const useEditorDocument = defineStore('editor:document', () => {
     addSnippets,
     treeMetadata,
     registerItems,
-    findItemByPath,
     getItemMetadata,
     duplicateSnippet,
     updateSnippetContents,
     updateSnippetMetadata,
+    findItemMetadataByPath,
   };
 });

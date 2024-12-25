@@ -22,7 +22,7 @@ import ShareSnippet from './share/ShareSnippet.vue';
 const editorStore = useEditorStore();
 
 useTauriWindowEvent('snippet:open', (event) => {
-  const item = editorStore.document.findItemByPath(event.payload);
+  const item = editorStore.document.findItemMetadataByPath(event.payload);
   if (!item) return;
 
   editorStore.state.updateState('activeFileId', item.id);
@@ -30,8 +30,8 @@ useTauriWindowEvent('snippet:open', (event) => {
 useTauriWindowEvent('snippet:created', (event) => {
   const parsedPath = getDocumentParentDir(event.payload.path);
   const parent = parsedPath.parentDir
-    ? editorStore.document.findItemByPath(parsedPath.parentDir, true)?.id ||
-      TREE_ROOT_KEY
+    ? editorStore.document.findItemMetadataByPath(parsedPath.parentDir, true)
+        ?.id || TREE_ROOT_KEY
     : TREE_ROOT_KEY;
 
   editorStore.document.registerItems({
