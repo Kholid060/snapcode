@@ -24,6 +24,16 @@
       border-radius: theme('borderRadius.md');
     }
 
+    label {
+      display: inline-flex;
+      align-items: center;
+
+      input[type="checkbox"] {
+        margin-top: 0;
+        margin-bottom: 0;
+      }
+    }
+
     .cm-button {
       border: none;
       background-image: none;
