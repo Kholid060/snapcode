@@ -91,7 +91,7 @@ async function removeGitHubGist() {
 
     let message = typeof error === 'string' ? error : '';
     if (error instanceof FetchError) {
-      message = error.message;
+      message = error.status === 404 ? 'Gist not found' : error.message;
     }
 
     toast({
