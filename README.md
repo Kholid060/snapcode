@@ -10,4 +10,4 @@ Snippy is a snippets manager that will help you manage and organize your snippet
 
 ### License
 
-![MIT](https://github.com/Kholid060/snippy/blob/main/LICENSE)
+[MIT](https://github.com/Kholid060/snippy/blob/main/LICENSE)
