@@ -25,7 +25,7 @@
     "updater": {
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDlGNzIyMEVEREIzNTk0QkMKUldTOGxEWGI3U0J5bjVRM3JiQ1JkUTB4QkVNMDYwMUhDS0JuWHFnNjczRStBWStXekEwR1lzUGgKdW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDlGNzIyMEVEREIzNTk0QkMKUldTOGxEWGI3U0J5bjVRM3JiQ1JkUTB4QkVNMDYwMUhDS0JuWHFnNjczRStBWStXekEwR1lzUGgK",
       "endpoints": [
-        "https://github.com/kholid060/snippy/releases/latest/download/latest.json"
+        "https://gist.githubusercontent.com/Kholid060/2ab6f75e83105193fb8ea29b30ae1893/raw/snippy-release.json"
       ]
     }
   }
