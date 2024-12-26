@@ -8,6 +8,7 @@ export default defineNuxtConfig({
     '@nuxt/eslint',
     'shadcn-nuxt',
     '@nuxtjs/color-mode',
+    'unplugin-icons/nuxt',
   ],
   app: {
     head: {

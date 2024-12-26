@@ -99,12 +99,10 @@
   </footer>
 </template>
 <script setup lang="ts">
-import {
-  FolderFileStorageIcon,
-  BrowserIcon,
-  FileSyncIcon,
-} from 'hugeicons-vue';
 import githubMarkWhite from '~/assets/svg/github-mark-white.svg';
+import FolderFileStorageIcon from '~icons/hugeicons/folder-file-storage';
+import BrowserIcon from '~icons/hugeicons/browser';
+import FileSyncIcon from '~icons/hugeicons/file-sync';
 
 const features: {
   id: string;

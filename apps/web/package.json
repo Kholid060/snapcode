@@ -27,9 +27,11 @@
     "vue-router": "latest"
   },
   "devDependencies": {
+    "@iconify-json/hugeicons": "^1.2.3",
     "@nuxt/kit": "^3.14.1592",
     "@snippy/eslint-config": "workspace:*",
     "tailwindcss": "^3.4.15",
+    "unplugin-icons": "^0.22.0",
     "vite": "^6.0.1"
   }
 }
