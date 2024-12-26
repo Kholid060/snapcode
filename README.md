@@ -7,3 +7,7 @@ Snippy is a snippets manager that will help you manage and organize your snippet
 [Latest Release](https://github.com/kholid060/snippy/releases)
 
 ![snippy](/assets/image.png)
+
+### License
+
+![MIT](https://github.com/Kholid060/snippy/blob/main/LICENSE)
