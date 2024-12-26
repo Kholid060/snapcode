@@ -1,0 +1,31 @@
+[package]
+name = "tauri-plugin-decorum"
+version = "1.1.1"
+authors = ["Siddharth <siddharth99c@gmail.com>"]
+description = "Opnionated window decoration controls for Tauri apps."
+edition = "2021"
+rust-version = "1.70"
+exclude = ["/examples", "/webview-dist", "/webview-src", "/node_modules"]
+links = "tauri-plugin-decorum"
+license = "MIT"
+homepage = "https://github.com/clearlysid/tauri-plugin-decorum"
+repository = "https://github.com/clearlysid/tauri-plugin-decorum"
+
+[dependencies]
+tauri = { version = "2.0.0-rc" }
+serde = "1.0"
+anyhow = "1.0"
+
+[target.'cfg(target_os = "macos")'.dependencies]
+rand = "^0.8"
+cocoa = "0.25"
+objc = "0.2"
+
+[target.'cfg(target_os = "windows")'.dependencies]
+enigo = "0.1.3"
+
+[target.'cfg(target_os = "linux")'.dependencies]
+linicon = "2.3.0"
+
+[build-dependencies]
+tauri-plugin = { version = "2.0.0-rc", features = ["build"] }

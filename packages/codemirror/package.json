@@ -1,0 +1,52 @@
+{
+  "name": "@snippy/codemirror",
+  "version": "0.0.0",
+  "description": "",
+  "type": "module",
+  "main": "./src",
+  "scripts": {
+    "lint": "eslint . --max-warnings 0"
+  },
+  "dependencies": {
+    "@codemirror/autocomplete": "^6.18.3",
+    "@codemirror/commands": "^6.7.1",
+    "@codemirror/lang-cpp": "^6.0.2",
+    "@codemirror/lang-css": "^6.3.0",
+    "@codemirror/lang-go": "^6.0.1",
+    "@codemirror/lang-html": "^6.4.9",
+    "@codemirror/lang-java": "^6.0.1",
+    "@codemirror/lang-javascript": "^6.2.2",
+    "@codemirror/lang-json": "^6.0.1",
+    "@codemirror/lang-less": "^6.0.2",
+    "@codemirror/lang-liquid": "^6.2.2",
+    "@codemirror/lang-markdown": "^6.3.1",
+    "@codemirror/lang-php": "^6.0.1",
+    "@codemirror/lang-python": "^6.1.6",
+    "@codemirror/lang-rust": "^6.0.1",
+    "@codemirror/lang-sass": "^6.0.2",
+    "@codemirror/lang-sql": "^6.8.0",
+    "@codemirror/lang-wast": "^6.0.2",
+    "@codemirror/lang-xml": "^6.1.0",
+    "@codemirror/lang-yaml": "^6.1.1",
+    "@codemirror/language": "^6.10.4",
+    "@codemirror/language-data": "^6.5.1",
+    "@codemirror/legacy-modes": "^6.4.2",
+    "@codemirror/lint": "^6.8.4",
+    "@codemirror/search": "^6.5.8",
+    "@codemirror/state": "^6.4.1",
+    "@codemirror/view": "^6.35.0",
+    "@lezer/common": "^1.2.3",
+    "@lezer/highlight": "^1.2.1",
+    "@lezer/lr": "^1.4.2",
+    "@replit/codemirror-vscode-keymap": "^6.0.2",
+    "@uiw/codemirror-theme-tokyo-night": "^4.23.6",
+    "@uiw/codemirror-themes": "^4.23.6",
+    "codemirror": "^6.0.1",
+    "vue": "^3.5.13"
+  },
+  "devDependencies": {
+    "@lezer/generator": "^1.7.1",
+    "@snippy/eslint-config": "workspace:*",
+    "typescript": "^5.7.2"
+  }
+}

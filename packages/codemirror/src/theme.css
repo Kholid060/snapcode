@@ -1,0 +1,48 @@
+.codemirror {
+  .cm-scroller {
+    font-size: var(--editor-font-size);
+    font-family: var(--editor-font-family);
+  }
+
+  .cm-lineNumbers {
+    color: theme('colors.muted.foreground');
+  }
+
+  .cm-focused {
+    outline: none;
+  }
+
+  .cm-lineNumbers {
+    .cm-activeLineGutter {
+      border-top-left-radius: theme('borderRadius.sm');
+      border-bottom-left-radius: theme('borderRadius.sm');
+    }
+  }
+
+  .cm-activeLine {
+    border-top-right-radius: theme('borderRadius.sm');
+    border-bottom-right-radius: theme('borderRadius.sm');
+  }
+
+  .cm-editor {
+    height: 100%;
+  }
+
+  .cm-tooltip-autocomplete {
+    padding: theme('padding[0.5]');
+    color: theme('colors.muted.foreground');
+    border-radius: theme('borderRadius.md');
+    border: 1px solid theme('colors.border');
+    background-color: theme('colors.card.DEFAULT');
+
+    ul {
+      font-size: theme('fontSize.xs');
+      font-family: theme('fontFamily.mono') !important;
+
+      li[aria-selected] {
+        border-radius: theme('borderRadius.sm');
+        background-color: hsl(var(--primary) / 0.20);
+      }
+    }
+  }
+}

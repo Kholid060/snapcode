@@ -1,0 +1,163 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --ruby-1: 340 100% 99%;
+    --ruby-2: 352 100% 98%;
+    --ruby-3: 350 90% 95%;
+    --ruby-4: 351 100% 93%;
+    --ruby-5: 350 100% 90%;
+    --ruby-6: 350 80% 86%;
+    --ruby-7: 349 67% 80%;
+    --ruby-8: 347 61% 73%;
+    --ruby-9: 347 75% 58%;
+    --ruby-10: 347 69% 54%;
+    --ruby-11: 345 61% 46%;
+    --ruby-12: 344 62% 24%;
+
+    --olive-1: 120 20% 99%;
+    --olive-2: 120 16% 97%;
+    --olive-3: 120 6% 94%;
+    --olive-4: 120 4% 90%;
+    --olive-5: 120 4% 88%;
+    --olive-6: 120 3% 84%;
+    --olive-7: 120 3% 80%;
+    --olive-8: 105 2% 72%;
+    --olive-9: 102 3% 54%;
+    --olive-10: 102 2% 50%;
+    --olive-11: 110 3% 38%;
+    --olive-12: 108 8% 11%;
+
+    --lime-1: 79 42% 98%;
+    --lime-2: 77 41% 96%;
+    --lime-3: 75 64% 90%;
+    --lime-4: 76 62% 84%;
+    --lime-5: 78 57% 77%;
+    --lime-6: 79 49% 71%;
+    --lime-7: 82 42% 62%;
+    --lime-8: 85 40% 52%;
+    --lime-9: 81 80% 66%;
+    --lime-10: 81 75% 60%;
+    --lime-11: 84 45% 33%;
+    --lime-12: 75 39% 18%;
+
+    --background: var(--olive-1);
+    --foreground: var(--olive-12);
+
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: var(--olive-11);
+
+    --popover: var(--olive-2);
+    --popover-foreground: var(--olive-12);
+
+    --card: var(--olive-2);
+    --card-foreground: var(--olive-12);
+
+    --border: var(--olive-6);
+    --input: var(--olive-7);
+
+    --primary: var(--lime-9);
+    --primary-hover: var(--lime-10);
+    --primary-foreground: var(--olive-12);
+
+    --secondary: var(--olive-3);
+    --secondary-hover: var(--olive-4);
+    --secondary-foreground: var(--olive-12);
+
+    --accent: var(--olive-4);
+    --accent-foreground: var(--olive-12);
+
+    --destructive: var(--ruby-9);
+    --destructive-text: var(--ruby-10);
+    --destructive-foreground: var(--olive-12);
+
+    --ring: var(--lime-6);
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --olive-1: 90 5% 6%;
+    --olive-2: 90 4% 9%;
+    --olive-3: 89 3% 12%;
+    --olive-4: 100 3% 15%;
+    --olive-5: 99 3% 18%;
+    --olive-6: 90 3% 21%;
+    --olive-7: 96 3% 27%;
+    --olive-8: 111 3% 37%;
+    --olive-9: 108 4% 41%;
+    --olive-10: 106 3% 47%;
+    --olive-11: 105 5% 69%;
+    --olive-12: 120 5% 92%;  
+
+    --ruby-1: 345 19% 8%;
+    --ruby-2: 346 17% 10%;
+    --ruby-3: 344 48% 15%;
+    --ruby-4: 341 60% 19%;
+    --ruby-5: 342 56% 23%;
+    --ruby-6: 343 49% 29%;
+    --ruby-7: 346 26% 36%;
+    --ruby-8: 348 42% 48%;
+    --ruby-9: 347 75% 58%;
+    --ruby-10: 350 79% 63%;
+    --ruby-11: 354 100% 79%;
+    --ruby-12: 339 95% 90%;  
+    
+    --lime-1: 77 22% 6%;
+    --lime-2: 90 23% 8%;
+    --lime-3: 93 28% 12%;
+    --lime-4: 92 30% 16%;
+    --lime-5: 90 32% 20%;
+    --lime-6: 91 32% 24%;
+    --lime-7: 90 33% 28%;
+    --lime-8: 89 35% 33%;
+    --lime-9: 81 80% 66%;
+    --lime-10: 78 100% 71%;
+    --lime-11: 79 69% 66%;
+    --lime-12: 79 79% 84%;
+  
+
+    --background: var(--olive-1);
+    --foreground: var(--olive-12);
+
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: var(--olive-11);
+
+    --popover: var(--olive-2);
+    --popover-foreground: var(--olive-12);
+
+    --card: var(--olive-2);
+    --card-foreground: var(--olive-12);
+
+    --border: var(--olive-6);
+    --input: var(--olive-7);
+
+    --primary: var(--lime-9);
+    --primary-hover: var(--lime-10);
+    --primary-foreground: var(--olive-1);
+
+    --secondary: var(--olive-3);
+    --secondary-hover: var(--olive-4);
+    --secondary-foreground: var(--olive-12);
+
+    --accent: var(--olive-4);
+    --accent-foreground: var(--olive-12);
+
+    --destructive: var(--ruby-9);
+    --destructive-text: var(--ruby-10);
+    --destructive-foreground: var(--olive-12);
+
+    --ring: var(--lime-6);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}

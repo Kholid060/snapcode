@@ -1,0 +1,79 @@
+@import "@snippy/ui/theme.css";
+@import "./fonts.css";
+
+:root {
+  font-feature-settings: "liga" 1, "calt" 1, "cv02", "cv03", "cv04", "cv11";
+}
+
+:not(.native-scroll) {
+  /* width */
+  &::-webkit-scrollbar {
+    width: 14px;
+    border: 4px solid transparent;
+  }
+  
+  /* Track */
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  /* Handle */
+  &::-webkit-scrollbar-thumb {
+    background-clip: padding-box;
+    border: 3px solid transparent;
+    border-radius: theme('borderRadius.xl');
+    background-color: theme('colors.olive.5');
+  }
+
+  /* Handle on hover */
+  &::-webkit-scrollbar-thumb:hover {
+    background-color: theme('colors.olive.6'); 
+  }
+
+  &::-webkit-scrollbar-corner {
+    background-color: transparent; 
+  }
+}
+
+html {
+  cursor: default;
+  overflow: hidden;
+  user-select: none;
+}
+
+button {
+  cursor: default;
+}
+
+[data-tauri-decorum-tb] {
+  z-index: 49 !important;
+  border-bottom: 1px solid theme('colors.border');
+  background-color: theme('colors.background') !important;
+  height: theme('height.14') !important;
+  align-items: center !important;
+  width: auto !important;
+  right: 0px !important;
+  left: auto !important;
+
+  .decorum-tb-btn {
+    width: theme('width.12');
+
+    &:not(.decorum-tb-close):hover {
+      background-color: theme('colors.secondary.hover');
+    }
+  }
+
+  [data-tauri-drag-region] {
+    z-index: -2;
+    position: absolute;
+  }
+}
+
+span[search-result], mk {
+  @apply bg-primary/40 text-foreground rounded;
+}
+
+.cmx-search-input:not(:placeholder-shown) + svg[clear-icon],
+.cmx-search-input:not(:placeholder-shown) + button[clear-icon] {
+  display: block;
+}

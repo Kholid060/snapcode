@@ -1,0 +1,63 @@
+[package]
+name = "desktop"
+version = "0.1.0"
+description = "Snippet management tool"
+authors = ["Ahmad Kholid"]
+edition = "2021"
+
+[profile.dev]
+incremental = true # Compile your binary in smaller steps.
+
+[profile.release]
+codegen-units = 1 # Allows LLVM to perform better optimization.
+lto = true # Enables link-time-optimizations.
+opt-level = "s" # Prioritizes small binary size. Use `3` if you prefer speed.
+panic = "abort" # Higher performance by disabling panic handlers.
+strip = true # Ensures debug symbols are removed.
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+# The `_lib` suffix may seem redundant but it is necessary
+# to make the lib name unique and wouldn't conflict with the bin name.
+# This seems to be only an issue on Windows, see https://github.com/rust-lang/cargo/issues/8519
+name = "desktop_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = ["tray-icon"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tauri-plugin-fs = { version = "2.0.3", features = ["watch"] }
+tauri-plugin-log = "2.0.2"
+tauri-plugin-store = { "path" = "../../../packages/tauri-plugin-store" }
+tauri-plugin-decorum = { "path" = "../../../packages/tauri-plugin-decorum" }
+tauri-plugin-os = "2.0.1"
+tauri-plugin-dialog = "2.2.0"
+regex = "1.11.1"
+enigo = "0.3.0"
+tauri-plugin-opener = "2.0.0"
+tauri-plugin-clipboard-manager = "2.0.2"
+tauri-plugin-http = "2.0.4"
+tauri-plugin-stronghold = "2"
+tauri-plugin-prevent-default = "0.8.0"
+walkdir = "2.5.0"
+path-slash = "0.2.1"
+normalize-path = "0.2.1"
+trash = "5.2.1"
+ignore = "0.4.23"
+anyhow = "1.0.94"
+grep-matcher = "0.1.7"
+grep-searcher = "0.1.14"
+grep-regex = "0.1.13"
+rust-argon2 = "2.1.0"
+
+[target.'cfg(any(target_os = "macos", windows, target_os = "linux"))'.dependencies]
+tauri-plugin-autostart = "2.2.0"
+tauri-plugin-global-shortcut = "2.0.1"
+tauri-plugin-single-instance = "2.2.0"
+tauri-plugin-updater = "2.3.0"
+

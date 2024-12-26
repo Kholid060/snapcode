@@ -1,0 +1,64 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "Capability for the main window",
+  "windows": [
+    "main"
+  ],
+  "permissions": [
+    "core:default",
+    "log:default",
+    "log:allow-log",
+    "store:default",
+    "core:window:allow-close",
+    "core:window:allow-center",
+    "core:window:allow-minimize",
+    "core:window:allow-maximize",
+    "core:window:allow-set-size",
+    "core:window:allow-set-focus",
+    "global-shortcut:allow-register",
+    "global-shortcut:allow-unregister",
+    "global-shortcut:allow-is-registered",
+    "core:window:allow-is-maximized",
+    "core:window:allow-start-dragging",
+    "core:window:allow-toggle-maximize",
+    "decorum:allow-show-snap-overlay",
+    "stronghold:default",
+    "stronghold:allow-remove-store-record",
+    "fs:default",
+    "autostart:default",
+    "updater:default",
+    "clipboard-manager:allow-write-text",
+    "dialog:allow-open",
+    {
+      "identifier": "opener:allow-open-url",
+      "allow": [
+        {
+          "url": "https://snippy-app.netlify.app"
+        },
+        {
+          "url": "https://github.com/kholid060/*"
+        },
+        {
+          "url": "https://docs.github.com/**/*"
+        },
+        {
+          "url": "https://gist.github.com/**/*"
+        }
+      ]
+    },
+    {
+      "identifier": "fs:allow-write-text-file",
+      "allow": [
+        "$DOCUMENT/Snippy/snippets/**"
+      ]
+    },
+    {
+      "identifier": "http:default",
+      "allow": [
+        "https://api.github.com/**/*",
+        "https://gist.githubusercontent.com/**/*"
+      ]
+    }
+  ]
+}

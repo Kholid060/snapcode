@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="winkey" version="1.1" viewBox="0 0 11 11" xmlns="http://www.w3.org/2000/svg">
+  <rect id="canvas" width="11" height="11" style="fill:none;stroke-width:0"/>
+  <path id="rbyll" d="m10.667 5.8507-1e-3 4.7993-5.5441-0.775-0.0077-4.0332z" style="fill:#202122;stroke-width:0"/>
+  <path id="rtgrn" d="m5.1213 1.1806 5.5437-0.80176v4.8208l-5.5437 0.044z" style="fill:#202122;stroke-width:0"/>
+  <path id="lbblu" d="m4.5124 5.8129v3.9999l-4.1758-0.5694-2.3e-4 -3.4573z" style="fill:#202122;stroke-width:0"/>
+  <path id="ltred" d="m0.33354 1.8186 4.1809-0.5643v3.9965l-4.179 0.024z" style="fill:#202122;stroke-width:0"/>
+</svg>
