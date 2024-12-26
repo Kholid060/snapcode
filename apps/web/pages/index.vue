@@ -14,7 +14,9 @@
         snippets and quickly access them.
       </p>
       <div class="mt-24">
-        <UiButton size="lg"> Download for Windows </UiButton>
+        <UiButton size="lg" @click="appDownloader.download()">
+          Download for Windows
+        </UiButton>
         <p class="text-muted-foreground mt-1 text-sm">Windows 10, 11</p>
       </div>
     </section>
@@ -137,4 +139,6 @@ const features: {
       'Sync your snippets across devices with cloud sync services such as Dropbox, Google Drive, etc.',
   },
 ];
+
+const appDownloader = useAppDownloader();
 </script>

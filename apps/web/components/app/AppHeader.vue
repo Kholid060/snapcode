@@ -27,7 +27,11 @@
         </a>
       </UiButton>
     </UiTooltipSimple>
-    <UiButton size="sm" class="hidden text-sm md:inline-flex">
+    <UiButton
+      size="sm"
+      class="hidden text-sm md:inline-flex"
+      @click="appDownloader.download()"
+    >
       <img
         src="~/assets/svg/windows-logo-2012-gray.svg"
         alt="windows"
@@ -38,4 +42,6 @@
     </UiButton>
   </header>
 </template>
-<script setup lang="ts"></script>
+<script setup lang="ts">
+const appDownloader = useAppDownloader();
+</script>
