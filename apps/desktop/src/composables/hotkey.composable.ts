@@ -139,6 +139,8 @@ export function useGlobalHotkey(
 
   watchEffect(async (onCleanUp) => {
     try {
+      if (!hotkeysStore.initiated) return;
+
       const shortcut = hotkeysStore.hotkeys[name];
       if (!shortcut) throw new Error(`"${name}" invalid global shortcut`);
 

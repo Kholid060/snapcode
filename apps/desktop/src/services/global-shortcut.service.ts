@@ -9,9 +9,13 @@ class GlobalShortcut {
 
   constructor() {}
 
+  isRegistered(shortcut: string) {
+    return this.handlers.has(shortcut);
+  }
+
   async register(shortcut: string, handler: ShortcutHandler) {
     if (await isRegistered(shortcut)) {
-      await unregister(shortcut);
+      await this.unregister(shortcut);
     }
 
     await register(shortcut, handler);

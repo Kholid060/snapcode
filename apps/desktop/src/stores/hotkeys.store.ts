@@ -18,13 +18,12 @@ const DEFAULT_HOTKEYS: HotkeysData = {
 };
 
 export const useHotkeysStore = defineStore('hotkeys', () => {
-  let initiated = false;
-
+  const initiated = shallowRef(false);
   const hotkeys = shallowReactive<HotkeysData>(DEFAULT_HOTKEYS);
 
   async function init() {
     try {
-      if (initiated) return;
+      if (initiated.value) return;
 
       const customHotkeys =
         await documentService.stores.settings.xGet('hotkeys');
@@ -36,7 +35,7 @@ export const useHotkeysStore = defineStore('hotkeys', () => {
         shortcut: hotkeys.quickAccessWindow,
       });
 
-      initiated = true;
+      initiated.value = true;
     } catch (error) {
       logger.error(getLogMessage('store:hotkeys-init', error));
     }
@@ -67,6 +66,7 @@ export const useHotkeysStore = defineStore('hotkeys', () => {
     hotkeys,
     isMatch,
     getLabel,
+    initiated,
     updateHotkey,
   };
 });
