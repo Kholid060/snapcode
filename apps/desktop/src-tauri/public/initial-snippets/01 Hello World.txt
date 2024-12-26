@@ -1,0 +1,6 @@
+Welcome to Snippy!
+
+If you found a bug or want to request a new feature.
+Feel free to open an issue in the Snippy GitHub repository:
+
+https://github.com/kholid060/snippy

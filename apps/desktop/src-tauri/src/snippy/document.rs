@@ -8,7 +8,7 @@ pub use document_items::*;
 use normalize_path::NormalizePath;
 use path_slash::PathExt;
 use serde_json::json;
-use tauri::{self, Manager};
+use tauri::{self, path::BaseDirectory, Manager};
 use tauri_plugin_store::StoreExt;
 use walkdir::WalkDir;
 
@@ -30,7 +30,7 @@ pub struct AppDocument {
     metadata_dir: PathBuf,
 }
 impl AppDocument {
-    fn new(base_dir: PathBuf) -> tauri::Result<AppDocument> {
+    fn new(base_dir: PathBuf, app: &tauri::App) -> tauri::Result<AppDocument> {
         let base_dir = base_dir.join("Snippy");
         ensure_dir(&base_dir)?;
 
@@ -38,7 +38,19 @@ impl AppDocument {
         ensure_dir(&metadata_dir)?;
 
         let snippets_dir = base_dir.join("snippets");
-        ensure_dir(&snippets_dir)?;
+        if !fs::exists(&snippets_dir)? {
+            let resource_path = app
+                .path()
+                .resolve("public/initial-snippets", BaseDirectory::Resource)?;
+            fs::create_dir(&snippets_dir)?;
+            for file in fs::read_dir(resource_path)? {
+                let file = file?;
+                fs::copy(
+                    file.path(),
+                    &snippets_dir.join(file.file_name().to_str().unwrap_or_default()),
+                )?;
+            }
+        }
 
         Ok(AppDocument {
             base_dir,
@@ -371,7 +383,7 @@ where
 }
 
 pub fn init_app_document(app: &tauri::App) -> tauri::Result<()> {
-    let app_document = AppDocument::new(app.path().document_dir()?)?;
+    let app_document = AppDocument::new(app.path().document_dir()?, app)?;
     app.manage(Mutex::new(app_document));
 
     Ok(())

@@ -1,0 +1,7 @@
+Placeholders allow you to define dynamic content within your text snippets.
+To use a placeholder, enclose the text within double square brackets, like so: [[placeholder_text]].
+
+When pasting a snippet using the Quick Access Window, you need to input the value for the placeholders first.
+And the placeholder will be replaced with the provided value.
+For example, if your snippet contains "Hello, [[name]]!", and you  inputs "World" for the placeholder, 
+the resulting text will be "Hello, World!".
