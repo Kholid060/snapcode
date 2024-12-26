@@ -11,6 +11,7 @@ export * from './components/ui/dialog';
 export * from './components/ui/tooltip';
 export * from './components/ui/command';
 export * from './components/ui/popover';
+export * from './components/ui/carousel';
 export * from './components/ui/skeleton';
 export * from './components/ui/textarea';
 export * from './components/ui/checkbox';

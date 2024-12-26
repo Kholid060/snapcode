@@ -9,8 +9,16 @@ export default defineNuxtConfig({
     'shadcn-nuxt',
     '@nuxtjs/color-mode',
   ],
+  app: {
+    head: {
+      bodyAttrs: {
+        class: 'dark',
+      },
+      title: 'Snippy ー Snippets Manager',
+    },
+  },
   shadcn: {
     prefix: 'Ui',
     componentDir: '../../packages/ui/src/components/ui',
   },
-})
+});
