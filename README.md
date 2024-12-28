@@ -1,4 +1,4 @@
-<img src="./packages/shared/assets/images/logo-no-bg.png" width="64" />
+<img src="./packages/shared/assets/images/logo.png" width="64" />
 
 # Snippy
 
