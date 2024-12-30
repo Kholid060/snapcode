@@ -1,5 +1,5 @@
 [package]
-name = "desktop"
+name = "snippy"
 version = "0.1.0"
 description = "Snippet management tool"
 authors = ["Ahmad Kholid"]

@@ -98,6 +98,7 @@ impl MainWindow {
         .title("Snippy")
         .min_inner_size(800.0, 600.0)
         .disable_drag_drop_handler()
+        .visible(false)
         .on_navigation(|url| {
             url.host_str().unwrap_or_default().starts_with("tauri")
                 || (cfg!(dev) && url.host_str() == Some("localhost"))
@@ -117,9 +118,24 @@ impl MainWindow {
 
                 window
             }
-            None => MainWindow::create(app)?,
+            None => {
+                let window = MainWindow::create(app)?;
+                let _ = window.show();
+                
+                window
+            },
         };
 
         Ok(popup_window)
     }
+}
+
+pub fn init_app_window(app: &tauri::App) -> tauri::Result<()> {
+    if !std::env::args().any(|arg| &arg == "--autostart") {
+        MainWindow::create_or_show(app.app_handle())?;
+    } else {
+        MainWindow::create(app.app_handle())?;
+    }
+
+    Ok(())
 }
