@@ -72,7 +72,11 @@
 import { getSnippetLangFromName } from '@/utils/snippet-utils';
 import type { CMEditorView } from '@snippy/codemirror';
 import { Compartment } from '@codemirror/state';
-import { loadCodemirrorMinimal, placeholder } from '@snippy/codemirror';
+import {
+  loadCodemirrorMinimal,
+  placeholder,
+  snippetPlaceholder,
+} from '@snippy/codemirror';
 import { debounce } from '@snippy/shared';
 import {
   Button,
@@ -198,6 +202,8 @@ useHotkey(['mod+enter', 'alt+enter'], () => {
 });
 
 onActivated(() => {
+  unrefElement(nameInput)?.focus();
+
   if (Date.now() - lastFetch < MAX_CACHE_TTL_MS) return;
   fetchData();
 });
@@ -207,7 +213,11 @@ onMounted(() => {
   fetchData();
   editorView.value = loadCodemirrorMinimal({
     parent: editorContainer.value!,
-    extensions: [placeholder('Text here...'), languageComp.of([])],
+    extensions: [
+      placeholder('Text here...'),
+      snippetPlaceholder(),
+      languageComp.of([]),
+    ],
   });
 });
 onBeforeUnmount(() => {

@@ -65,7 +65,8 @@ window.addEventListener('keydown', (event) => {
 
   if (
     event.target instanceof HTMLElement &&
-    excludeRole.includes(event.target.role ?? '')
+    (excludeRole.includes(event.target.role ?? '') ||
+      event.target.classList.contains('cm-content'))
   )
     return;
 
