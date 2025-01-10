@@ -47,6 +47,6 @@
   "devDependencies": {
     "@lezer/generator": "^1.7.1",
     "@snippy/eslint-config": "workspace:*",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.3"
   }
 }
